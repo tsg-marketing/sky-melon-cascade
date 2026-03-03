@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Icon from "@/components/ui/icon";
+import ThankYouModal from "@/components/ThankYouModal";
+import { useLeadForm } from "@/hooks/useLeadForm";
 
 const CATALOG_URL = "https://functions.poehali.dev/7093349e-12b4-4025-a465-82ce3b87b0b2";
 
@@ -22,16 +24,9 @@ const inputCls = "w-full px-4 py-3 bg-background border border-border rounded-xl
 const btnPrimary = "px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20";
 const btnOutline = "px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all";
 
-const CompareForm = () => {
+const CompareForm = ({ onSent }: { onSent: (name: string, phone: string) => void }) => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [sent, setSent] = useState(false);
-  if (sent) return (
-    <div className="text-center py-8">
-      <Icon name="CheckCircle" size={48} className="text-primary mx-auto mb-3" />
-      <p className="font-bold text-xl text-foreground">Спасибо! Перезвоним в течение 2 часов</p>
-    </div>
-  );
   return (
     <div className="p-8 bg-white border-2 border-primary/20 rounded-3xl shadow-sm">
       <h3 className="font-display font-bold text-2xl mb-1 text-foreground text-center">Хотите подобрать оборудование?</h3>
@@ -40,8 +35,9 @@ const CompareForm = () => {
         <input type="text" placeholder="Ваше имя" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
         <input type="tel" placeholder="Телефон" value={phone} onChange={e => setPhone(e.target.value)} className={inputCls} />
         <button
-          onClick={() => { if (name && phone) setSent(true); }}
-          className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-sm"
+          onClick={() => { if (name && phone) onSent(name, phone); }}
+          disabled={!name.trim() || !phone.trim()}
+          className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
         >
           Отправить
         </button>
@@ -65,12 +61,11 @@ const QUIZ_QUESTIONS = [
   { q: "Нужна программируемость (PLC)?", options: ["Да, несколько программ", "Нет, простое управление", "Нужна консультация"] },
 ];
 
-const QuizBlock = () => {
+const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswers: Record<string, string>) => void }) => {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [sent, setSent] = useState(false);
 
   const isLast = step === QUIZ_QUESTIONS.length;
 
@@ -80,13 +75,12 @@ const QuizBlock = () => {
     setStep(step + 1);
   };
 
-  if (sent) return (
-    <div className="text-center py-16">
-      <Icon name="CheckCircle" size={56} className="text-primary mx-auto mb-4" />
-      <p className="font-bold text-3xl text-foreground mb-2">Спасибо!</p>
-      <p className="text-lg text-muted-foreground">Технолог свяжется в течение 2 часов и подберёт оборудование под вашу задачу</p>
-    </div>
-  );
+  const handleSubmit = () => {
+    if (!name.trim() || !phone.trim()) return;
+    const quizAnswers: Record<string, string> = {};
+    QUIZ_QUESTIONS.forEach((q, i) => { quizAnswers[q.q] = answers[i] || ""; });
+    onSent(name, phone, quizAnswers);
+  };
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -124,8 +118,9 @@ const QuizBlock = () => {
             <input type="text" placeholder="Ваше имя" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
             <input type="tel" placeholder="Телефон" value={phone} onChange={e => setPhone(e.target.value)} className={inputCls} />
             <button
-              onClick={() => { if (name && phone) setSent(true); }}
-              className="w-full py-4 bg-primary text-white rounded-xl font-bold text-xl hover:bg-primary/90 transition-all shadow-sm"
+              onClick={handleSubmit}
+              disabled={!name.trim() || !phone.trim()}
+              className="w-full py-4 bg-primary text-white rounded-xl font-bold text-xl hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
             >
               Отправить
             </button>
@@ -152,10 +147,16 @@ const CONSENT_TEXT = (
 );
 
 const Index = () => {
+  const { sendLead, thankYouOpen, setThankYouOpen } = useLeadForm();
   const [visibleSections, setVisibleSections] = useState<Record<string, boolean>>({});
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalProduct, setModalProduct] = useState("");
+  const [modalName, setModalName] = useState("");
+  const [modalPhone, setModalPhone] = useState("");
+  const [contactsName, setContactsName] = useState("");
+  const [contactsPhone, setContactsPhone] = useState("");
+  const [contactsComment, setContactsComment] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [catalogExpanded, setCatalogExpanded] = useState(false);
 
@@ -170,7 +171,6 @@ const Index = () => {
   const [inquiryItem, setInquiryItem] = useState<CatalogItem | null>(null);
   const [inquiryName, setInquiryName] = useState("");
   const [inquiryPhone, setInquiryPhone] = useState("");
-  const [inquirySent, setInquirySent] = useState(false);
 
   useEffect(() => {
     const ids = [
@@ -897,9 +897,7 @@ const Index = () => {
             >
               <Icon name="X" size={16} />
             </button>
-            {!inquirySent ? (
-              <>
-                <h3 className="text-2xl font-display font-black text-foreground mb-1">Узнать подробней</h3>
+            <h3 className="text-2xl font-display font-black text-foreground mb-1">Узнать подробней</h3>
                 <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                   <span className="font-medium text-foreground">{inquiryItem.name}</span>
                 </p>
@@ -919,7 +917,12 @@ const Index = () => {
                     className={inputCls}
                   />
                   <button
-                    onClick={() => setInquirySent(true)}
+                    onClick={() => {
+                      if (inquiryName.trim() && inquiryPhone.trim()) {
+                        sendLead({ name: inquiryName, phone: inquiryPhone, product: inquiryItem?.name, formType: 'inquiry' });
+                        setInquiryItem(null); setInquiryName(""); setInquiryPhone("");
+                      }
+                    }}
                     disabled={!inquiryName.trim() || !inquiryPhone.trim()}
                     className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-md disabled:opacity-40"
                   >
@@ -927,16 +930,6 @@ const Index = () => {
                   </button>
                   {CONSENT_TEXT}
                 </div>
-              </>
-            ) : (
-              <div className="text-center py-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Icon name="Check" size={32} className="text-green-600" />
-                </div>
-                <h3 className="text-2xl font-display font-black text-foreground mb-2">Заявка отправлена!</h3>
-                <p className="text-muted-foreground">Свяжемся с вами в течение рабочего дня</p>
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -1033,7 +1026,7 @@ const Index = () => {
           </div>
 
           <div className="max-w-md mx-auto mt-14">
-            <CompareForm />
+            <CompareForm onSent={(name, phone) => sendLead({ name, phone, formType: 'compare' })} />
           </div>
         </div>
       </section>
@@ -1069,7 +1062,7 @@ const Index = () => {
             </h2>
             <p className="text-lg text-muted-foreground mt-4">Технолог подберёт оборудование и пришлёт КП в течение 2 часов</p>
           </div>
-          <QuizBlock />
+          <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, formType: 'quiz' })} />
         </div>
       </section>
 
@@ -1317,10 +1310,19 @@ const Index = () => {
                 <h3 className="font-display font-bold text-2xl mb-2 text-foreground">Отправить вопрос</h3>
                 <p className="text-muted-foreground mb-6 text-sm">Технолог ответит в течение 2 часов</p>
                 <div className="space-y-4">
-                  <input type="text" placeholder="Имя *" required className={inputCls} />
-                  <input type="tel"  placeholder="Телефон *" required className={inputCls} />
-                  <textarea placeholder="Комментарий (продукт, объём, задача)" rows={4} className={inputCls + " resize-none"} />
-                  <button className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm">
+                  <input type="text" placeholder="Имя *" required value={contactsName} onChange={e => setContactsName(e.target.value)} className={inputCls} />
+                  <input type="tel"  placeholder="Телефон *" required value={contactsPhone} onChange={e => setContactsPhone(e.target.value)} className={inputCls} />
+                  <textarea placeholder="Комментарий (продукт, объём, задача)" rows={4} value={contactsComment} onChange={e => setContactsComment(e.target.value)} className={inputCls + " resize-none"} />
+                  <button
+                    onClick={() => {
+                      if (contactsName.trim() && contactsPhone.trim()) {
+                        sendLead({ name: contactsName, phone: contactsPhone, comment: contactsComment, formType: 'contacts' });
+                        setContactsName(""); setContactsPhone(""); setContactsComment("");
+                      }
+                    }}
+                    disabled={!contactsName.trim() || !contactsPhone.trim()}
+                    className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
+                  >
                     Отправить
                   </button>
                   {CONSENT_TEXT}
@@ -1349,9 +1351,18 @@ const Index = () => {
               </button>
             </div>
             <div className="space-y-4">
-              <input type="text" placeholder="Имя *" required className={inputCls} />
-              <input type="tel"  placeholder="Телефон *" required className={inputCls} />
-              <button className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm">
+              <input type="text" placeholder="Имя *" required value={modalName} onChange={e => setModalName(e.target.value)} className={inputCls} />
+              <input type="tel"  placeholder="Телефон *" required value={modalPhone} onChange={e => setModalPhone(e.target.value)} className={inputCls} />
+              <button
+                onClick={() => {
+                  if (modalName.trim() && modalPhone.trim()) {
+                    sendLead({ name: modalName, phone: modalPhone, product: modalProduct, formType: 'modal' });
+                    setModalOpen(false); setModalName(""); setModalPhone("");
+                  }
+                }}
+                disabled={!modalName.trim() || !modalPhone.trim()}
+                className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
+              >
                 Отправить
               </button>
               {CONSENT_TEXT}
@@ -1422,6 +1433,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
     </div>
   );
 };
