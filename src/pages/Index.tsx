@@ -251,23 +251,23 @@ const Index = () => {
           </nav>
           <div className="flex items-center gap-3">
             <div className="hidden md:flex flex-col items-end gap-0.5">
-              <a
-                href="#cta"
+              <button
+                onClick={() => { setModalProduct(""); setModalOpen(true); }}
                 className="px-5 py-2 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm"
               >
                 Рассчитать решение
-              </a>
+              </button>
               <a href="tel:88005059124" className="flex items-center gap-1.5 text-base font-bold text-foreground hover:text-primary transition-colors">
                 <Icon name="Phone" size={15} className="text-primary" />
                 8 800 505-91-24
               </a>
             </div>
-            <a
-              href="#cta"
+            <button
+              onClick={() => { setModalProduct(""); setModalOpen(true); }}
               className="md:hidden hidden sm:block px-5 py-2.5 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm"
             >
               Рассчитать решение
-            </a>
+            </button>
             <button className="lg:hidden p-2 text-muted-foreground" onClick={() => setMenuOpen(!menuOpen)}>
               <Icon name={menuOpen ? "X" : "Menu"} size={22} />
             </button>
