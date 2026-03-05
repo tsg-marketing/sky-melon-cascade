@@ -312,7 +312,7 @@ const Index = () => {
                   { icon: "TrendingDown",  text: "Меньше непросола и рекламаций" },
                   { icon: "Wind",          text: "Вакуум — быстрее процесс, меньше окисления" },
                   { icon: "ArrowUpCircle", text: "Увеличиваем выход готового продукта + 30–70%" },
-                  { icon: "Shield",        text: "SUS304, санитарный конструктив, быстрая мойка" },
+                  { icon: "Shield",        text: "Пищевая нержавеющая сталь, санитарный конструктив, быстрая мойка" },
                 ].map((b, i) => (
                   <li key={i} className="flex items-center gap-3 text-base font-medium text-foreground">
                     <div className="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-lg flex-shrink-0">
@@ -344,7 +344,7 @@ const Index = () => {
                   {
                     icon: "Cpu",
                     label: "Комплектующие мировых брендов",
-                    sub: "NORD, Mitsubishi, Schneider, SIEMENS и OMRON — лучшие компоненты для надёжной работы",
+                    sub: "Лучшие компоненты для надёжной работы",
                   },
                   {
                     icon: "Zap",
@@ -366,7 +366,7 @@ const Index = () => {
 
               <div className="rounded-2xl overflow-hidden border border-border shadow-xl bg-white">
                 <img
-                  src="https://cdn.poehali.dev/files/e7ddde3a-0e1a-47f1-916d-405e3e61e337.jpg"
+                  src="https://cdn.poehali.dev/files/a80d03fc-2480-4c9b-a141-456c301f7d59.jpg"
                   alt="Вакуумный массажер Daribo"
                   className="w-full h-auto object-contain"
                 />
@@ -478,7 +478,7 @@ const Index = () => {
                 icon: "RefreshCw",
                 title: "Вакуумные массажеры",
                 desc: "Бережное вакуумное массирование — рассол проникает глубже, текстура лучше, цикл короче. Регулируемые режимы: время, вакуум, скорость.",
-                specs: ["до −0.1 МПа вакуум", "100–3000 л объём", "SUS304"],
+                specs: ["до −0.1 МПа вакуум", "100–3000 л объём", "Пищевая нержавеющая сталь"],
                 highlight: false,
               },
               {
