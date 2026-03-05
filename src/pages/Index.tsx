@@ -21,22 +21,44 @@ interface CatalogItem {
 }
 
 const inputCls = "w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary transition-colors";
+const inputError = "w-full px-4 py-3 bg-background border border-red-400 rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-red-500 transition-colors";
+
+function isValidPhone(v: string): boolean {
+  const digits = v.replace(/\D/g, "");
+  if (digits.length < 10 || digits.length > 12) return false;
+  // Россия: 7/8 + 10 цифр
+  if (/^[78]\d{10}$/.test(digits)) return true;
+  // Казахстан: 77/76 + 9 цифр (начинается с 7)
+  if (/^7[67]\d{9}$/.test(digits)) return true;
+  // Беларусь: 375 + 9 цифр
+  if (/^375\d{9}$/.test(digits)) return true;
+  return false;
+}
+
+function formatPhone(v: string): string {
+  return v.replace(/[^\d+\s\-()]/g, "");
+}
 const btnPrimary = "px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20";
 const btnOutline = "px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all";
 
 const CompareForm = ({ onSent }: { onSent: (name: string, phone: string) => void }) => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const phoneValid = isValidPhone(phone);
   return (
     <div className="p-8 bg-white border-2 border-primary/20 rounded-3xl shadow-sm">
       <h3 className="font-display font-bold text-2xl mb-1 text-foreground text-center">Хотите подобрать оборудование?</h3>
       <p className="text-muted-foreground text-base mb-6 text-center">Оставьте контакты — технолог свяжется в течение 2 часов</p>
       <div className="space-y-4">
         <input type="text" placeholder="Ваше имя" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
-        <input type="tel" placeholder="Телефон" value={phone} onChange={e => setPhone(e.target.value)} className={inputCls} />
+        <div>
+          <input type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={e => setPhone(formatPhone(e.target.value))} onBlur={() => setPhoneTouched(true)} className={phoneTouched && !phoneValid ? inputError : inputCls} />
+          {phoneTouched && !phoneValid && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
+        </div>
         <button
-          onClick={() => { if (name && phone) onSent(name, phone); }}
-          disabled={!name.trim() || !phone.trim()}
+          onClick={() => { if (name && phoneValid) onSent(name, phone); }}
+          disabled={!name.trim() || !phoneValid}
           className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
         >
           Отправить
@@ -66,8 +88,10 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswe
   const [answers, setAnswers] = useState<string[]>([]);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneTouched, setPhoneTouched] = useState(false);
 
   const isLast = step === QUIZ_QUESTIONS.length;
+  const phoneValid = isValidPhone(phone);
 
   const choose = (opt: string) => {
     const next = [...answers, opt];
@@ -76,7 +100,7 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswe
   };
 
   const handleSubmit = () => {
-    if (!name.trim() || !phone.trim()) return;
+    if (!name.trim() || !phoneValid) return;
     const quizAnswers: Record<string, string> = {};
     QUIZ_QUESTIONS.forEach((q, i) => { quizAnswers[q.q] = answers[i] || ""; });
     onSent(name, phone, quizAnswers);
@@ -116,10 +140,13 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswe
           <p className="text-muted-foreground text-base mb-8 text-center">Оставьте контакты — технолог подберёт оборудование и пришлёт КП</p>
           <div className="space-y-4">
             <input type="text" placeholder="Ваше имя" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
-            <input type="tel" placeholder="Телефон" value={phone} onChange={e => setPhone(e.target.value)} className={inputCls} />
+            <div>
+              <input type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={e => setPhone(formatPhone(e.target.value))} onBlur={() => setPhoneTouched(true)} className={phoneTouched && !phoneValid ? inputError : inputCls} />
+              {phoneTouched && !phoneValid && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
+            </div>
             <button
               onClick={handleSubmit}
-              disabled={!name.trim() || !phone.trim()}
+              disabled={!name.trim() || !phoneValid}
               className="w-full py-4 bg-primary text-white rounded-xl font-bold text-xl hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
             >
               Отправить
@@ -171,6 +198,9 @@ const Index = () => {
   const [inquiryItem, setInquiryItem] = useState<CatalogItem | null>(null);
   const [inquiryName, setInquiryName] = useState("");
   const [inquiryPhone, setInquiryPhone] = useState("");
+  const [inquiryPhoneTouched, setInquiryPhoneTouched] = useState(false);
+  const [contactsPhoneTouched, setContactsPhoneTouched] = useState(false);
+  const [modalPhoneTouched, setModalPhoneTouched] = useState(false);
 
   useEffect(() => {
     const ids = [
@@ -921,21 +951,25 @@ const Index = () => {
                     onChange={(e) => setInquiryName(e.target.value)}
                     className={inputCls}
                   />
-                  <input
-                    type="tel"
-                    placeholder="Телефон"
-                    value={inquiryPhone}
-                    onChange={(e) => setInquiryPhone(e.target.value)}
-                    className={inputCls}
-                  />
+                  <div>
+                    <input
+                      type="tel"
+                      placeholder="+7 (___) ___-__-__"
+                      value={inquiryPhone}
+                      onChange={(e) => setInquiryPhone(formatPhone(e.target.value))}
+                      onBlur={() => setInquiryPhoneTouched(true)}
+                      className={inquiryPhoneTouched && !isValidPhone(inquiryPhone) ? inputError : inputCls}
+                    />
+                    {inquiryPhoneTouched && !isValidPhone(inquiryPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
+                  </div>
                   <button
                     onClick={() => {
-                      if (inquiryName.trim() && inquiryPhone.trim()) {
+                      if (inquiryName.trim() && isValidPhone(inquiryPhone)) {
                         sendLead({ name: inquiryName, phone: inquiryPhone, product: inquiryItem?.name, formType: 'inquiry' });
-                        setInquiryItem(null); setInquiryName(""); setInquiryPhone("");
+                        setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false);
                       }
                     }}
-                    disabled={!inquiryName.trim() || !inquiryPhone.trim()}
+                    disabled={!inquiryName.trim() || !isValidPhone(inquiryPhone)}
                     className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-md disabled:opacity-40"
                   >
                     Отправить
@@ -1323,16 +1357,19 @@ const Index = () => {
                 <p className="text-muted-foreground mb-6 text-sm">Технолог ответит в течение 2 часов</p>
                 <div className="space-y-4">
                   <input type="text" placeholder="Имя *" required value={contactsName} onChange={e => setContactsName(e.target.value)} className={inputCls} />
-                  <input type="tel"  placeholder="Телефон *" required value={contactsPhone} onChange={e => setContactsPhone(e.target.value)} className={inputCls} />
+                  <div>
+                    <input type="tel" placeholder="+7 (___) ___-__-__" required value={contactsPhone} onChange={e => setContactsPhone(formatPhone(e.target.value))} onBlur={() => setContactsPhoneTouched(true)} className={contactsPhoneTouched && !isValidPhone(contactsPhone) ? inputError : inputCls} />
+                    {contactsPhoneTouched && !isValidPhone(contactsPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
+                  </div>
                   <textarea placeholder="Комментарий (продукт, объём, задача)" rows={4} value={contactsComment} onChange={e => setContactsComment(e.target.value)} className={inputCls + " resize-none"} />
                   <button
                     onClick={() => {
-                      if (contactsName.trim() && contactsPhone.trim()) {
+                      if (contactsName.trim() && isValidPhone(contactsPhone)) {
                         sendLead({ name: contactsName, phone: contactsPhone, comment: contactsComment, formType: 'contacts' });
-                        setContactsName(""); setContactsPhone(""); setContactsComment("");
+                        setContactsName(""); setContactsPhone(""); setContactsComment(""); setContactsPhoneTouched(false);
                       }
                     }}
-                    disabled={!contactsName.trim() || !contactsPhone.trim()}
+                    disabled={!contactsName.trim() || !isValidPhone(contactsPhone)}
                     className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
                   >
                     Отправить
@@ -1364,15 +1401,18 @@ const Index = () => {
             </div>
             <div className="space-y-4">
               <input type="text" placeholder="Имя *" required value={modalName} onChange={e => setModalName(e.target.value)} className={inputCls} />
-              <input type="tel"  placeholder="Телефон *" required value={modalPhone} onChange={e => setModalPhone(e.target.value)} className={inputCls} />
+              <div>
+                <input type="tel" placeholder="+7 (___) ___-__-__" required value={modalPhone} onChange={e => setModalPhone(formatPhone(e.target.value))} onBlur={() => setModalPhoneTouched(true)} className={modalPhoneTouched && !isValidPhone(modalPhone) ? inputError : inputCls} />
+                {modalPhoneTouched && !isValidPhone(modalPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
+              </div>
               <button
                 onClick={() => {
-                  if (modalName.trim() && modalPhone.trim()) {
+                  if (modalName.trim() && isValidPhone(modalPhone)) {
                     sendLead({ name: modalName, phone: modalPhone, product: modalProduct, formType: 'modal' });
-                    setModalOpen(false); setModalName(""); setModalPhone("");
+                    setModalOpen(false); setModalName(""); setModalPhone(""); setModalPhoneTouched(false);
                   }
                 }}
-                disabled={!modalName.trim() || !modalPhone.trim()}
+                disabled={!modalName.trim() || !isValidPhone(modalPhone)}
                 className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
               >
                 Отправить
