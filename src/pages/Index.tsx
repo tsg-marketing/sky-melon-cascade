@@ -240,7 +240,7 @@ const Index = () => {
               alt="Техносиб"
               className="h-9 w-auto object-contain"
             />
-            <p className="text-xs text-muted-foreground hidden sm:block mt-0.5">Оборудование для маринования и посола мяса</p>
+            <p className="text-sm text-muted-foreground hidden sm:block mt-0.5">Оборудование для маринования и посола мяса</p>
           </div>
           <nav className="hidden lg:flex gap-7 text-base font-semibold">
             {navLinks.map((l) => (
@@ -250,13 +250,21 @@ const Index = () => {
             ))}
           </nav>
           <div className="flex items-center gap-3">
-            <a href="tel:88005059124" className="hidden md:flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-primary transition-colors">
-              <Icon name="Phone" size={15} className="text-primary" />
-              8 800 505-91-24
-            </a>
+            <div className="hidden md:flex flex-col items-end gap-0.5">
+              <a
+                href="#cta"
+                className="px-5 py-2 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm"
+              >
+                Рассчитать решение
+              </a>
+              <a href="tel:88005059124" className="flex items-center gap-1.5 text-base font-bold text-foreground hover:text-primary transition-colors">
+                <Icon name="Phone" size={15} className="text-primary" />
+                8 800 505-91-24
+              </a>
+            </div>
             <a
               href="#cta"
-              className="hidden sm:block px-5 py-2.5 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm"
+              className="md:hidden hidden sm:block px-5 py-2.5 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm"
             >
               Рассчитать решение
             </a>
@@ -293,7 +301,7 @@ const Index = () => {
                 с вакуумными массажерами
               </h1>
               <p className="text-2xl font-semibold text-foreground leading-relaxed mb-3 max-w-xl">
-                Оборудование от ведущих производителей мясного оборудования Daribo, Niro-Tech, INWESTPOL
+                Оборудование от ведущих производителей мясного оборудования Daribo (Дарибо), Niro-Tech (Ниро-Тех), INWESTPOL (Инвестпол)
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
                 Ускоряем цикл, выравниваем качество партии, снижаем риск брака. Подбираем оборудование и настройки под ветчину, копчёности, деликатесы, фабрики-кухни.
@@ -1124,16 +1132,16 @@ const Index = () => {
             <div className={`transition-all duration-1000 ${vis("about") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               <span className="text-xs font-semibold tracking-widest text-primary uppercase">О компании</span>
               <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 mb-6 text-foreground whitespace-nowrap">
-                О компании Daribo
+                О компании Daribo (Дарибо)
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed mb-5">
-                Мы предлагаем оборудование компании <strong className="text-foreground">Daribo</strong>. «Shanghai DARIBO Food Machinery Co., Ltd» — крупный производитель оборудования для пищевой промышленности, базирующийся в Шанхае.
+                Мы предлагаем оборудование компании <strong className="text-foreground">Daribo (Дарибо)</strong>. «Shanghai DARIBO Food Machinery Co., Ltd» — крупный производитель оборудования для пищевой промышленности, базирующийся в Шанхае.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-5">
-                Специализация Daribo включает вакуумные массажеры (серия GRY, например DRB-GRY750L), автоматические инъекторы рассола, слайсеры, порционирующие машины, волчки для замороженного мяса, блокорезки, вакуумные фаршемесы, котлетные машины и полные производственные линии под ключ. Поставляет продукцию в США, Мексику, Францию, Индонезию, Таиланд, Филиппины и другие страны.
+                Специализация Daribo (Дарибо) включает вакуумные массажеры (серия GRY, например DRB-GRY750L), автоматические инъекторы рассола, слайсеры, порционирующие машины, волчки для замороженного мяса, блокорезки, вакуумные фаршемесы, котлетные машины и полные производственные линии под ключ. Поставляет продукцию в США, Мексику, Францию, Индонезию, Таиланд, Филиппины и другие страны.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                Специализация Daribo включает <strong className="text-foreground">вакуумные массажеры</strong> (серия GRY, например DRB-GRY750L), <strong className="text-foreground">инъекторы рассола</strong>, мясорезки, котлетные машины и полные производственные линии под ключ.
+                Специализация Daribo (Дарибо) включает <strong className="text-foreground">вакуумные массажеры</strong> (серия GRY, например DRB-GRY750L), <strong className="text-foreground">инъекторы рассола</strong>, мясорезки, котлетные машины и полные производственные линии под ключ.
               </p>
               <div className="grid grid-cols-2 gap-3">
                 {[
@@ -1290,10 +1298,10 @@ const Index = () => {
                   <p className="text-center text-sm font-medium text-muted-foreground mb-6">Оборудование в чистом пищевом цехе</p>
                   <div className="space-y-4">
                     {[
-                      { icon: "Phone",  label: "Телефон",  value: "+7 (000) 000-00-00" },
-                      { icon: "Mail",   label: "Почта",    value: "info@t-sib.ru" },
+                      { icon: "Phone",  label: "Телефон",  value: "8 800 505-91-24", href: "tel:88005059124" },
+                      { icon: "Mail",   label: "Почта",    value: "massagers@t-sib.ru", href: "mailto:massagers@t-sib.ru" },
                     ].map((c, i) => (
-                      <div key={i} className="flex items-center gap-4 p-4 bg-white border border-primary/10 rounded-xl">
+                      <a key={i} href={c.href} className="flex items-center gap-4 p-4 bg-white border border-primary/10 rounded-xl hover:border-primary/30 transition-colors">
                         <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                           <Icon name={c.icon} fallback="Star" size={18} className="text-primary" />
                         </div>
@@ -1301,7 +1309,7 @@ const Index = () => {
                           <p className="text-xs text-muted-foreground">{c.label}</p>
                           <p className="font-bold text-base text-foreground">{c.value}</p>
                         </div>
-                      </div>
+                      </a>
                     ))}
                   </div>
                 </div>
@@ -1412,7 +1420,7 @@ const Index = () => {
               <div className="space-y-2">
                 {["#benefits", "#compare", "#service", "#about", "#faq"].map((href, i) => (
                   <a key={i} href={href} className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                    {["Преимущества", "Почему работает лучше", "От подбора до запуска", "О компании Daribo", "FAQ"][i]}
+                    {["Преимущества", "Почему работает лучше", "От подбора до запуска", "О компании Daribo (Дарибо)", "FAQ"][i]}
                   </a>
                 ))}
               </div>
