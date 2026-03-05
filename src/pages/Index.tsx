@@ -242,14 +242,18 @@ const Index = () => {
             />
             <p className="text-xs text-muted-foreground hidden sm:block mt-0.5">Оборудование для маринования и посола мяса</p>
           </div>
-          <nav className="hidden lg:flex gap-7 text-sm font-medium">
+          <nav className="hidden lg:flex gap-7 text-base font-semibold">
             {navLinks.map((l) => (
-              <a key={l.href} href={l.href} className="text-muted-foreground hover:text-primary transition-colors">
+              <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors">
                 {l.label}
               </a>
             ))}
           </nav>
           <div className="flex items-center gap-3">
+            <a href="tel:88005059124" className="hidden md:flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-primary transition-colors">
+              <Icon name="Phone" size={15} className="text-primary" />
+              8 800 505-91-24
+            </a>
             <a
               href="#cta"
               className="hidden sm:block px-5 py-2.5 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm"
@@ -1383,13 +1387,13 @@ const Index = () => {
               />
               <p className="text-xs text-muted-foreground mb-4">Оборудование для маринования и посола мяса</p>
               <div className="space-y-2">
-                <a href="tel:+70000000000" className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors">
+                <a href="tel:88005059124" className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors">
                   <Icon name="Phone" size={14} className="text-primary" />
-                  +7 (000) 000-00-00
+                  8 800 505-91-24
                 </a>
-                <a href="mailto:info@t-sib.ru" className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors">
+                <a href="mailto:massagers@t-sib.ru" className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors">
                   <Icon name="Mail" size={14} className="text-primary" />
-                  info@t-sib.ru
+                  massagers@t-sib.ru
                 </a>
               </div>
             </div>
