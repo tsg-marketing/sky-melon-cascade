@@ -25,18 +25,32 @@ const inputError = "w-full px-4 py-3 bg-background border border-red-400 rounded
 
 function isValidPhone(v: string): boolean {
   const digits = v.replace(/\D/g, "");
-  if (digits.length < 10 || digits.length > 12) return false;
-  // Россия: 7/8 + 10 цифр
   if (/^[78]\d{10}$/.test(digits)) return true;
-  // Казахстан: 77/76 + 9 цифр (начинается с 7)
-  if (/^7[67]\d{9}$/.test(digits)) return true;
-  // Беларусь: 375 + 9 цифр
   if (/^375\d{9}$/.test(digits)) return true;
   return false;
 }
 
-function formatPhone(v: string): string {
-  return v.replace(/[^\d+\s\-()]/g, "");
+function formatPhone(prev: string, next: string): string {
+  // Разрешаем только цифры и ведущий +
+  let raw = next.replace(/[^\d+]/g, "");
+
+  // Если начинается с 8 — заменяем на 7
+  if (raw.startsWith("8")) raw = "7" + raw.slice(1);
+  // Если начинается с 9 или 3 — добавляем 7 или 375 префикс
+  if (/^[9]/.test(raw)) raw = "7" + raw;
+
+  // Убираем лишние + внутри строки (оставляем только в начале)
+  raw = raw.replace(/\+/g, "");
+
+  // Беларусь: 375...
+  const isBy = raw.startsWith("375");
+  // Максимум цифр: Россия/Казахстан = 11, Беларусь = 12
+  const maxDigits = isBy ? 12 : 11;
+  raw = raw.slice(0, maxDigits);
+
+  // Форматируем с ведущим +
+  if (!raw) return "";
+  return "+" + raw;
 }
 const btnPrimary = "px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20";
 const btnOutline = "px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all";
@@ -53,7 +67,7 @@ const CompareForm = ({ onSent }: { onSent: (name: string, phone: string) => void
       <div className="space-y-4">
         <input type="text" placeholder="Ваше имя" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
         <div>
-          <input type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={e => setPhone(formatPhone(e.target.value))} onBlur={() => setPhoneTouched(true)} className={phoneTouched && !phoneValid ? inputError : inputCls} />
+          <input type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={e => setPhone(formatPhone(phone, e.target.value))} onBlur={() => setPhoneTouched(true)} className={phoneTouched && !phoneValid ? inputError : inputCls} />
           {phoneTouched && !phoneValid && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
         </div>
         <button
@@ -141,7 +155,7 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswe
           <div className="space-y-4">
             <input type="text" placeholder="Ваше имя" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
             <div>
-              <input type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={e => setPhone(formatPhone(e.target.value))} onBlur={() => setPhoneTouched(true)} className={phoneTouched && !phoneValid ? inputError : inputCls} />
+              <input type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={e => setPhone(formatPhone(phone, e.target.value))} onBlur={() => setPhoneTouched(true)} className={phoneTouched && !phoneValid ? inputError : inputCls} />
               {phoneTouched && !phoneValid && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
             </div>
             <button
@@ -956,7 +970,7 @@ const Index = () => {
                       type="tel"
                       placeholder="+7 (___) ___-__-__"
                       value={inquiryPhone}
-                      onChange={(e) => setInquiryPhone(formatPhone(e.target.value))}
+                      onChange={(e) => setInquiryPhone(formatPhone(inquiryPhone, e.target.value))}
                       onBlur={() => setInquiryPhoneTouched(true)}
                       className={inquiryPhoneTouched && !isValidPhone(inquiryPhone) ? inputError : inputCls}
                     />
@@ -1358,7 +1372,7 @@ const Index = () => {
                 <div className="space-y-4">
                   <input type="text" placeholder="Имя *" required value={contactsName} onChange={e => setContactsName(e.target.value)} className={inputCls} />
                   <div>
-                    <input type="tel" placeholder="+7 (___) ___-__-__" required value={contactsPhone} onChange={e => setContactsPhone(formatPhone(e.target.value))} onBlur={() => setContactsPhoneTouched(true)} className={contactsPhoneTouched && !isValidPhone(contactsPhone) ? inputError : inputCls} />
+                    <input type="tel" placeholder="+7 (___) ___-__-__" required value={contactsPhone} onChange={e => setContactsPhone(formatPhone(contactsPhone, e.target.value))} onBlur={() => setContactsPhoneTouched(true)} className={contactsPhoneTouched && !isValidPhone(contactsPhone) ? inputError : inputCls} />
                     {contactsPhoneTouched && !isValidPhone(contactsPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
                   </div>
                   <textarea placeholder="Комментарий (продукт, объём, задача)" rows={4} value={contactsComment} onChange={e => setContactsComment(e.target.value)} className={inputCls + " resize-none"} />
@@ -1402,7 +1416,7 @@ const Index = () => {
             <div className="space-y-4">
               <input type="text" placeholder="Имя *" required value={modalName} onChange={e => setModalName(e.target.value)} className={inputCls} />
               <div>
-                <input type="tel" placeholder="+7 (___) ___-__-__" required value={modalPhone} onChange={e => setModalPhone(formatPhone(e.target.value))} onBlur={() => setModalPhoneTouched(true)} className={modalPhoneTouched && !isValidPhone(modalPhone) ? inputError : inputCls} />
+                <input type="tel" placeholder="+7 (___) ___-__-__" required value={modalPhone} onChange={e => setModalPhone(formatPhone(modalPhone, e.target.value))} onBlur={() => setModalPhoneTouched(true)} className={modalPhoneTouched && !isValidPhone(modalPhone) ? inputError : inputCls} />
                 {modalPhoneTouched && !isValidPhone(modalPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
               </div>
               <button
