@@ -1,15 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const API_URL = '/api/b24-send-lead';
+const API_URL = '/api/b24-send-lead.php';
+const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+
+function saveUtmToCookies() {
+  if (typeof window === 'undefined') return;
+  const params = new URLSearchParams(window.location.search);
+  const expires = new Date();
+  expires.setDate(expires.getDate() + 30);
+  const expStr = expires.toUTCString();
+  UTM_KEYS.forEach((key) => {
+    const value = params.get(key);
+    if (value) {
+      document.cookie = `${key}=${encodeURIComponent(value)};expires=${expStr};path=/`;
+    }
+  });
+}
 
 function getUtmFromCookies(): Record<string, string> {
-  const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
   const result: Record<string, string> = {};
   if (typeof document === 'undefined') return result;
   const cookies = document.cookie.split(';');
   for (const cookie of cookies) {
     const [key, value] = cookie.trim().split('=');
-    if (utmKeys.includes(key)) result[key] = decodeURIComponent(value || '');
+    if (UTM_KEYS.includes(key)) result[key] = decodeURIComponent(value || '');
   }
   return result;
 }
@@ -26,6 +40,10 @@ export interface LeadPayload {
 
 export function useLeadForm() {
   const [thankYouOpen, setThankYouOpen] = useState(false);
+
+  useEffect(() => {
+    saveUtmToCookies();
+  }, []);
 
   async function sendLead(payload: LeadPayload) {
     const utm = getUtmFromCookies();
