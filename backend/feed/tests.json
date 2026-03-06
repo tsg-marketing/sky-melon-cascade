@@ -1,0 +1,12 @@
+{
+  "tests": [
+    {
+      "name": "GET YML feed",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": "<?xml",
+      "bodyMatcher": "contains"
+    }
+  ]
+}

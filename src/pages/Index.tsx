@@ -247,7 +247,27 @@ const Index = () => {
     setCatalogLoading(true);
     fetch(CATALOG_URL)
       .then((r) => r.json())
-      .then((d) => setCatalogData(d))
+      .then((d) => {
+        setCatalogData(d);
+        // Открываем товар по хэшу URL после загрузки каталога
+        const hash = window.location.hash;
+        if (hash.startsWith("#product-")) {
+          const productId = hash.slice("#product-".length);
+          const allItems = [...(d.massagers || []), ...(d.injectors || [])];
+          const found = allItems.find((it: CatalogItem) => it.id === productId);
+          if (found) {
+            const tab = (d.massagers || []).find((it: CatalogItem) => it.id === productId) ? "massagers" : "injectors";
+            setCatalogTab(tab);
+            setCatalogExpanded(true);
+            setTimeout(() => {
+              setSelectedItem(found);
+              setSelectedSlide(0);
+              const el = document.getElementById("product-" + productId);
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 100);
+          }
+        }
+      })
       .finally(() => setCatalogLoading(false));
   }, []);
 
@@ -635,6 +655,7 @@ const Index = () => {
                     return (
                       <div
                         key={item.id}
+                        id={`product-${item.id}`}
                         className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/40 transition-all flex flex-col group"
                       >
                         {/* Фото + слайдер */}
