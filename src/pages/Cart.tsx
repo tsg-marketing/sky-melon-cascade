@@ -201,9 +201,9 @@ export default function Cart() {
                   </button>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     Отправляя форму, я соглашаюсь с{" "}
-                    <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                      политикой обработки персональных данных
-                    </a>
+                    <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">политикой обработки персональных данных</a>
+                    {" "}и даю{" "}
+                    <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">согласие на обработку персональных данных</a>.
                   </p>
                 </div>
               </div>
