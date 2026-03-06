@@ -190,7 +190,7 @@ const CONSENT_TEXT = (
 );
 
 const Index = () => {
-  const { sendLead, thankYouOpen, setThankYouOpen } = useLeadForm();
+  const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
   const { addItem, removeItem, getQuantity, totalCount } = useCart();
   const navigate = useNavigate();
   const [visibleSections, setVisibleSections] = useState<Record<string, boolean>>({});
@@ -1042,15 +1042,15 @@ const Index = () => {
                   </div>
                   <button
                     onClick={() => {
-                      if (inquiryName.trim() && isValidPhone(inquiryPhone)) {
+                      if (inquiryName.trim() && isValidPhone(inquiryPhone) && !sending) {
                         sendLead({ name: inquiryName, phone: inquiryPhone, product: inquiryItem?.name, formType: 'inquiry' });
                         setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false);
                       }
                     }}
-                    disabled={!inquiryName.trim() || !isValidPhone(inquiryPhone)}
+                    disabled={!inquiryName.trim() || !isValidPhone(inquiryPhone) || sending}
                     className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-md disabled:opacity-40"
                   >
-                    Отправить
+                    {sending ? "Отправляем..." : "Отправить"}
                   </button>
                   {CONSENT_TEXT}
                 </div>
@@ -1442,15 +1442,15 @@ const Index = () => {
                   <textarea placeholder="Комментарий (продукт, объём, задача)" rows={4} value={contactsComment} onChange={e => setContactsComment(e.target.value)} className={inputCls + " resize-none"} />
                   <button
                     onClick={() => {
-                      if (contactsName.trim() && isValidPhone(contactsPhone)) {
+                      if (contactsName.trim() && isValidPhone(contactsPhone) && !sending) {
                         sendLead({ name: contactsName, phone: contactsPhone, comment: contactsComment, formType: 'contacts' });
                         setContactsName(""); setContactsPhone(""); setContactsComment(""); setContactsPhoneTouched(false);
                       }
                     }}
-                    disabled={!contactsName.trim() || !isValidPhone(contactsPhone)}
+                    disabled={!contactsName.trim() || !isValidPhone(contactsPhone) || sending}
                     className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
                   >
-                    Отправить
+                    {sending ? "Отправляем..." : "Отправить"}
                   </button>
                   {CONSENT_TEXT}
                 </div>
@@ -1485,15 +1485,15 @@ const Index = () => {
               </div>
               <button
                 onClick={() => {
-                  if (modalName.trim() && isValidPhone(modalPhone)) {
+                  if (modalName.trim() && isValidPhone(modalPhone) && !sending) {
                     sendLead({ name: modalName, phone: modalPhone, product: modalProduct, formType: 'modal' });
                     setModalOpen(false); setModalName(""); setModalPhone(""); setModalPhoneTouched(false);
                   }
                 }}
-                disabled={!modalName.trim() || !isValidPhone(modalPhone)}
+                disabled={!modalName.trim() || !isValidPhone(modalPhone) || sending}
                 className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
               >
-                Отправить
+                {sending ? "Отправляем..." : "Отправить"}
               </button>
               {CONSENT_TEXT}
             </div>

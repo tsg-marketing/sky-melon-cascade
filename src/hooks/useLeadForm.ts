@@ -40,12 +40,15 @@ export interface LeadPayload {
 
 export function useLeadForm() {
   const [thankYouOpen, setThankYouOpen] = useState(false);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     saveUtmToCookies();
   }, []);
 
   async function sendLead(payload: LeadPayload) {
+    if (sending) return;
+    setSending(true);
     const utm = getUtmFromCookies();
     const body = {
       ...payload,
@@ -65,10 +68,12 @@ export function useLeadForm() {
       });
     } catch (_e) {
       // игнорируем ошибки сети — форма показывает спасибо в любом случае
+    } finally {
+      setSending(false);
     }
 
     setThankYouOpen(true);
   }
 
-  return { sendLead, thankYouOpen, setThankYouOpen };
+  return { sendLead, sending, thankYouOpen, setThankYouOpen };
 }

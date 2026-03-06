@@ -30,7 +30,7 @@ function formatPhone(prev: string, next: string): string {
 export default function Cart() {
   const navigate = useNavigate();
   const { items, addItem, removeItem, removeAll, clearCart, totalCount, totalPrice } = useCart();
-  const { sendLead, thankYouOpen, setThankYouOpen } = useLeadForm();
+  const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -194,10 +194,10 @@ export default function Cart() {
                   </div>
                   <button
                     onClick={handleSubmit}
-                    disabled={!name.trim() || !phoneValid}
+                    disabled={!name.trim() || !phoneValid || sending}
                     className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
                   >
-                    Отправить заявку
+                    {sending ? "Отправляем..." : "Отправить заявку"}
                   </button>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     Отправляя форму, я соглашаюсь с{" "}
