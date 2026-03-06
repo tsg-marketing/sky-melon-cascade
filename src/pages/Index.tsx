@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import ThankYouModal from "@/components/ThankYouModal";
 import { useLeadForm } from "@/hooks/useLeadForm";
+import { useCart } from "@/hooks/useCart";
 
 const CATALOG_URL = "https://functions.poehali.dev/7093349e-12b4-4025-a465-82ce3b87b0b2";
 
@@ -189,6 +191,8 @@ const CONSENT_TEXT = (
 
 const Index = () => {
   const { sendLead, thankYouOpen, setThankYouOpen } = useLeadForm();
+  const { addItem, removeItem, getQuantity, totalCount } = useCart();
+  const navigate = useNavigate();
   const [visibleSections, setVisibleSections] = useState<Record<string, boolean>>({});
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -297,41 +301,54 @@ const Index = () => {
 
       {/* HEADER */}
       <header className="fixed top-0 w-full bg-white/90 backdrop-blur-xl border-b border-border z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div>
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-6">
+          {/* Логотип + меню рядом */}
+          <div className="flex items-center gap-6 flex-shrink-0">
             <img
               src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg"
               alt="Техносиб"
               className="h-9 w-auto object-contain"
             />
-            <p className="text-sm text-muted-foreground hidden sm:block mt-0.5">Оборудование для маринования и посола мяса</p>
+            <nav className="hidden lg:flex gap-6 text-sm font-semibold">
+              {navLinks.map((l) => (
+                <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
+                  {l.label}
+                </a>
+              ))}
+            </nav>
           </div>
-          <nav className="hidden lg:flex gap-7 text-base font-semibold">
-            {navLinks.map((l) => (
-              <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors">
-                {l.label}
-              </a>
-            ))}
-          </nav>
-          <div className="flex items-center gap-3">
-            <div className="hidden md:flex flex-col items-end gap-0.5">
-              <button
-                onClick={() => { setModalProduct(""); setModalOpen(true); }}
-                className="px-5 py-2 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm"
-              >
-                Рассчитать решение
-              </button>
-              <a href="tel:88005059124" className="flex items-center gap-1.5 text-base font-bold text-foreground hover:text-primary transition-colors">
-                <Icon name="Phone" size={15} className="text-primary" />
-                8 800 505-91-24
-              </a>
-            </div>
+
+          {/* Правая часть — растягивается */}
+          <div className="flex items-center gap-3 ml-auto">
+            {/* Телефон */}
+            <a href="tel:88005059124" className="hidden md:flex items-center gap-1.5 text-sm font-bold text-foreground hover:text-primary transition-colors whitespace-nowrap">
+              <Icon name="Phone" size={14} className="text-primary" />
+              8 800 505-91-24
+            </a>
+
+            {/* Корзина */}
+            <button
+              onClick={() => navigate("/cart")}
+              className="relative flex items-center gap-2 px-4 py-2 border-2 border-primary/30 text-primary rounded-full text-sm font-semibold hover:border-primary hover:bg-primary/5 transition-all"
+            >
+              <Icon name="ShoppingCart" size={16} />
+              <span className="hidden sm:inline">Корзина</span>
+              {totalCount > 0 && (
+                <span className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {totalCount}
+                </span>
+              )}
+            </button>
+
+            {/* CTA */}
             <button
               onClick={() => { setModalProduct(""); setModalOpen(true); }}
-              className="md:hidden hidden sm:block px-5 py-2.5 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm"
+              className="hidden sm:block px-5 py-2 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm whitespace-nowrap"
             >
               Рассчитать решение
             </button>
+
+            {/* Мобильное меню */}
             <button className="lg:hidden p-2 text-muted-foreground" onClick={() => setMenuOpen(!menuOpen)}>
               <Icon name={menuOpen ? "X" : "Menu"} size={22} />
             </button>
@@ -734,12 +751,38 @@ const Index = () => {
                             >
                               Узнать подробней
                             </button>
-                            <button
-                              onClick={() => { setSelectedItem(item); setSelectedSlide(0); }}
-                              className="w-full py-3.5 border-2 border-primary/30 text-primary rounded-xl text-base font-semibold hover:border-primary hover:bg-primary/5 transition-all"
-                            >
-                              Подробнее
-                            </button>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => { setSelectedItem(item); setSelectedSlide(0); }}
+                                className="flex-1 py-3.5 border-2 border-primary/30 text-primary rounded-xl text-base font-semibold hover:border-primary hover:bg-primary/5 transition-all"
+                              >
+                                Подробнее
+                              </button>
+                              {(() => {
+                                const qty = getQuantity(item.id);
+                                return qty > 0 ? (
+                                  <div className="flex items-center gap-1 border-2 border-primary rounded-xl px-2">
+                                    <button
+                                      onClick={() => removeItem(item.id)}
+                                      className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors"
+                                    >−</button>
+                                    <span className="w-5 text-center font-bold text-primary text-sm">{qty}</span>
+                                    <button
+                                      onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })}
+                                      className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors"
+                                    >+</button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })}
+                                    className="py-3.5 px-4 border-2 border-primary/30 text-primary rounded-xl hover:border-primary hover:bg-primary/5 transition-all"
+                                    title="В корзину"
+                                  >
+                                    <Icon name="ShoppingCart" size={18} />
+                                  </button>
+                                );
+                              })()}
+                            </div>
                           </div>
                         </div>
                       </div>

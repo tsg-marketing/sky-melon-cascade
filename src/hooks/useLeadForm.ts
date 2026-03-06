@@ -35,7 +35,7 @@ export interface LeadPayload {
   comment?: string;
   product?: string;
   quizAnswers?: Record<string, string>;
-  formType: 'quiz' | 'compare' | 'contacts' | 'modal' | 'inquiry';
+  formType: 'quiz' | 'compare' | 'contacts' | 'modal' | 'inquiry' | 'cart';
 }
 
 export function useLeadForm() {
