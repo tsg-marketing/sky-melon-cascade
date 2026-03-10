@@ -399,36 +399,6 @@ const Index = () => {
             </div>
 
             <div className={`transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
-              <div className="space-y-4 mb-8">
-                {[
-                  {
-                    icon: "Shield",
-                    label: "Высокое качество стали марки 304",
-                    sub: "Пищевая нержавеющая сталь гарантирует безопасность продукции и долговечность оборудования",
-                  },
-                  {
-                    icon: "Cpu",
-                    label: "Комплектующие мировых брендов",
-                    sub: "Лучшие компоненты для надёжной работы",
-                  },
-                  {
-                    icon: "Zap",
-                    label: "Безотказная работа",
-                    sub: "Исключительная долговечность и продолжительный срок службы оборудования",
-                  },
-                ].map((b, i) => (
-                  <div key={i} className="flex items-start gap-4 p-5 bg-white border border-border rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                    <div className="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl flex-shrink-0">
-                      <Icon name={b.icon} fallback="Star" size={22} className="text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-base text-foreground leading-tight mb-1">{b.label}</p>
-                      <p className="text-sm text-muted-foreground">{b.sub}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
               <div className="rounded-2xl overflow-hidden border border-border shadow-xl bg-white">
                 <img
                   src="https://cdn.poehali.dev/files/a80d03fc-2480-4c9b-a141-456c301f7d59.jpg"
@@ -467,8 +437,8 @@ const Index = () => {
                   <Icon name={item.icon} fallback="CheckCircle" size={24} className="text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-foreground mb-1">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                  <h3 className="font-bold text-xl text-foreground mb-2">{item.title}</h3>
+                  <p className="text-base text-muted-foreground leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
