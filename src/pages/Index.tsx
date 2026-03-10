@@ -382,27 +382,11 @@ const Index = () => {
                 с вакуумными массажерами
               </h1>
               <p className="text-2xl font-semibold text-foreground leading-relaxed mb-3 max-w-xl">
-                Оборудование от ведущих производителей мясного оборудования Daribo (Дарибо), Niro-Tech (Ниро-Тех), INWESTPOL (Инвестпол)
+                Мясомассажеры и инъекторы от ведущих производителей мясного оборудования Daribo (Дарибо), Niro-Tech (Ниро-Тех), INWESTPOL (Инвестпол)
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
                 Ускоряем цикл, выравниваем качество партии, снижаем риск брака. Подбираем оборудование и настройки под ветчину, копчёности, деликатесы, фабрики-кухни.
               </p>
-
-              <ul className="space-y-3 mb-10">
-                {[
-                  { icon: "TrendingDown",  text: "Меньше непросола и рекламаций" },
-                  { icon: "Wind",          text: "Вакуум — быстрее процесс, меньше окисления" },
-                  { icon: "ArrowUpCircle", text: "Увеличиваем выход готового продукта + 30–70%" },
-                  { icon: "Shield",        text: "Пищевая нержавеющая сталь, санитарный конструктив, быстрая мойка" },
-                ].map((b, i) => (
-                  <li key={i} className="flex items-center gap-3 text-base font-medium text-foreground">
-                    <div className="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-lg flex-shrink-0">
-                      <Icon name={b.icon} fallback="CheckCircle" size={17} className="text-primary" />
-                    </div>
-                    {b.text}
-                  </li>
-                ))}
-              </ul>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <button onClick={() => setModalOpen(true)} className="px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 text-center">
@@ -453,6 +437,41 @@ const Index = () => {
                 />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* НАШИ ПРЕИМУЩЕСТВА */}
+      <section className="py-16 px-6 bg-primary/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground mb-4">
+              Наши преимущества
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Почему предприятия выбирают вакуумное оборудование от T-SIB
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { icon: "TrendingDown",  title: "Меньше непросола и рекламаций",                  desc: "Стабильный результат на каждой партии снижает потери и претензии от покупателей" },
+              { icon: "Wind",          title: "Вакуум — быстрее процесс, меньше окисления",     desc: "Вакуумная среда ускоряет массирование и сохраняет свежесть и цвет продукта" },
+              { icon: "ArrowUpCircle", title: "Увеличиваем выход готового продукта +30–70%",    desc: "Оптимальное маринование и посол повышают выход без потери качества" },
+              { icon: "Shield",        title: "Пищевая нержавеющая сталь",                      desc: "Сталь марки 304 гарантирует безопасность продукции и долговечность оборудования. Санитарный конструктив, быстрая мойка." },
+              { icon: "Star",          title: "Комплектующие мировых брендов",                  desc: "Лучшие компоненты для надёжной работы без сбоев" },
+              { icon: "Award",         title: "Безотказная работа",                              desc: "Исключительная долговечность и продолжительный срок службы оборудования" },
+            ].map((item, i) => (
+              <div key={i} className="bg-white rounded-2xl p-6 border border-primary/10 flex flex-col gap-4 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl flex-shrink-0">
+                  <Icon name={item.icon} fallback="CheckCircle" size={24} className="text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-foreground mb-1">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
