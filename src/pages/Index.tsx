@@ -449,46 +449,49 @@ const Index = () => {
             </h2>
           </div>
 
-          {/* Bento grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[280px]">
-
-            {/* Большой квадрат с картинкой — занимает 2 колонки и 2 строки */}
-            <div className="col-span-2 lg:col-span-1 lg:row-span-2 rounded-2xl overflow-hidden border border-border shadow-md">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="rounded-2xl overflow-hidden border border-border shadow-xl">
               <img
                 src="https://cdn.poehali.dev/files/a80d03fc-2480-4c9b-a141-456c301f7d59.jpg"
                 alt="Оборудование Техно-Сиб"
-                className="w-full h-full object-cover"
+                className="w-full h-auto object-contain"
               />
             </div>
 
-            {/* Карточка 1 — большая, широкая */}
-            <div className="col-span-2 lg:col-span-2 rounded-2xl p-8 bg-primary border border-primary flex flex-col justify-between hover:shadow-lg transition-shadow">
-              <div className="w-14 h-14 flex items-center justify-center bg-white/15 rounded-2xl">
-                <Icon name="Cpu" fallback="CheckCircle" size={28} className="text-white" />
-              </div>
-              <div>
-                <h3 className="font-bold text-2xl text-white mb-2">Функциональность и высокая производительность</h3>
-                <p className="text-white/80 text-base leading-relaxed">Вакуумное массирование — рассол проникает глубже, текстура лучше, цикл короче. До −0,1 МПа, 100–3000 л. Инъекторы: 84 иглы, до 4 т/ч, до 4,3 бар.</p>
-              </div>
+            <div className="space-y-5">
+              {[
+                {
+                  icon: "Cpu",
+                  title: "Функциональность и высокая производительность",
+                  desc: "Наши вакуумные массажеры осуществляют бережное вакуумное массирование — рассол проникает глубже, текстура лучше, цикл короче. Регулируемые режимы: время, вакуум, скорость. Давление до −0,1 МПа, объём 100–3000 литров. Инъекторы рассола имеют 84 иглы с регистром давления, до 4 т/ч, до 4,3 бар — равномерное распределение рассола.",
+                },
+                {
+                  icon: "Star",
+                  title: "Комплектующие мировых брендов",
+                  desc: "Лучшие компоненты для надёжной работы без сбоев",
+                },
+                {
+                  icon: "Award",
+                  title: "Безотказная работа",
+                  desc: "Исключительная долговечность и продолжительный срок службы оборудования",
+                },
+                {
+                  icon: "Shield",
+                  title: "Пищевая нержавеющая сталь",
+                  desc: "Сталь марки 304 гарантирует безопасность продукции и долговечность оборудования. Санитарный конструктив, быстрая мойка.",
+                },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-4 p-5 bg-primary/5 border border-primary/10 rounded-2xl hover:shadow-md transition-shadow">
+                  <div className="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl flex-shrink-0">
+                    <Icon name={item.icon} fallback="CheckCircle" size={22} className="text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xl text-foreground mb-1">{item.title}</h3>
+                    <p className="text-base text-muted-foreground leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            {/* Карточки 2–4 */}
-            {[
-              { icon: "Star",   title: "Комплектующие мировых брендов", desc: "Лучшие компоненты для надёжной работы без сбоев" },
-              { icon: "Award",  title: "Безотказная работа",             desc: "Исключительная долговечность и продолжительный срок службы оборудования" },
-              { icon: "Shield", title: "Пищевая нержавеющая сталь",      desc: "Сталь марки 304. Санитарный конструктив, быстрая мойка." },
-            ].map((item, i) => (
-              <div key={i} className="rounded-2xl p-6 bg-primary/5 border border-primary/10 flex flex-col justify-between hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl">
-                  <Icon name={item.icon} fallback="CheckCircle" size={24} className="text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-xl text-foreground mb-1">{item.title}</h3>
-                  <p className="text-base text-muted-foreground leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-
           </div>
         </div>
       </section>
