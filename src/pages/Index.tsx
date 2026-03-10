@@ -440,134 +440,76 @@ const Index = () => {
         </div>
       </section>
 
-      {/* БЛОК 2: ПРЕИМУЩЕСТВА ТЕХНО-СИБ */}
-      <section className="py-16 px-6 bg-white">
+      {/* ─── ПРЕИМУЩЕСТВА НАШЕГО ОБОРУДОВАНИЯ ─── */}
+      <section className="py-12 px-6 bg-gradient-to-br from-primary/5 via-white to-primary/10">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground mb-4">
-              Преимущества мясомассажеров и инъекторов от компании Техно-Сиб
+          <div className="text-center mb-14">
+            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground">
+              Преимущества нашего оборудования
             </h2>
           </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {[
-              {
-                icon: "Cpu",
-                title: "Функциональность и высокая производительность",
-                desc: "Наши вакуумные массажеры осуществляют бережное вакуумное массирование — рассол проникает глубже, текстура лучше, цикл короче. Регулируемые режимы: время, вакуум, скорость. Давление до −0,1 МПа, объём 100–3000 литров. Инъекторы рассола имеют 84 иглы с регистром давления, до 4 т/ч, до 4,3 бар — равномерное распределение рассола.",
-              },
-              {
-                icon: "Star",
-                title: "Комплектующие мировых брендов",
-                desc: "Лучшие компоненты для надёжной работы без сбоев",
-              },
-              {
-                icon: "Award",
-                title: "Безотказная работа",
-                desc: "Исключительная долговечность и продолжительный срок службы оборудования",
-              },
-              {
-                icon: "Shield",
-                title: "Пищевая нержавеющая сталь",
-                desc: "Сталь марки 304 гарантирует безопасность продукции и долговечность оборудования. Санитарный конструктив, быстрая мойка.",
-              },
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-4 p-6 bg-primary/5 border border-primary/10 rounded-2xl hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 flex items-center justify-center bg-primary rounded-xl flex-shrink-0 mt-0.5">
-                  <Icon name={item.icon} fallback="CheckCircle" size={20} className="text-white" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-xl text-foreground mb-2">{item.title}</h3>
-                  <p className="text-base text-muted-foreground leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ЭКРАН 2: БОЛИ vs РЕШЕНИЕ */}
-      <section id="pain" className="py-12 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ${vis("pain") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">
-              Качество посола и маринования
-            </h2>
-          </div>
-
-          {/* Схема линии */}
-          <div className={`flex items-center justify-center gap-2 flex-wrap mb-16 transition-all duration-700 ${vis("pain") ? "opacity-100" : "opacity-0"}`}>
-            {[
-              { icon: "Package",     label: "Сырьё" },
-              { icon: "Pipette",     label: "Инъектор" },
-              { icon: "RefreshCw",   label: "Массажер" },
-              { icon: "Thermometer", label: "Термообработка" },
-              { icon: "CheckCircle", label: "Готово" },
-            ].map((step, i, arr) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="flex flex-col items-center gap-2 px-5 py-4 bg-primary/5 border border-primary/15 rounded-2xl min-w-[100px]">
-                  <Icon name={step.icon} fallback="Circle" size={28} className="text-primary" />
-                  <span className="text-sm font-semibold text-foreground">{step.label}</span>
-                </div>
-                {i < arr.length - 1 && <Icon name="ChevronRight" size={20} className="text-primary/40" />}
-              </div>
-            ))}
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12">
-            <div className={`transition-all duration-700 ${vis("pain") ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-red-50 border border-red-200 rounded-xl flex items-center justify-center">
-                  <Icon name="AlertTriangle" size={20} className="text-red-500" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground">Типичные проблемы производства</h3>
-              </div>
-              <div className="space-y-3">
+            {/* Колонка: Массажеры */}
+            <div>
+              <h3 className="text-2xl font-black text-foreground mb-4 pb-3 border-b-2 border-primary/30 flex items-center gap-2">
+                <Icon name="RefreshCw" size={24} className="text-primary" />
+                Массажеры
+              </h3>
+              <div className="flex flex-col gap-1.5">
                 {[
-                  { icon: "AlertCircle",  text: "Непросол и пятна — рекламации и брак партий" },
-                  { icon: "Clock",        text: "Длинный цикл посола сдерживает объёмы выпуска" },
-                  { icon: "ThumbsDown",   text: "Жалобы на качество — неповторяемость вкуса" },
-                  { icon: "Wrench",       text: "Простои из-за мойки — сложная санобработка" },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-4 p-4 border border-red-100 rounded-xl bg-red-50 hover:bg-red-100/60 transition-all" style={{ transitionDelay: `${i * 80}ms` }}>
-                    <Icon name={item.icon} fallback="AlertCircle" size={20} className="text-red-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-base text-foreground">{item.text}</span>
+                  { icon: "Zap",               title: "Производительность до 4 т/ч",   desc: "Рабочее давление до 4,3 бар" },
+                  { icon: "Gauge",             title: "Вакуумный барабан до −0,1 МПа", desc: "Интенсивное массирование без потерь качества" },
+                  { icon: "Database",          title: "Объём барабана 100–3000 л",      desc: "Широкий модельный ряд под любой объём производства" },
+                  { icon: "ShieldCheck",       title: "Пищевая нержавеющая сталь",      desc: "Соответствие санитарным нормам" },
+                  { icon: "Droplets",          title: "Быстрая мойка",                  desc: "Форма барабана оптимизирована под скоростную очистку" },
+                  { icon: "SlidersHorizontal", title: "Регулируемые параметры",         desc: "Скорость, время, вакуум и направление вращения" },
+                  { icon: "Package",           title: "Рёбра целостности",              desc: "Рёбра сохраняют целостность кусков при массировании" },
+                  { icon: "ListChecks",        title: "99 программ работы",             desc: "Сохранение режимов массирования" },
+                ].map((feat, i) => (
+                  <div key={i} className="flex items-center gap-3 bg-white rounded-xl border border-border px-4 py-3 hover:border-primary/40 hover:shadow-sm transition-all">
+                    <div className="w-10 h-10 shrink-0 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <Icon name={feat.icon} fallback="Star" size={20} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-xl text-foreground leading-snug">{feat.title}</p>
+                      <p className="text-base text-muted-foreground">{feat.desc}</p>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className={`transition-all duration-700 delay-200 ${vis("pain") ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center">
-                  <Icon name="CheckCircle" size={20} className="text-primary" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground">Что даёт наше оборудование</h3>
-              </div>
-              <div className="space-y-3">
+            {/* Колонка: Инъекторы */}
+            <div>
+              <h3 className="text-2xl font-black text-foreground mb-4 pb-3 border-b-2 border-primary/30 flex items-center gap-2">
+                <Icon name="Pipette" size={24} className="text-primary" />
+                Инъекторы
+              </h3>
+              <div className="flex flex-col gap-1.5">
                 {[
-                  { icon: "Gauge",    text: "Регистр давления — стабильная подача в каждую иглу" },
-                  { icon: "Wind",     text: "Вакуум: меньше окисления, лучше текстура продукта" },
-                  { icon: "Settings", text: "Программируемые режимы — повторяемые результаты" },
-                  { icon: "Shield",   text: "Санитарный конструктив — быстрая мойка без разборки" },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-4 p-4 border border-primary/15 rounded-xl bg-primary/5 hover:bg-primary/10 transition-all" style={{ transitionDelay: `${i * 80}ms` }}>
-                    <Icon name={item.icon} fallback="CheckCircle" size={20} className="text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-base text-foreground">{item.text}</span>
+                  { icon: "Grid3x3",        title: "84 иглы",                 desc: "Максимальное покрытие продукта" },
+                  { icon: "Gauge",          title: "Давление до 4,3 бар",     desc: "Работа с вязкими маринадами без потери качества" },
+                  { icon: "Zap",            title: "Подпружиненные иглы",     desc: "Не ломаются при контакте с костью, равномерно покрывают продукт" },
+                  { icon: "MoveHorizontal", title: "Зубчатый конвейер",       desc: "Боковые направляющие — продукт не сдвигается" },
+                  { icon: "Ruler",          title: "Шаг 15–60 мм",            desc: "Точная настройка под любой продукт" },
+                  { icon: "Repeat",         title: "Повторяемость",           desc: "Одинаковый шаг на каждой партии" },
+                  { icon: "Droplets",       title: "Мойка без разбора корпуса", desc: "Быстрая санитарная обработка без простоев" },
+                  { icon: "ListChecks",     title: "До 99 программ работы",   desc: "Время, интервалы, вакуум, скорость — всё сохраняется" },
+                ].map((feat, i) => (
+                  <div key={i} className="flex items-center gap-3 bg-white rounded-xl border border-border px-4 py-3 hover:border-primary/40 hover:shadow-sm transition-all">
+                    <div className="w-10 h-10 shrink-0 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <Icon name={feat.icon} fallback="Star" size={20} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-xl text-foreground leading-snug">{feat.title}</p>
+                      <p className="text-base text-muted-foreground">{feat.desc}</p>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
 
-          <div className={`text-center mt-12 transition-all duration-700 ${vis("pain") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-            <button
-              onClick={() => { setModalProduct("consult"); setModalOpen(true); }}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
-            >
-              <Icon name="Phone" size={18} />
-              Получить консультацию технолога
-            </button>
           </div>
         </div>
       </section>
@@ -1062,6 +1004,92 @@ const Index = () => {
               Рассчитать эффект
               <Icon name="Calculator" size={18} />
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ЭКРАН 2: БОЛИ vs РЕШЕНИЕ */}
+      <section id="pain" className="py-12 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className={`text-center mb-16 transition-all duration-1000 ${vis("pain") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">
+              Качество посола и маринования
+            </h2>
+          </div>
+
+          {/* Схема линии */}
+          <div className={`flex items-center justify-center gap-2 flex-wrap mb-16 transition-all duration-700 ${vis("pain") ? "opacity-100" : "opacity-0"}`}>
+            {[
+              { icon: "Package",     label: "Сырьё" },
+              { icon: "Pipette",     label: "Инъектор" },
+              { icon: "RefreshCw",   label: "Массажер" },
+              { icon: "Thermometer", label: "Термообработка" },
+              { icon: "CheckCircle", label: "Готово" },
+            ].map((step, i, arr) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className="flex flex-col items-center gap-2 px-5 py-4 bg-primary/5 border border-primary/15 rounded-2xl min-w-[100px]">
+                  <Icon name={step.icon} fallback="Circle" size={28} className="text-primary" />
+                  <span className="text-sm font-semibold text-foreground">{step.label}</span>
+                </div>
+                {i < arr.length - 1 && <Icon name="ChevronRight" size={20} className="text-primary/40" />}
+              </div>
+            ))}
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div className={`transition-all duration-700 ${vis("pain") ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-red-50 border border-red-200 rounded-xl flex items-center justify-center">
+                  <Icon name="AlertTriangle" size={20} className="text-red-500" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground">Типичные проблемы производства</h3>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { icon: "AlertCircle",  text: "Непросол и пятна — рекламации и брак партий" },
+                  { icon: "Clock",        text: "Длинный цикл посола сдерживает объёмы выпуска" },
+                  { icon: "ThumbsDown",   text: "Жалобы на качество — неповторяемость вкуса" },
+                  { icon: "Wrench",       text: "Простои из-за мойки — сложная санобработка" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-4 p-4 border border-red-100 rounded-xl bg-red-50 hover:bg-red-100/60 transition-all" style={{ transitionDelay: `${i * 80}ms` }}>
+                    <Icon name={item.icon} fallback="AlertCircle" size={20} className="text-red-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-base text-foreground">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={`transition-all duration-700 delay-200 ${vis("pain") ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center">
+                  <Icon name="CheckCircle" size={20} className="text-primary" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground">Что даёт наше оборудование</h3>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { icon: "Gauge",    text: "Регистр давления — стабильная подача в каждую иглу" },
+                  { icon: "Wind",     text: "Вакуум: меньше окисления, лучше текстура продукта" },
+                  { icon: "Settings", text: "Программируемые режимы — повторяемые результаты" },
+                  { icon: "Shield",   text: "Санитарный конструктив — быстрая мойка без разборки" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-4 p-4 border border-primary/15 rounded-xl bg-primary/5 hover:bg-primary/10 transition-all" style={{ transitionDelay: `${i * 80}ms` }}>
+                    <Icon name={item.icon} fallback="CheckCircle" size={20} className="text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-base text-foreground">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className={`text-center mt-12 transition-all duration-700 ${vis("pain") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+            <button
+              onClick={() => { setModalProduct("consult"); setModalOpen(true); }}
+              className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+            >
+              <Icon name="Phone" size={18} />
+              Получить консультацию технолога
+            </button>
           </div>
         </div>
       </section>
