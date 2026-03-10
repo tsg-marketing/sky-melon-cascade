@@ -256,7 +256,7 @@ const Injector = () => {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className={`transition-all duration-1000 ${vis("hero") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               <span className="inline-block text-xs font-semibold tracking-widest text-primary uppercase border border-primary/30 rounded-full px-4 py-1.5 mb-6 bg-primary/5">Поставка и внедрение</span>
-              <h1 className="text-5xl lg:text-6xl xl:text-7xl font-display font-black leading-[1.05] tracking-tight mb-6 text-foreground">Равномерный посол и{" "}<span className="text-primary">стабильный выход</span>{" "}с инъекторами для мяса</h1>
+              <h1 className="text-5xl lg:text-6xl xl:text-7xl font-display font-black leading-[1.05] tracking-tight mb-6 text-foreground">Инъекторы для равномерного{" "}<span className="text-primary">маринования мяса</span></h1>
               <p className="text-2xl font-semibold text-foreground leading-relaxed mb-3 max-w-xl">Инъекторы для мяса от ведущих производителей мясного оборудования Daribo (Дарибо), Niro-Tech (Ниро-Тех), INWESTPOL (Инвестпол)</p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">Точная дозировка рассола, работа с вязкими маринадами, подпружиненные иглы для тушек с костью. Подбираем модель и настройки под ваш продукт.</p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -266,7 +266,7 @@ const Injector = () => {
             </div>
             <div className={`transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
               <div className="rounded-2xl overflow-hidden border border-border shadow-xl bg-white">
-                <img src="https://cdn.poehali.dev/files/a80d03fc-2480-4c9b-a141-456c301f7d59.jpg" alt="Инъектор для мяса Daribo" className="w-full h-auto object-contain" />
+                <img src="https://cdn.poehali.dev/files/31cdb492-7133-4082-ab8b-95564d292c21.jpg" alt="Инъектор для мяса Daribo" className="w-full h-auto object-contain" />
               </div>
             </div>
           </div>
@@ -490,9 +490,9 @@ const Injector = () => {
 
       <section id="compare" className="py-12 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ${vis("compare") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Почему это работает лучше</h2></div>
+          <div className={`text-center mb-16 transition-all duration-1000 ${vis("compare") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Инъекторы с давлением и обычные инъекторы</h2></div>
           <div className={`transition-all duration-700 ${vis("compare") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <h3 className="font-bold text-2xl text-foreground mb-4">Инъектор с регистром давления vs обычный</h3>
+            <h3 className="font-bold text-2xl text-foreground mb-4">Сравнение инъекторов</h3>
             <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
               {[["Параметр","Регистр давления","Обычный инъектор"],["Давление на каждой игле","Одинаковое","Варьируется"],["Риск серых пятен","Минимальный","Высокий"],["Засор одной иглы","Остальные работают","Падает вся система"],["Вязкие маринады","Да, до 4,3 бар","Ограниченно"],["Кость / тушки птицы","Да (подпружинен.)","Нет"],["Точность дозировки","Высокая","Средняя"]].map((row, ri) => (
                 <div key={ri} className={`grid grid-cols-3 text-base ${ri === 0 ? "bg-primary/5 font-bold text-foreground" : "border-t border-border text-foreground"} hover:bg-primary/3 transition-colors`}>
