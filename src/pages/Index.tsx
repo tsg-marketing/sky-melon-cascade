@@ -411,26 +411,20 @@ const Index = () => {
         </div>
       </section>
 
-      {/* НАШИ ПРЕИМУЩЕСТВА */}
+      {/* БЛОК 1: ЗАЧЕМ НУЖНЫ */}
       <section className="py-16 px-6 bg-primary/5">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground mb-4">
-              Наши преимущества
+              Зачем нужны мясомассажеры и инъекторы?
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Почему предприятия выбирают вакуумное оборудование от T-SIB
-            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: "TrendingDown",  title: "Меньше непросола и рекламаций",                  desc: "Стабильный результат на каждой партии снижает потери и претензии от покупателей" },
-              { icon: "Wind",          title: "Вакуум — быстрее процесс, меньше окисления",     desc: "Вакуумная среда ускоряет массирование и сохраняет свежесть и цвет продукта" },
-              { icon: "ArrowUpCircle", title: "Увеличиваем выход готового продукта +30–70%",    desc: "Оптимальное маринование и посол повышают выход без потери качества" },
-              { icon: "Shield",        title: "Пищевая нержавеющая сталь",                      desc: "Сталь марки 304 гарантирует безопасность продукции и долговечность оборудования. Санитарный конструктив, быстрая мойка." },
-              { icon: "Star",          title: "Комплектующие мировых брендов",                  desc: "Лучшие компоненты для надёжной работы без сбоев" },
-              { icon: "Award",         title: "Безотказная работа",                              desc: "Исключительная долговечность и продолжительный срок службы оборудования" },
+              { icon: "TrendingDown",  title: "Меньше непросола и рекламаций",               desc: "Стабильный результат на каждой партии снижает потери и претензии от покупателей" },
+              { icon: "Wind",          title: "Вакуум — быстрее процесс, меньше окисления",  desc: "Вакуумная среда ускоряет массирование и сохраняет свежесть и цвет продукта" },
+              { icon: "ArrowUpCircle", title: "Увеличиваем выход готового продукта +30–70%", desc: "Оптимальное маринование и посол повышают выход без потери качества" },
             ].map((item, i) => (
               <div key={i} className="bg-white rounded-2xl p-6 border border-primary/10 flex flex-col gap-4 hover:shadow-md transition-shadow">
                 <div className="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl flex-shrink-0">
@@ -442,6 +436,62 @@ const Index = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* БЛОК 2: ПРЕИМУЩЕСТВА ТЕХНО-СИБ */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground mb-4">
+              Преимущества мясомассажеров и инъекторов от компании Техно-Сиб
+            </h2>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="rounded-2xl overflow-hidden border border-border shadow-xl">
+              <img
+                src="https://cdn.poehali.dev/files/a80d03fc-2480-4c9b-a141-456c301f7d59.jpg"
+                alt="Оборудование Техно-Сиб"
+                className="w-full h-auto object-contain"
+              />
+            </div>
+
+            <div className="space-y-5">
+              {[
+                {
+                  icon: "Cpu",
+                  title: "Функциональность и высокая производительность",
+                  desc: "Наши вакуумные массажеры осуществляют бережное вакуумное массирование — рассол проникает глубже, текстура лучше, цикл короче. Регулируемые режимы: время, вакуум, скорость. Давление до −0,1 МПа, объём 100–3000 литров. Инъекторы рассола имеют 84 иглы с регистром давления, до 4 т/ч, до 4,3 бар — равномерное распределение рассола.",
+                },
+                {
+                  icon: "Star",
+                  title: "Комплектующие мировых брендов",
+                  desc: "Лучшие компоненты для надёжной работы без сбоев",
+                },
+                {
+                  icon: "Award",
+                  title: "Безотказная работа",
+                  desc: "Исключительная долговечность и продолжительный срок службы оборудования",
+                },
+                {
+                  icon: "Shield",
+                  title: "Пищевая нержавеющая сталь",
+                  desc: "Сталь марки 304 гарантирует безопасность продукции и долговечность оборудования. Санитарный конструктив, быстрая мойка.",
+                },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-4 p-5 bg-primary/5 border border-primary/10 rounded-2xl hover:shadow-md transition-shadow">
+                  <div className="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl flex-shrink-0">
+                    <Icon name={item.icon} fallback="CheckCircle" size={22} className="text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xl text-foreground mb-1">{item.title}</h3>
+                    <p className="text-base text-muted-foreground leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -528,67 +578,6 @@ const Index = () => {
               <Icon name="Phone" size={18} />
               Получить консультацию технолога
             </button>
-          </div>
-        </div>
-      </section>
-
-      {/* ЭКРАН 3: 3 КАРТОЧКИ */}
-      <section id="solutions" className="py-12 px-6 bg-background">
-        <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ${vis("solutions") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <span className="text-xs font-semibold tracking-widest text-primary uppercase">Оборудование</span>
-            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">
-              Оборудование + режим + рассол<br />= стабильная партия
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {[
-              {
-                icon: "RefreshCw",
-                title: "Вакуумные массажеры",
-                desc: "Бережное вакуумное массирование — рассол проникает глубже, текстура лучше, цикл короче. Регулируемые режимы: время, вакуум, скорость.",
-                specs: ["до −0.1 МПа вакуум", "100–3000 л объём", "Пищевая нержавеющая сталь"],
-                highlight: false,
-              },
-              {
-                icon: "Pipette",
-                title: "Инъекторы рассола",
-                desc: "84 иглы с регистром давления, до 4 т/ч, до 4,3 бар. Равномерное распределение рассола — без пятен и недосола по всему объёму.",
-                specs: ["84 иглы", "до 4 т/ч", "до 4,3 бар"],
-                highlight: true,
-              },
-            ].map((card, i) => (
-              <div
-                key={i}
-                className={`group transition-all duration-700 ${vis("solutions") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-                style={{ transitionDelay: `${i * 150}ms` }}
-              >
-                <div className={`h-full flex flex-col p-10 border-2 rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all ${card.highlight ? "border-primary shadow-primary/10" : "border-border hover:border-primary/40"}`}>
-                  {card.highlight && (
-                    <div className="mb-4">
-                      <span className="text-sm font-bold bg-primary text-white px-4 py-1.5 rounded-full">Популярно</span>
-                    </div>
-                  )}
-                  <div className={`w-24 h-24 flex items-center justify-center rounded-2xl mb-8 ${card.highlight ? "bg-primary" : "bg-primary/10"}`}>
-                    <Icon name={card.icon} fallback="Star" size={46} className={card.highlight ? "text-white" : "text-primary"} />
-                  </div>
-                  <h3 className="font-display font-bold text-3xl mb-4 text-foreground">{card.title}</h3>
-                  <p className="text-foreground/70 text-xl leading-relaxed mb-8 flex-1">{card.desc}</p>
-                  <div className="flex flex-wrap gap-2 mb-10">
-                    {card.specs.map((s, j) => (
-                      <span key={j} className="text-sm font-medium px-4 py-1.5 bg-primary/8 text-primary border border-primary/20 rounded-full">{s}</span>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => { setModalProduct(card.title); setModalOpen(true); }}
-                    className={`w-full py-4 rounded-xl font-bold text-lg text-center transition-all ${card.highlight ? "bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/20" : "border-2 border-primary/30 text-primary hover:border-primary hover:bg-primary/5"}`}
-                  >
-                    Оставить заявку
-                  </button>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
