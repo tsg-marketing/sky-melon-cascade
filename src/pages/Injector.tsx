@@ -189,7 +189,7 @@ const CONSENT_TEXT = (
   </p>
 );
 
-const Index = () => {
+const Injector = () => {
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
   const { addItem, removeItem, getQuantity, totalCount } = useCart();
   const navigate = useNavigate();
@@ -206,7 +206,7 @@ const Index = () => {
   const [catalogExpanded, setCatalogExpanded] = useState(false);
 
   // Catalog state
-  const [catalogTab, setCatalogTab] = useState<"massagers" | "injectors">("massagers");
+  const [catalogTab, setCatalogTab] = useState<"massagers" | "injectors">("injectors");
   const [catalogData, setCatalogData] = useState<{ massagers: CatalogItem[]; injectors: CatalogItem[] } | null>(null);
   const [catalogLoading, setCatalogLoading] = useState(true);
   const [catalogSearch, setCatalogSearch] = useState("");
@@ -261,8 +261,6 @@ const Index = () => {
           const allItems = [...(d.massagers || []), ...(d.injectors || [])];
           const found = allItems.find((it: CatalogItem) => it.id === productId);
           if (found) {
-            const tab = (d.massagers || []).find((it: CatalogItem) => it.id === productId) ? "massagers" : "injectors";
-            setCatalogTab(tab);
             setCatalogExpanded(true);
             setTimeout(() => {
               setSelectedItem(found);
@@ -278,7 +276,7 @@ const Index = () => {
 
   const filteredItems = useCallback(() => {
     if (!catalogData) return [];
-    const items = catalogData.massagers;
+    const items = catalogData.injectors;
     if (!catalogSearch.trim()) return items;
     const q = catalogSearch.toLowerCase();
     return items.filter(
@@ -289,13 +287,13 @@ const Index = () => {
   }, [catalogData, catalogSearch]);
 
   const navLinks = [
-    { href: "/injector",   label: "Инъекторы" },
-    { href: "#catalog",    label: "Каталог" },
-    { href: "#benefits",   label: "Преимущества" },
-    { href: "#selector",   label: "Подбор" },
-    { href: "#about",      label: "О компании" },
-    { href: "#faq",        label: "FAQ" },
-    { href: "#contacts",   label: "Контакты" },
+    { href: "/", label: "Массажеры" },
+    { href: "#catalog", label: "Каталог" },
+    { href: "#benefits", label: "Преимущества" },
+    { href: "#selector", label: "Подбор" },
+    { href: "#about", label: "О компании" },
+    { href: "#faq", label: "FAQ" },
+    { href: "#contacts", label: "Контакты" },
   ];
 
   return (
@@ -312,11 +310,17 @@ const Index = () => {
               className="h-9 w-auto object-contain"
             />
             <nav className="hidden lg:flex gap-6 text-sm font-semibold">
-              {navLinks.map((l) => (
-                <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
-                  {l.label}
-                </a>
-              ))}
+              {navLinks.map((l) =>
+                l.href === "/" ? (
+                  <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
+                    {l.label}
+                  </a>
+                ) : (
+                  <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
+                    {l.label}
+                  </a>
+                )
+              )}
             </nav>
           </div>
 
@@ -358,11 +362,17 @@ const Index = () => {
         </div>
         {menuOpen && (
           <div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4">
-            {navLinks.map((l) => (
-              <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>
-                {l.label}
-              </a>
-            ))}
+            {navLinks.map((l) =>
+              l.href === "/" ? (
+                <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  {l.label}
+                </a>
+              ) : (
+                <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>
+                  {l.label}
+                </a>
+              )
+            )}
           </div>
         )}
       </header>
@@ -379,22 +389,22 @@ const Index = () => {
                 Поставка и внедрение
               </span>
               <h1 className="text-5xl lg:text-6xl xl:text-7xl font-display font-black leading-[1.05] tracking-tight mb-6 text-foreground">
-                Стабильный посол и{" "}
-                <span className="text-primary">выше выход</span>{" "}
-                с вакуумными массажерами
+                Равномерный посол и{" "}
+                <span className="text-primary">стабильный выход</span>{" "}
+                с инъекторами для мяса
               </h1>
               <p className="text-2xl font-semibold text-foreground leading-relaxed mb-3 max-w-xl">
-                Вакуумные мясомассажеры от ведущих производителей мясного оборудования Daribo (Дарибо), Niro-Tech (Ниро-Тех), INWESTPOL (Инвестпол)
+                Инъекторы для мяса от ведущих производителей мясного оборудования Daribo (Дарибо), Niro-Tech (Ниро-Тех), INWESTPOL (Инвестпол)
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
-                Ускоряем цикл, выравниваем качество партии, снижаем риск брака. Подбираем оборудование и настройки под ветчину, копчёности, деликатесы, фабрики-кухни.
+                Точная дозировка рассола, работа с вязкими маринадами, подпружиненные иглы для тушек с костью. Подбираем модель и настройки под ваш продукт.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <button onClick={() => setModalOpen(true)} className="px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 text-center">
                   Получить предложение
                 </button>
-                <a href="#solutions" className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all text-center">
+                <a href="#catalog" className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all text-center">
                   Смотреть оборудование
                 </a>
               </div>
@@ -404,7 +414,7 @@ const Index = () => {
               <div className="rounded-2xl overflow-hidden border border-border shadow-xl bg-white">
                 <img
                   src="https://cdn.poehali.dev/files/a80d03fc-2480-4c9b-a141-456c301f7d59.jpg"
-                  alt="Вакуумный массажер Daribo"
+                  alt="Инъектор для мяса Daribo"
                   className="w-full h-auto object-contain"
                 />
               </div>
@@ -418,15 +428,15 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground mb-4">
-              Зачем нужен вакуумный массажер?
+              Зачем нужен инъектор для мяса?
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: "TrendingDown",  title: "Меньше непросола и рекламаций",               desc: "Стабильный результат на каждой партии снижает потери и претензии от покупателей" },
-              { icon: "Wind",          title: "Вакуум — быстрее процесс, меньше окисления",  desc: "Вакуумная среда ускоряет массирование и сохраняет свежесть и цвет продукта" },
-              { icon: "ArrowUpCircle", title: "Увеличиваем выход готового продукта +30–70%", desc: "Оптимальное маринование и посол повышают выход без потери качества" },
+              { icon: "Target",         title: "Равномерный посол без серых пятен",               desc: "Регистр давления обеспечивает одинаковое давление на каждой игле — нет пересола и недосола" },
+              { icon: "Zap",            title: "Работа с вязкими маринадами до 4,3 бар",         desc: "Густые маринады, соусы с частицами и специями — без засора системы" },
+              { icon: "ArrowUpCircle",  title: "Увеличение выхода готового продукта",             desc: "Точная дозировка рассола повышает выход продукта без потери качества" },
             ].map((item, i) => (
               <div key={i} className="bg-white rounded-2xl p-6 border border-primary/10 flex flex-col gap-4 hover:shadow-md transition-shadow">
                 <div className="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl flex-shrink-0">
@@ -442,24 +452,24 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─── ПРЕИМУЩЕСТВА НАШИХ МАССАЖЕРОВ ─── */}
+      {/* ─── ПРЕИМУЩЕСТВА НАШИХ ИНЪЕКТОРОВ ─── */}
       <section className="py-12 px-6 bg-gradient-to-br from-primary/5 via-white to-primary/10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground">
-              Преимущества наших массажеров
+              Преимущества наших инъекторов
             </h2>
           </div>
           <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { icon: "Zap",               title: "Производительность до 4 т/ч",   desc: "Рабочее давление до 4,3 бар" },
-              { icon: "Gauge",             title: "Вакуумный барабан до −0,1 МПа", desc: "Интенсивное массирование без потерь качества" },
-              { icon: "Database",          title: "Объём барабана 100–3000 л",      desc: "Широкий модельный ряд под любой объём производства" },
-              { icon: "ShieldCheck",       title: "Пищевая нержавеющая сталь",      desc: "Соответствие санитарным нормам" },
-              { icon: "Droplets",          title: "Быстрая мойка",                  desc: "Форма барабана оптимизирована под скоростную очистку" },
-              { icon: "SlidersHorizontal", title: "Регулируемые параметры",         desc: "Скорость, время, вакуум и направление вращения" },
-              { icon: "Package",           title: "Рёбра целостности",              desc: "Рёбра сохраняют целостность кусков при массировании" },
-              { icon: "ListChecks",        title: "99 программ работы",             desc: "Сохранение режимов массирования" },
+              { icon: "Grid3x3",        title: "84 иглы",                 desc: "Максимальное покрытие продукта" },
+              { icon: "Gauge",          title: "Давление до 4,3 бар",     desc: "Работа с вязкими маринадами без потери качества" },
+              { icon: "Zap",            title: "Подпружиненные иглы",     desc: "Не ломаются при контакте с костью, равномерно покрывают продукт" },
+              { icon: "MoveHorizontal", title: "Зубчатый конвейер",       desc: "Боковые направляющие — продукт не сдвигается" },
+              { icon: "Ruler",          title: "Шаг 15–60 мм",            desc: "Точная настройка под любой продукт" },
+              { icon: "Repeat",         title: "Повторяемость",           desc: "Одинаковый шаг на каждой партии" },
+              { icon: "Droplets",       title: "Мойка без разбора корпуса", desc: "Быстрая санитарная обработка без простоев" },
+              { icon: "ListChecks",     title: "До 99 программ работы",   desc: "Время, интервалы, вакуум, скорость — всё сохраняется" },
             ].map((feat, i) => (
               <div key={i} className="flex items-center gap-3 bg-white rounded-xl border border-border px-4 py-3 hover:border-primary/40 hover:shadow-sm transition-all">
                 <div className="w-10 h-10 shrink-0 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -591,7 +601,7 @@ const Index = () => {
                                 <span className="text-muted-foreground"><span className="font-medium text-foreground">{item.productivity.name}:</span> {item.productivity.value}</span>
                               </div>
                             )}
-                            {item.extra_params.map((p, pi) => (
+                            {item.extra_params.slice(0, 3).map((p, pi) => (
                               <div key={pi} className="flex items-start gap-2 text-base">
                                 <Icon name="ChevronRight" size={16} className="text-primary flex-shrink-0 mt-0.5" />
                                 <span className="text-muted-foreground"><span className="font-medium text-foreground">{p.name}:</span> {p.value}</span>
@@ -601,7 +611,7 @@ const Index = () => {
 
                           <div className="flex flex-col gap-2 mt-2">
                             <button
-                              onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }}
+                              onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); }}
                               className="w-full py-4 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md"
                             >
                               Узнать подробней
@@ -737,7 +747,7 @@ const Index = () => {
                     <p className="text-2xl sm:text-3xl font-black text-primary">{selectedItem.price_display}</p>
                   )}
                   <button
-                    onClick={() => { setSelectedItem(null); setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }}
+                    onClick={() => { setSelectedItem(null); setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); }}
                     className="hidden sm:block mt-2 w-full py-3 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md"
                   >
                     Узнать подробней
@@ -773,7 +783,7 @@ const Index = () => {
 
                 {/* Кнопка на мобиле */}
                 <button
-                  onClick={() => { setSelectedItem(null); setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }}
+                  onClick={() => { setSelectedItem(null); setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); }}
                   className="sm:hidden w-full py-4 bg-primary text-white rounded-xl text-lg font-bold hover:bg-primary/90 transition-all shadow-md"
                 >
                   Узнать подробней
@@ -975,16 +985,16 @@ const Index = () => {
           </div>
 
           <div className={`transition-all duration-700 ${vis("compare") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <h3 className="font-bold text-2xl text-foreground mb-4">Вакуумный массажер vs классический посол</h3>
+            <h3 className="font-bold text-2xl text-foreground mb-4">Инъектор с регистром давления vs обычный</h3>
             <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
               {[
-                ["Параметр",              "Вакуумный массажер",    "Классический посол"],
-                ["Время цикла",           "2–8 часов",             "12–72 часа"],
-                ["Однородность посола",   "Высокая",               "Неравномерно"],
-                ["Окисление",             "Минимальное (вакуум)",  "Высокое"],
-                ["Выход",                 "+20–30% (ориентир)",    "Базовый"],
-                ["Повторяемость",         "Да (программы PLC)",    "Зависит от операт."],
-                ["Мойка",                 "Быстро, без разборки",  "Стандартная"],
+                ["Параметр",                   "Регистр давления",    "Обычный инъектор"],
+                ["Давление на каждой игле",    "Одинаковое",          "Варьируется"],
+                ["Риск серых пятен",           "Минимальный",         "Высокий"],
+                ["Засор одной иглы",           "Остальные работают",  "Падает вся система"],
+                ["Вязкие маринады",            "Да, до 4,3 бар",      "Ограниченно"],
+                ["Кость / тушки птицы",        "Да (подпружинен.)",   "Нет"],
+                ["Точность дозировки",         "Высокая",             "Средняя"],
               ].map((row, ri) => (
                 <div key={ri} className={`grid grid-cols-3 text-base ${ri === 0 ? "bg-primary/5 font-bold text-foreground" : "border-t border-border text-foreground"} hover:bg-primary/3 transition-colors`}>
                   {row.map((cell, ci) => (
@@ -1138,8 +1148,8 @@ const Index = () => {
           </div>
           <div className="space-y-3 mb-12">
             {[
-              { q: "Зачем нужен вакуум в массажере?",                     a: "Вакуум раскрывает поры и волокна сырья, позволяя рассолу проникать глубже. Дополнительно тормозит окисление жиров и улучшает цвет и сроки хранения продукта." },
-              { q: "Насколько вакуумный массажер ускоряет процесс?",      a: "В зависимости от продукта и режима — от 2 до 10 раз быстрее классического посола. Например, цикл на ветчину вместо 48 часов может составить 6–12 часов." },
+              { q: "Что происходит при засоре одной иглы?",               a: "При конструкции с регистром давления засор одной иглы не влияет на остальные — давление перераспределяется. В обычных инъекторах засор одной иглы снижает давление во всей системе." },
+              { q: "Работает ли с вязкими маринадами и специями?",        a: "Да. Инъекторы работают при давлении до 4,3 бар, что позволяет использовать густые маринады, соусы с частицами и специями без засора системы." },
               { q: "Можно ли работать с тушками птицы и костью?",         a: "Да. Модели с подпружиненными иглами специально рассчитаны на работу с тушками птицы и продуктом на кости — иглы пружинят при контакте с костью, не ломаются." },
               { q: "Как устроена мойка оборудования?",                    a: "Конвейер снимается без инструмента за 1–2 минуты. Корпус и внутренние поверхности из SUS304 легко моются стандартными дезинфектантами. Полная мойка занимает 15–30 минут." },
               { q: "Что такое PLC и зачем нужны 99 программ?",            a: "PLC — программируемый логический контроллер. Позволяет сохранять до 99 рецептур (время, вакуум, скорость, направление, интервалы) и воспроизводить их в одно касание. Исключает человеческий фактор и обеспечивает повторяемость." },
@@ -1413,4 +1423,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Injector;
