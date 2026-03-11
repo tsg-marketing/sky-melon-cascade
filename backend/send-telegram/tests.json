@@ -1,0 +1,19 @@
+{
+  "tests": [
+    {
+      "name": "Test send telegram message",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "name": "Тестовый клиент",
+        "phone": "+79001234567",
+        "message": "Хочу заказать звуковое оборудование"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

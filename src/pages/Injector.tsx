@@ -180,6 +180,10 @@ const Injector = () => {
   const [inquirySent, setInquirySent] = useState(false);
   const [contactsPhoneTouched, setContactsPhoneTouched] = useState(false);
   const [modalPhoneTouched, setModalPhoneTouched] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [videoOpen, setVideoOpen] = useState(false);
 
   useEffect(() => {
     const ids = ["hero","pain","catalog","benefits","compare","selector","service","about","faq","contacts"];
@@ -218,13 +222,13 @@ const Injector = () => {
   }, [catalogData, catalogSearch]);
 
   const navLinks = [
-    { href: "/",           label: "Массажеры" },
-    { href: "#catalog",    label: "Каталог" },
-    { href: "#benefits",   label: "Преимущества" },
-    { href: "#selector",   label: "Подбор" },
-    { href: "#about",      label: "О компании" },
-    { href: "#faq",        label: "FAQ" },
-    { href: "#contacts",   label: "Контакты" },
+    { href: "/",             label: "Массажеры" },
+    { href: "#catalog",      label: "Каталог" },
+    { href: "#advantages",   label: "Преимущества" },
+    { href: "#selector",     label: "Подбор" },
+    { href: "#technosib",    label: "О компании" },
+    { href: "#faq",          label: "Вопросы" },
+    { href: "#contacts",     label: "Контакты" },
   ];
 
   return (
@@ -232,7 +236,10 @@ const Injector = () => {
       <header className="fixed top-0 w-full bg-white/90 backdrop-blur-xl border-b border-border z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-6">
           <div className="flex items-center gap-6 flex-shrink-0">
-            <a href="/"><img src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg" alt="Техносиб" className="h-9 w-auto object-contain" /></a>
+            <div className="flex flex-col">
+              <a href="/"><img src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg" alt="Техносиб" className="h-9 w-auto object-contain" /></a>
+              <span className="text-[10px] text-muted-foreground leading-tight mt-0.5">Оборудование для маринования и посола мяса</span>
+            </div>
             <nav className="hidden lg:flex gap-6 text-sm font-semibold">
               {navLinks.map((l) => (<a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">{l.label}</a>))}
             </nav>
@@ -247,16 +254,17 @@ const Injector = () => {
             <button className="lg:hidden p-2 text-muted-foreground" onClick={() => setMenuOpen(!menuOpen)}><Icon name={menuOpen ? "X" : "Menu"} size={22} /></button>
           </div>
         </div>
-        {menuOpen && (<div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4">{navLinks.map((l) => (<a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>{l.label}</a>))}</div>)}
+        {menuOpen && (<div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4"><span className="text-[10px] text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>{navLinks.map((l) => (<a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>{l.label}</a>))}</div>)}
       </header>
 
       <section id="hero" className="relative pt-28 pb-20 px-6 min-h-screen flex items-center bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
+        <div className="absolute inset-0 lg:hidden" style={{ backgroundImage: "url(https://cdn.poehali.dev/files/31cdb492-7133-4082-ab8b-95564d292c21.jpg)", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat", opacity: 0.13 }} />
         <div className="absolute top-24 right-0 w-[600px] h-[600px] bg-primary/6 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-7xl mx-auto w-full">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className={`transition-all duration-1000 ${vis("hero") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               <span className="inline-block text-xs font-semibold tracking-widest text-primary uppercase border border-primary/30 rounded-full px-4 py-1.5 mb-6 bg-primary/5">Поставка и внедрение</span>
-              <h1 className="text-5xl lg:text-6xl xl:text-7xl font-display font-black leading-[1.05] tracking-tight mb-6 text-foreground">Инъекторы для равномерного{" "}<span className="text-primary">маринования мяса</span></h1>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-display font-black leading-[1.05] tracking-tight mb-6 text-foreground">Инъекторы для равномерного{" "}<span className="text-primary">маринования мяса</span></h1>
               <p className="text-2xl font-semibold text-foreground leading-relaxed mb-3 max-w-xl">Инъекторы для мяса от ведущих производителей мясного оборудования Daribo (Дарибо), Niro-Tech (Ниро-Тех), INWESTPOL (Инвестпол)</p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">Точная дозировка рассола, работа с вязкими маринадами, подпружиненные иглы для тушек с костью. Подбираем модель и настройки под ваш продукт.</p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -264,10 +272,8 @@ const Injector = () => {
                 <a href="#catalog" className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all text-center">Смотреть оборудование</a>
               </div>
             </div>
-            <div className={`transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
-              <div className="rounded-2xl overflow-hidden border border-border shadow-xl bg-white">
-                <img src="https://cdn.poehali.dev/files/31cdb492-7133-4082-ab8b-95564d292c21.jpg" alt="Инъектор для мяса Daribo" className="w-full h-auto object-contain" />
-              </div>
+            <div className={`hidden lg:block transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
+              <img src="https://cdn.poehali.dev/files/31cdb492-7133-4082-ab8b-95564d292c21.jpg" alt="Инъектор для мяса Daribo" className="w-full h-auto object-contain lg:scale-125" />
             </div>
           </div>
         </div>
@@ -293,7 +299,7 @@ const Injector = () => {
         </div>
       </section>
 
-      <section className="py-12 px-6 bg-gradient-to-br from-primary/5 via-white to-primary/10">
+      <section id="advantages" className="py-12 px-6 bg-gradient-to-br from-primary/5 via-white to-primary/10">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14"><h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground">Преимущества наших инъекторов</h2></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -319,8 +325,7 @@ const Injector = () => {
       <section id="catalog" className="py-12 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className={`text-center mb-14 transition-all duration-1000 ${vis("catalog") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <span className="text-xs font-semibold tracking-widest text-primary uppercase">Каталог</span>
-            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Инъекторы для мяса</h2>
+            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Инъекторы для мяса</h2>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">
             <div className="relative w-full sm:w-80">
@@ -341,7 +346,7 @@ const Injector = () => {
                     return (
                       <div key={item.id} id={`product-${item.id}`} className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/40 transition-all flex flex-col group">
                         <div className="relative bg-gray-50 overflow-hidden" style={{ aspectRatio: "4/3" }}>
-                          <img src={item.pictures[slide]} alt={item.name} className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500" onClick={() => { setSelectedItem(item); setSelectedSlide(slide); }} style={{ cursor: "pointer" }} />
+                          <img src={item.pictures[slide]} alt={item.name} className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500" onClick={() => { setLightboxPhotos(item.pictures); setLightboxIndex(slide); setLightboxOpen(true); }} style={{ cursor: "pointer" }} />
                           {item.pictures.length > 1 && (<>
                             <button onClick={(e) => { e.stopPropagation(); setCardSlides((prev) => ({ ...prev, [item.id]: (slide - 1 + item.pictures.length) % item.pictures.length })); }} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white rounded-full shadow flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Icon name="ChevronLeft" size={16} className="text-foreground" /></button>
                             <button onClick={(e) => { e.stopPropagation(); setCardSlides((prev) => ({ ...prev, [item.id]: (slide + 1) % item.pictures.length })); }} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white rounded-full shadow flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Icon name="ChevronRight" size={16} className="text-foreground" /></button>
@@ -421,7 +426,7 @@ const Injector = () => {
                 <input type="tel" placeholder="+7 (___) ___-__-__" value={inquiryPhone} onChange={(e) => setInquiryPhone(formatPhone(inquiryPhone, e.target.value))} onBlur={() => setInquiryPhoneTouched(true)} className={inquiryPhoneTouched && !isValidPhone(inquiryPhone) ? inputError : inputCls} />
                 {inquiryPhoneTouched && !isValidPhone(inquiryPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
               </div>
-              <button onClick={() => { if (inquiryName.trim() && isValidPhone(inquiryPhone) && !sending) { sendLead({ name: inquiryName, phone: inquiryPhone, product: inquiryItem?.name, formType: 'inquiry' }); setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false); } }} disabled={!inquiryName.trim() || !isValidPhone(inquiryPhone) || sending} className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
+              <button onClick={() => { if (inquiryName.trim() && isValidPhone(inquiryPhone) && !sending) { sendLead({ name: inquiryName, phone: inquiryPhone, product: inquiryItem?.name, topic: 'инъекторы для мяса', formType: 'inquiry' }); setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false); } }} disabled={!inquiryName.trim() || !isValidPhone(inquiryPhone) || sending} className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
               {CONSENT_TEXT}
             </div>
           </div>
@@ -431,8 +436,7 @@ const Injector = () => {
       <section id="benefits" className="py-12 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 ${vis("benefits") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <span className="text-xs font-semibold tracking-widest text-primary uppercase">После внедрения</span>
-            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Что меняется после внедрения</h2>
+            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Что меняется после внедрения</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {[
@@ -493,29 +497,39 @@ const Injector = () => {
           <div className={`text-center mb-16 transition-all duration-1000 ${vis("compare") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Инъекторы с давлением и обычные инъекторы</h2></div>
           <div className={`transition-all duration-700 ${vis("compare") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
             <h3 className="font-bold text-2xl text-foreground mb-4">Сравнение инъекторов</h3>
-            <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
-              {[["Параметр","Регистр давления","Обычный инъектор"],["Давление на каждой игле","Одинаковое","Варьируется"],["Риск серых пятен","Минимальный","Высокий"],["Засор одной иглы","Остальные работают","Падает вся система"],["Вязкие маринады","Да, до 4,3 бар","Ограниченно"],["Кость / тушки птицы","Да (подпружинен.)","Нет"],["Точность дозировки","Высокая","Средняя"]].map((row, ri) => (
-                <div key={ri} className={`grid grid-cols-3 text-base ${ri === 0 ? "bg-primary/5 font-bold text-foreground" : "border-t border-border text-foreground"} hover:bg-primary/3 transition-colors`}>
-                  {row.map((cell, ci) => (<div key={ci} className={`px-4 py-4 ${ci === 1 && ri > 0 ? "text-primary font-semibold" : ""}`}>{cell}</div>))}
-                </div>
-              ))}
+            <div className="overflow-x-auto -mx-4 px-4">
+              <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm min-w-[600px]">
+                {[["Параметр","Регистр давления","Обычный инъектор"],["Давление на каждой игле","Одинаковое","Варьируется"],["Риск серых пятен","Минимальный","Высокий"],["Засор одной иглы","Остальные работают","Падает вся система"],["Вязкие маринады","Да, до 4,3 бар","Ограниченно"],["Кость / тушки птицы","Да (подпружинен.)","Нет"],["Точность дозировки","Высокая","Средняя"]].map((row, ri) => (
+                  <div key={ri} className={`grid grid-cols-3 text-base ${ri === 0 ? "bg-primary/5 font-bold text-foreground" : "border-t border-border text-foreground"} hover:bg-primary/3 transition-colors`}>
+                    {row.map((cell, ci) => (<div key={ci} className={`px-4 py-4 ${ci === 1 && ri > 0 ? "text-primary font-semibold" : ""}`}>{cell}</div>))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-          <div className="max-w-md mx-auto mt-14"><CompareForm onSent={(name, phone) => sendLead({ name, phone, formType: 'compare' })} /></div>
+          <div className="max-w-md mx-auto mt-14"><CompareForm onSent={(name, phone) => sendLead({ name, phone, topic: 'инъекторы для мяса', formType: 'compare' })} /></div>
         </div>
       </section>
 
       <section className="py-12 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10"><span className="text-xs font-semibold tracking-widest text-primary uppercase">Смотрите в деле</span><h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground">Посмотрите как работает наше оборудование</h2></div>
-          <div className="rounded-3xl overflow-hidden shadow-xl border border-border aspect-video"><iframe src="https://rutube.ru/play/embed/a4b1832f47b691f9066c6370f007d8d0/" className="w-full h-full" allowFullScreen allow="autoplay; fullscreen" title="Оборудование Daribo" /></div>
+          <div className="rounded-3xl overflow-hidden shadow-xl border border-border aspect-video bg-gray-900 relative cursor-pointer group" onClick={() => setVideoOpen(true)}>
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <Icon name="Play" size={36} className="text-white ml-1" />
+              </div>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-[1]" />
+            <img src="https://cdn.poehali.dev/files/31cdb492-7133-4082-ab8b-95564d292c21.jpg" alt="Видео об оборудовании" className="w-full h-full object-cover opacity-60" />
+          </div>
         </div>
       </section>
 
       <section id="selector" className="py-12 px-6 bg-background">
         <div className="max-w-4xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 ${vis("selector") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><span className="text-xs font-semibold tracking-widest text-primary uppercase">Подбор оборудования</span><h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Ответьте на 6 вопросов — получите решение</h2><p className="text-lg text-muted-foreground mt-4">Технолог подберёт оборудование и пришлёт КП в течение 2 часов</p></div>
-          <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, formType: 'quiz' })} />
+          <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, topic: 'инъекторы для мяса', formType: 'quiz' })} />
         </div>
       </section>
 
@@ -540,7 +554,7 @@ const Injector = () => {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className={`transition-all duration-1000 ${vis("about") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               <span className="text-xs font-semibold tracking-widest text-primary uppercase">О компании</span>
-              <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 mb-6 text-foreground whitespace-nowrap">О компании Daribo (Дарибо)</h2>
+              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 mb-6 text-foreground">О компании Daribo (Дарибо)</h2>
               <p className="text-lg text-muted-foreground leading-relaxed mb-5">Мы предлагаем оборудование компании <strong className="text-foreground">Daribo (Дарибо)</strong>. «Shanghai DARIBO Food Machinery Co., Ltd» — крупный производитель оборудования для пищевой промышленности, базирующийся в Шанхае.</p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-5">Специализация Daribo (Дарибо) включает вакуумные массажеры (серия GRY, например DRB-GRY750L), автоматические инъекторы рассола, слайсеры, порционирующие машины, волчки для замороженного мяса, блокорезки, вакуумные фаршемесы, котлетные машины и полные производственные линии под ключ. Поставляет продукцию в США, Мексику, Францию, Индонезию, Таиланд, Филиппины и другие страны.</p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-8">Специализация Daribo (Дарибо) включает <strong className="text-foreground">вакуумные массажеры</strong> (серия GRY, например DRB-GRY750L), <strong className="text-foreground">инъекторы рассола</strong>, мясорезки, котлетные машины и полные производственные линии под ключ.</p>
@@ -577,9 +591,9 @@ const Injector = () => {
         </div>
       </section>
 
-      <section className="py-12 px-6 bg-gradient-to-b from-background to-white">
+      <section id="technosib" className="py-12 px-6 bg-gradient-to-b from-background to-white">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl lg:text-5xl font-display font-black text-center mb-10 text-foreground">О компании ТЕХНО-СИБ</h2>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black text-center mb-10 text-foreground">О компании ТЕХНО-СИБ</h2>
           <div className="grid sm:grid-cols-3 gap-5 mb-8">
             {[{ icon: "Calendar", title: "25 лет на рынке", desc: "Опыт работы с 2001 года" },{ icon: "MapPin", title: "2 города", desc: "Офисы в Москве и Новосибирске" },{ icon: "Globe", title: "Проверенные партнёры", desc: "Из Европы, России и Китая" }].map((s, i) => (
               <div key={i} className="bg-white rounded-2xl shadow-md p-6 text-center hover:shadow-lg transition-shadow"><div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4"><Icon name={s.icon} fallback="Star" size={30} className="text-primary" /></div><h3 className="font-bold text-lg text-foreground mb-1">{s.title}</h3><p className="text-muted-foreground text-sm">{s.desc}</p></div>
@@ -624,7 +638,7 @@ const Injector = () => {
                   <input type="text" placeholder="Имя *" required value={contactsName} onChange={e => setContactsName(e.target.value)} className={inputCls} />
                   <div><input type="tel" placeholder="+7 (___) ___-__-__" required value={contactsPhone} onChange={e => setContactsPhone(formatPhone(contactsPhone, e.target.value))} onBlur={() => setContactsPhoneTouched(true)} className={contactsPhoneTouched && !isValidPhone(contactsPhone) ? inputError : inputCls} />{contactsPhoneTouched && !isValidPhone(contactsPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}</div>
                   <textarea placeholder="Комментарий (продукт, объём, задача)" rows={4} value={contactsComment} onChange={e => setContactsComment(e.target.value)} className={inputCls + " resize-none"} />
-                  <button onClick={() => { if (contactsName.trim() && isValidPhone(contactsPhone) && !sending) { sendLead({ name: contactsName, phone: contactsPhone, comment: contactsComment, formType: 'contacts' }); setContactsName(""); setContactsPhone(""); setContactsComment(""); setContactsPhoneTouched(false); } }} disabled={!contactsName.trim() || !isValidPhone(contactsPhone) || sending} className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
+                  <button onClick={() => { if (contactsName.trim() && isValidPhone(contactsPhone) && !sending) { sendLead({ name: contactsName, phone: contactsPhone, comment: contactsComment, topic: 'инъекторы для мяса', formType: 'contacts' }); setContactsName(""); setContactsPhone(""); setContactsComment(""); setContactsPhoneTouched(false); } }} disabled={!contactsName.trim() || !isValidPhone(contactsPhone) || sending} className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
                   {CONSENT_TEXT}
                 </div>
               </div>
@@ -643,7 +657,7 @@ const Injector = () => {
             <div className="space-y-4">
               <input type="text" placeholder="Имя *" required value={modalName} onChange={e => setModalName(e.target.value)} className={inputCls} />
               <div><input type="tel" placeholder="+7 (___) ___-__-__" required value={modalPhone} onChange={e => setModalPhone(formatPhone(modalPhone, e.target.value))} onBlur={() => setModalPhoneTouched(true)} className={modalPhoneTouched && !isValidPhone(modalPhone) ? inputError : inputCls} />{modalPhoneTouched && !isValidPhone(modalPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}</div>
-              <button onClick={() => { if (modalName.trim() && isValidPhone(modalPhone) && !sending) { sendLead({ name: modalName, phone: modalPhone, product: modalProduct, formType: 'modal' }); setModalOpen(false); setModalName(""); setModalPhone(""); setModalPhoneTouched(false); } }} disabled={!modalName.trim() || !isValidPhone(modalPhone) || sending} className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
+              <button onClick={() => { if (modalName.trim() && isValidPhone(modalPhone) && !sending) { sendLead({ name: modalName, phone: modalPhone, product: modalProduct, topic: 'инъекторы для мяса', formType: 'modal' }); setModalOpen(false); setModalName(""); setModalPhone(""); setModalPhoneTouched(false); } }} disabled={!modalName.trim() || !isValidPhone(modalPhone) || sending} className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
               {CONSENT_TEXT}
             </div>
           </div>
@@ -688,6 +702,43 @@ const Injector = () => {
           </div>
         </div>
       </footer>
+
+      {videoOpen && (
+        <div className="fixed inset-0 z-[150] bg-black/95 flex items-center justify-center p-4" onClick={() => setVideoOpen(false)}>
+          <button onClick={() => setVideoOpen(false)} className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+            <Icon name="X" size={24} className="text-white" />
+          </button>
+          <div className="w-full max-w-5xl aspect-video" onClick={(e) => e.stopPropagation()}>
+            <iframe src="https://rutube.ru/play/embed/a4b1832f47b691f9066c6370f007d8d0/" className="w-full h-full rounded-2xl" allowFullScreen allow="autoplay; fullscreen" title="Оборудование Daribo" />
+          </div>
+        </div>
+      )}
+
+      {lightboxOpen && lightboxPhotos.length > 0 && (
+        <div className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center" onClick={() => setLightboxOpen(false)}>
+          <button onClick={() => setLightboxOpen(false)} className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+            <Icon name="X" size={24} className="text-white" />
+          </button>
+          <div className="relative w-full h-full flex items-center justify-center p-4" onClick={(e) => e.stopPropagation()}>
+            <img src={lightboxPhotos[lightboxIndex]} alt="" className="max-w-full max-h-full object-contain" />
+            {lightboxPhotos.length > 1 && (
+              <>
+                <button onClick={() => setLightboxIndex((i) => (i - 1 + lightboxPhotos.length) % lightboxPhotos.length)} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                  <Icon name="ChevronLeft" size={24} className="text-white" />
+                </button>
+                <button onClick={() => setLightboxIndex((i) => (i + 1) % lightboxPhotos.length)} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                  <Icon name="ChevronRight" size={24} className="text-white" />
+                </button>
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                  {lightboxPhotos.map((_, i) => (
+                    <button key={i} onClick={() => setLightboxIndex(i)} className={`w-2.5 h-2.5 rounded-full transition-all ${i === lightboxIndex ? "bg-white" : "bg-white/40"}`} />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
     </div>

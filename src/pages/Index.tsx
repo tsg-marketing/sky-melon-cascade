@@ -220,6 +220,9 @@ const Index = () => {
   const [inquirySent, setInquirySent] = useState(false);
   const [contactsPhoneTouched, setContactsPhoneTouched] = useState(false);
   const [modalPhoneTouched, setModalPhoneTouched] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     const ids = [
@@ -289,13 +292,13 @@ const Index = () => {
   }, [catalogData, catalogSearch]);
 
   const navLinks = [
-    { href: "/injector",   label: "Инъекторы" },
-    { href: "#catalog",    label: "Каталог" },
-    { href: "#benefits",   label: "Преимущества" },
-    { href: "#selector",   label: "Подбор" },
-    { href: "#about",      label: "О компании" },
-    { href: "#faq",        label: "FAQ" },
-    { href: "#contacts",   label: "Контакты" },
+    { href: "/injector",       label: "Инъекторы" },
+    { href: "#catalog",        label: "Каталог" },
+    { href: "#advantages",     label: "Преимущества" },
+    { href: "#selector",       label: "Подбор" },
+    { href: "#technosib",      label: "О компании" },
+    { href: "#faq",            label: "Вопросы" },
+    { href: "#contacts",       label: "Контакты" },
   ];
 
   return (
@@ -306,11 +309,14 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-6">
           {/* Логотип + меню рядом */}
           <div className="flex items-center gap-6 flex-shrink-0">
-            <img
-              src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg"
-              alt="Техносиб"
-              className="h-9 w-auto object-contain"
-            />
+            <div className="flex flex-col">
+              <img
+                src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg"
+                alt="Техносиб"
+                className="h-9 w-auto object-contain"
+              />
+              <span className="text-[10px] text-muted-foreground leading-tight mt-0.5">Оборудование для маринования и посола мяса</span>
+            </div>
             <nav className="hidden lg:flex gap-6 text-sm font-semibold">
               {navLinks.map((l) => (
                 <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
@@ -358,6 +364,7 @@ const Index = () => {
         </div>
         {menuOpen && (
           <div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4">
+            <span className="text-[10px] text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>
             {navLinks.map((l) => (
               <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>
                 {l.label}
@@ -369,6 +376,7 @@ const Index = () => {
 
       {/* ЭКРАН 1: HERO */}
       <section id="hero" className="relative pt-28 pb-20 px-6 min-h-screen flex items-center bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
+        <div className="absolute inset-0 lg:hidden" style={{ backgroundImage: "url(https://cdn.poehali.dev/files/a80d03fc-2480-4c9b-a141-456c301f7d59.jpg)", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat", opacity: 0.13 }} />
         <div className="absolute top-24 right-0 w-[600px] h-[600px] bg-primary/6 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-7xl mx-auto w-full">
@@ -384,7 +392,7 @@ const Index = () => {
                 с вакуумными массажерами
               </h1>
               <p className="text-2xl font-semibold text-foreground leading-relaxed mb-3 max-w-xl">
-                Вакуумные мясомассажеры от ведущих производителей мясного оборудования Daribo (Дарибо), Niro-Tech (Ниро-Тех), INWESTPOL (Инвестпол)
+                От ведущих производителей мясного оборудования Daribo (Дарибо), Niro-Tech (Ниро-Тех), INWESTPOL (Инвестпол)
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
                 Ускоряем цикл, выравниваем качество партии, снижаем риск брака. Подбираем оборудование и настройки под ветчину, копчёности, деликатесы, фабрики-кухни.
@@ -400,14 +408,12 @@ const Index = () => {
               </div>
             </div>
 
-            <div className={`transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
-              <div className="rounded-2xl overflow-hidden border border-border shadow-xl bg-white">
-                <img
-                  src="https://cdn.poehali.dev/files/a80d03fc-2480-4c9b-a141-456c301f7d59.jpg"
-                  alt="Вакуумный массажер Daribo"
-                  className="w-full h-auto object-contain"
-                />
-              </div>
+            <div className={`hidden lg:block transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
+              <img
+                src="https://cdn.poehali.dev/files/a80d03fc-2480-4c9b-a141-456c301f7d59.jpg"
+                alt="Вакуумный массажер Daribo"
+                className="w-full h-auto object-contain lg:scale-125"
+              />
             </div>
           </div>
         </div>
@@ -443,7 +449,7 @@ const Index = () => {
       </section>
 
       {/* ─── ПРЕИМУЩЕСТВА НАШИХ МАССАЖЕРОВ ─── */}
-      <section className="py-12 px-6 bg-gradient-to-br from-primary/5 via-white to-primary/10">
+      <section id="advantages" className="py-12 px-6 bg-gradient-to-br from-primary/5 via-white to-primary/10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground">
@@ -480,8 +486,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           {/* Заголовок */}
           <div className="text-center mb-12">
-            <span className="text-xs font-semibold tracking-widest text-primary uppercase">Оборудование</span>
-            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">
+            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">
               Каталог оборудования
             </h2>
             <p className="text-lg text-muted-foreground mt-4 max-w-xl mx-auto">Реальный ассортимент с ценами — выберите модель и оставьте заявку</p>
@@ -536,7 +541,7 @@ const Index = () => {
                             src={item.pictures[slide]}
                             alt={item.name}
                             className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-                            onClick={() => { setSelectedItem(item); setSelectedSlide(slide); }}
+                            onClick={() => { setLightboxPhotos(item.pictures); setLightboxIndex(slide); setLightboxOpen(true); }}
                             style={{ cursor: "pointer" }}
                           />
                           {item.pictures.length > 1 && (
@@ -845,8 +850,7 @@ const Index = () => {
       <section id="benefits" className="py-12 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 ${vis("benefits") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <span className="text-xs font-semibold tracking-widest text-primary uppercase">После внедрения</span>
-            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">
+            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">
               Что меняется после внедрения
             </h2>
           </div>
@@ -976,48 +980,29 @@ const Index = () => {
 
           <div className={`transition-all duration-700 ${vis("compare") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
             <h3 className="font-bold text-2xl text-foreground mb-4">Вакуумный массажер vs классический посол</h3>
-            <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
-              {[
-                ["Параметр",              "Вакуумный массажер",    "Классический посол"],
-                ["Время цикла",           "2–8 часов",             "12–72 часа"],
-                ["Однородность посола",   "Высокая",               "Неравномерно"],
-                ["Окисление",             "Минимальное (вакуум)",  "Высокое"],
-                ["Выход",                 "+20–30% (ориентир)",    "Базовый"],
-                ["Повторяемость",         "Да (программы PLC)",    "Зависит от операт."],
-                ["Мойка",                 "Быстро, без разборки",  "Стандартная"],
-              ].map((row, ri) => (
-                <div key={ri} className={`grid grid-cols-3 text-base ${ri === 0 ? "bg-primary/5 font-bold text-foreground" : "border-t border-border text-foreground"} hover:bg-primary/3 transition-colors`}>
-                  {row.map((cell, ci) => (
-                    <div key={ci} className={`px-4 py-4 ${ci === 1 && ri > 0 ? "text-primary font-semibold" : ""}`}>{cell}</div>
-                  ))}
-                </div>
-              ))}
+            <div className="overflow-x-auto -mx-4 px-4">
+              <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm min-w-[600px]">
+                {[
+                  ["Параметр",              "Вакуумный массажер",    "Классический посол"],
+                  ["Время цикла",           "2–8 часов",             "12–72 часа"],
+                  ["Однородность посола",   "Высокая",               "Неравномерно"],
+                  ["Окисление",             "Минимальное (вакуум)",  "Высокое"],
+                  ["Выход",                 "+20–30% (ориентир)",    "Базовый"],
+                  ["Повторяемость",         "Да (программы PLC)",    "Зависит от операт."],
+                  ["Мойка",                 "Быстро, без разборки",  "Стандартная"],
+                ].map((row, ri) => (
+                  <div key={ri} className={`grid grid-cols-3 text-base ${ri === 0 ? "bg-primary/5 font-bold text-foreground" : "border-t border-border text-foreground"} hover:bg-primary/3 transition-colors`}>
+                    {row.map((cell, ci) => (
+                      <div key={ci} className={`px-4 py-4 ${ci === 1 && ri > 0 ? "text-primary font-semibold" : ""}`}>{cell}</div>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
           <div className="max-w-md mx-auto mt-14">
             <CompareForm onSent={(name, phone) => sendLead({ name, phone, formType: 'compare' })} />
-          </div>
-        </div>
-      </section>
-
-      {/* ─── ВИДЕО ─── */}
-      <section className="py-12 px-6 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10">
-            <span className="text-xs font-semibold tracking-widest text-primary uppercase">Смотрите в деле</span>
-            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground">
-              Посмотрите как работает наше оборудование
-            </h2>
-          </div>
-          <div className="rounded-3xl overflow-hidden shadow-xl border border-border aspect-video">
-            <iframe
-              src="https://rutube.ru/play/embed/a4b1832f47b691f9066c6370f007d8d0/"
-              className="w-full h-full"
-              allowFullScreen
-              allow="autoplay; fullscreen"
-              title="Оборудование Daribo"
-            />
           </div>
         </div>
       </section>
@@ -1089,7 +1074,7 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className={`transition-all duration-1000 ${vis("about") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               <span className="text-xs font-semibold tracking-widest text-primary uppercase">О компании</span>
-              <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 mb-6 text-foreground whitespace-nowrap">
+              <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 mb-6 text-foreground">
                 О компании Daribo (Дарибо)
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed mb-5">
@@ -1171,7 +1156,7 @@ const Index = () => {
       </section>
 
       {/* ─── О КОМПАНИИ ТЕХНО-СИБ ─── */}
-      <section className="py-12 px-6 bg-gradient-to-b from-background to-white">
+      <section id="technosib" className="py-12 px-6 bg-gradient-to-b from-background to-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl lg:text-5xl font-display font-black text-center mb-10 text-foreground">
             О компании ТЕХНО-СИБ
@@ -1407,6 +1392,32 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {lightboxOpen && lightboxPhotos.length > 0 && (
+        <div className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center" onClick={() => setLightboxOpen(false)}>
+          <button onClick={() => setLightboxOpen(false)} className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+            <Icon name="X" size={24} className="text-white" />
+          </button>
+          <div className="relative w-full h-full flex items-center justify-center p-4" onClick={(e) => e.stopPropagation()}>
+            <img src={lightboxPhotos[lightboxIndex]} alt="" className="max-w-full max-h-full object-contain" />
+            {lightboxPhotos.length > 1 && (
+              <>
+                <button onClick={() => setLightboxIndex((i) => (i - 1 + lightboxPhotos.length) % lightboxPhotos.length)} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                  <Icon name="ChevronLeft" size={24} className="text-white" />
+                </button>
+                <button onClick={() => setLightboxIndex((i) => (i + 1) % lightboxPhotos.length)} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                  <Icon name="ChevronRight" size={24} className="text-white" />
+                </button>
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                  {lightboxPhotos.map((_, i) => (
+                    <button key={i} onClick={() => setLightboxIndex(i)} className={`w-2.5 h-2.5 rounded-full transition-all ${i === lightboxIndex ? "bg-white" : "bg-white/40"}`} />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
     </div>

@@ -34,6 +34,7 @@ export interface LeadPayload {
   email?: string;
   comment?: string;
   product?: string;
+  topic?: string;
   quizAnswers?: Record<string, string>;
   formType: 'quiz' | 'compare' | 'contacts' | 'modal' | 'inquiry' | 'cart';
 }
