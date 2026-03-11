@@ -514,13 +514,8 @@ const Injector = () => {
       <section className="py-12 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10"><span className="text-xs font-semibold tracking-widest text-primary uppercase">Смотрите в деле</span><h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground">Посмотрите как работает наше оборудование</h2></div>
-          <div className="rounded-3xl overflow-hidden shadow-xl border border-border aspect-video bg-gray-900 relative cursor-pointer group" onClick={() => setVideoOpen(true)}>
-            <div className="absolute inset-0 flex items-center justify-center z-10">
-              <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <Icon name="Play" size={36} className="text-white ml-1" />
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-gray-800 to-gray-900" />
+          <div className="rounded-3xl overflow-hidden shadow-xl border border-border aspect-video">
+            <iframe src="https://rutube.ru/play/embed/a4b1832f47b691f9066c6370f007d8d0/" className="w-full h-full" allowFullScreen allow="autoplay; fullscreen" title="Оборудование Daribo" />
           </div>
         </div>
       </section>
