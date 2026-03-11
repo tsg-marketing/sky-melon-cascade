@@ -1359,9 +1359,9 @@ const Index = () => {
             <div>
               <p className="font-semibold text-sm text-foreground mb-3">Компания</p>
               <div className="space-y-2">
-                {["#benefits", "#compare", "#service", "#about", "#faq"].map((href, i) => (
+                {["#benefits", "#compare", "#service", "#technosib", "#faq"].map((href, i) => (
                   <a key={i} href={href} className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                    {["Преимущества", "Почему работает лучше", "От подбора до запуска", "О компании Daribo (Дарибо)", "FAQ"][i]}
+                    {["Преимущества", "Почему работает лучше", "От подбора до запуска", "О компании Техно-Сиб", "Вопросы"][i]}
                   </a>
                 ))}
               </div>
