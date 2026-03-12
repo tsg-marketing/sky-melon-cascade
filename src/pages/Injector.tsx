@@ -265,7 +265,7 @@ const Injector = () => {
             <div className={`transition-all duration-1000 ${vis("hero") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               <span className="inline-block text-xs font-semibold tracking-widest text-primary uppercase border border-primary/30 rounded-full px-4 py-1.5 mb-6 bg-primary/5">Поставка и внедрение</span>
               <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-display font-black leading-[1.05] tracking-tight mb-6 text-foreground">Инъекторы для равномерного{" "}<span className="text-primary">маринования мяса</span></h1>
-              <p className="text-2xl font-semibold text-foreground leading-relaxed mb-3 max-w-xl">Инъекторы для мяса от ведущих производителей мясного оборудования Daribo (Дарибо), Niro-Tech (Ниро-Тех), INWESTPOL (Инвестпол)</p>
+              <p className="text-2xl font-semibold text-foreground leading-relaxed mb-3 max-w-xl">Инъекторы для мяса от ведущих производителей мясного оборудования Daribo (Дарибо), XiaoJin (Сяоджин), INWESTPOL (Инвестпол)</p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">Точная дозировка рассола, работа с вязкими маринадами, подпружиненные иглы для тушек с костью. Подбираем модель и настройки под ваш продукт.</p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button onClick={() => setModalOpen(true)} className="px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 text-center">Получить предложение</button>
