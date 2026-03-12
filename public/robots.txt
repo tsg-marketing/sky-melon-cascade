@@ -1,6 +1,9 @@
 User-agent: Googlebot
 Allow: /
 
+User-agent: Yandexbot
+Allow: /
+
 User-agent: Bingbot
 Allow: /
 
@@ -12,3 +15,7 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /cart
+
+Sitemap: https://t-sib.ru/sitemap.xml
+Host: https://t-sib.ru
