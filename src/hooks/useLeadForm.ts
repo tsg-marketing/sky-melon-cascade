@@ -74,6 +74,8 @@ export function useLeadForm() {
     }
 
     setThankYouOpen(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    try { (window as any).ym?.(107258870, 'reachGoal', 'send_FOS'); } catch (_e) { /* noop */ }
   }
 
   return { sendLead, sending, thankYouOpen, setThankYouOpen };

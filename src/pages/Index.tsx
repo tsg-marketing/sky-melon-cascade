@@ -1233,10 +1233,11 @@ const Index = () => {
                   <p className="text-center text-sm font-medium text-muted-foreground mb-6">Оборудование в чистом пищевом цехе</p>
                   <div className="space-y-4">
                     {[
-                      { icon: "Phone",  label: "Телефон",  value: "8 800 505-91-24", href: "tel:88005059124" },
-                      { icon: "Mail",   label: "Почта",    value: "massagers@t-sib.ru", href: "mailto:massagers@t-sib.ru" },
+                      { icon: "Phone",  label: "Телефон",  value: "8 800 505-91-24", href: "tel:88005059124", goal: "click_phone" },
+                      { icon: "Mail",   label: "Почта",    value: "massagers@t-sib.ru", href: "mailto:massagers@t-sib.ru", goal: "click_email" },
                     ].map((c, i) => (
-                      <a key={i} href={c.href} className="flex items-center gap-4 p-4 bg-white border border-primary/10 rounded-xl hover:border-primary/30 transition-colors">
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      <a key={i} href={c.href} onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', c.goal); } catch (_e) { /* noop */ } }} className="flex items-center gap-4 p-4 bg-white border border-primary/10 rounded-xl hover:border-primary/30 transition-colors">
                         <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                           <Icon name={c.icon} fallback="Star" size={18} className="text-primary" />
                         </div>
@@ -1336,11 +1337,13 @@ const Index = () => {
               />
               <p className="text-xs text-muted-foreground mb-4">Оборудование для маринования и посола мяса</p>
               <div className="space-y-2">
-                <a href="tel:88005059124" className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                <a href="tel:88005059124" onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', 'click_phone'); } catch (_e) { /* noop */ } }} className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors">
                   <Icon name="Phone" size={14} className="text-primary" />
                   8 800 505-91-24
                 </a>
-                <a href="mailto:massagers@t-sib.ru" className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                <a href="mailto:massagers@t-sib.ru" onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', 'click_email'); } catch (_e) { /* noop */ } }} className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors">
                   <Icon name="Mail" size={14} className="text-primary" />
                   massagers@t-sib.ru
                 </a>

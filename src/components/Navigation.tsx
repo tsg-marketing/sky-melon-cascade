@@ -94,7 +94,8 @@ const Navigation = () => {
           </div>
 
           <div className="flex lg:hidden items-center gap-4">
-            <a href="tel:+79089925030" className="text-primary hover:text-accent transition-colors">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            <a href="tel:+79089925030" onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', 'click_phone'); } catch (_e) { /* noop */ } }} className="text-primary hover:text-accent transition-colors">
               <Icon name="Phone" size={20} />
             </a>
             <button

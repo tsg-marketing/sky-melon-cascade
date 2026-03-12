@@ -67,6 +67,8 @@ const ContactFooter = () => {
       if (response.ok && data.success) {
         setSubmitStatus('success');
         setFormData({ name: '', phone: '', eventType: '', message: '' });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        try { (window as any).ym?.(107258870, 'reachGoal', 'send_FOS'); } catch (_e) { /* noop */ }
         setTimeout(() => setSubmitStatus('idle'), 5000);
       } else {
         setSubmitStatus('error');
@@ -155,15 +157,18 @@ const ContactFooter = () => {
               <div className="mt-8 pt-8 border-t">
                 <p className="text-center mb-4 font-semibold">Или свяжитесь с нами удобным способом:</p>
                 <div className="flex flex-wrap justify-center gap-3">
-                  <a href="tel:+79089925030" className="flex items-center gap-2 px-4 py-2 border-2 border-primary/30 rounded-lg hover:border-accent hover:bg-accent/10 transition-all">
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  <a href="tel:+79089925030" onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', 'click_phone'); } catch (_e) { /* noop */ } }} className="flex items-center gap-2 px-4 py-2 border-2 border-primary/30 rounded-lg hover:border-accent hover:bg-accent/10 transition-all">
                     <Icon name="Phone" size={18} className="text-primary" />
                     <span className="text-sm">+7 (908) 992-50-30</span>
                   </a>
-                  <a href="tel:+79147063497" className="flex items-center gap-2 px-4 py-2 border-2 border-primary/30 rounded-lg hover:border-accent hover:bg-accent/10 transition-all">
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  <a href="tel:+79147063497" onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', 'click_phone'); } catch (_e) { /* noop */ } }} className="flex items-center gap-2 px-4 py-2 border-2 border-primary/30 rounded-lg hover:border-accent hover:bg-accent/10 transition-all">
                     <Icon name="PhoneCall" size={18} className="text-primary" />
                     <span className="text-sm">+7 (914) 706-34-97</span>
                   </a>
-                  <a href="mailto:ppt@pmvl.ru" className="flex items-center gap-2 px-4 py-2 border-2 border-primary/30 rounded-lg hover:border-accent hover:bg-accent/10 transition-all">
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  <a href="mailto:ppt@pmvl.ru" onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', 'click_email'); } catch (_e) { /* noop */ } }} className="flex items-center gap-2 px-4 py-2 border-2 border-primary/30 rounded-lg hover:border-accent hover:bg-accent/10 transition-all">
                     <Icon name="Mail" size={18} className="text-primary" />
                     <span className="text-sm">ppt@pmvl.ru</span>
                   </a>
