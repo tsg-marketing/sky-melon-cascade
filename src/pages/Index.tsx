@@ -225,6 +225,78 @@ const Index = () => {
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
+    document.title = "Вакуумные массажеры для мяса — купить промышленный массажер | Техно-Сиб";
+    const setMeta = (name: string, content: string, property?: boolean) => {
+      const attr = property ? "property" : "name";
+      let el = document.querySelector(`meta[${attr}="${name}"]`);
+      if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
+      el.setAttribute("content", content);
+    };
+    setMeta("description", "Вакуумные массажеры для мяса от Daribo. Увеличение выхода до 30%, равномерный посол, 99 программ PLC. Подбор, поставка и пусконаладка по всей России. Техно-Сиб — 25 лет на рынке.");
+    setMeta("keywords", "вакуумный массажер для мяса, массажер Daribo, промышленный массажер, оборудование для посола мяса, оборудование для маринования, купить вакуумный массажер");
+    setMeta("og:title", "Вакуумные массажеры для мяса — промышленное оборудование | Техно-Сиб", true);
+    setMeta("og:description", "Вакуумные массажеры для равномерного посола и маринования мяса. Подбор модели под ваш продукт, поставка и сервис.", true);
+    setMeta("og:url", "https://meatmassagers.ru/", true);
+    const link = document.querySelector("link[rel='canonical']") || document.createElement("link");
+    link.setAttribute("rel", "canonical");
+    link.setAttribute("href", "https://meatmassagers.ru/");
+    if (!link.parentNode) document.head.appendChild(link);
+
+    const schema = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "https://meatmassagers.ru/",
+          "url": "https://meatmassagers.ru/",
+          "name": "Вакуумные массажеры для мяса — купить промышленный массажер",
+          "description": "Вакуумные массажеры для мяса от Daribo. Увеличение выхода до 30%, равномерный посол.",
+          "isPartOf": { "@id": "https://meatmassagers.ru/#website" }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://meatmassagers.ru/#website",
+          "url": "https://meatmassagers.ru",
+          "name": "Техно-Сиб — оборудование для маринования и посола мяса",
+          "publisher": { "@id": "https://meatmassagers.ru/#org" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://meatmassagers.ru/#org",
+          "name": "Техно-Сиб",
+          "url": "https://meatmassagers.ru",
+          "telephone": "+7-800-505-91-24",
+          "email": "massagers@t-sib.ru",
+          "logo": "https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg",
+          "address": { "@type": "PostalAddress", "addressCountry": "RU", "addressLocality": "Новосибирск" },
+          "foundingDate": "2001",
+          "description": "Поставщик профессионального пищевого оборудования с 2001 года. Вакуумные массажеры и инъекторы для мяса."
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            { "@type": "Question", "name": "Зачем нужен вакуум в массажере?", "acceptedAnswer": { "@type": "Answer", "text": "Вакуум раскрывает поры и волокна сырья, позволяя рассолу проникать глубже. Дополнительно тормозит окисление жиров и улучшает цвет и сроки хранения продукта." }},
+            { "@type": "Question", "name": "Насколько вакуумный массажер ускоряет процесс?", "acceptedAnswer": { "@type": "Answer", "text": "В зависимости от продукта и режима — от 2 до 10 раз быстрее классического посола." }},
+            { "@type": "Question", "name": "Можно ли работать с тушками птицы и костью?", "acceptedAnswer": { "@type": "Answer", "text": "Да. Модели с подпружиненными иглами специально рассчитаны на работу с тушками птицы и продуктом на кости." }},
+            { "@type": "Question", "name": "Что такое PLC и зачем нужны 99 программ?", "acceptedAnswer": { "@type": "Answer", "text": "PLC — программируемый логический контроллер. Позволяет сохранять до 99 рецептур и воспроизводить их в одно касание." }},
+            { "@type": "Question", "name": "Что нужно для подбора оборудования?", "acceptedAnswer": { "@type": "Answer", "text": "Достаточно указать: продукт, объём в смену, тип сырья, цель обработки, вязкость маринада. Остальное уточним на звонке." }}
+          ]
+        }
+      ]
+    };
+    let scriptEl = document.getElementById("schema-index");
+    if (!scriptEl) { scriptEl = document.createElement("script"); scriptEl.id = "schema-index"; scriptEl.setAttribute("type", "application/ld+json"); document.head.appendChild(scriptEl); }
+    scriptEl.textContent = JSON.stringify(schema);
+
+    return () => {
+      const canonical = document.querySelector("link[rel='canonical']");
+      if (canonical) canonical.remove();
+      const schemaEl = document.getElementById("schema-index");
+      if (schemaEl) schemaEl.remove();
+    };
+  }, []);
+
+  useEffect(() => {
     const ids = [
       "hero","pain","solutions","massager","gr","injector",
       "perf","conveyor","catalog","benefits","compare",

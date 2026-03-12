@@ -186,6 +186,87 @@ const Injector = () => {
   const [videoOpen, setVideoOpen] = useState(false);
 
   useEffect(() => {
+    document.title = "Инъекторы для мяса — купить промышленный инъектор рассола | Техно-Сиб";
+    const setMeta = (name: string, content: string, property?: boolean) => {
+      const attr = property ? "property" : "name";
+      let el = document.querySelector(`meta[${attr}="${name}"]`);
+      if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
+      el.setAttribute("content", content);
+    };
+    setMeta("description", "Промышленные инъекторы для мяса от Daribo, XiaoJin, INWESTPOL. Точная дозировка рассола, работа с вязкими маринадами, подпружиненные иглы. Подбор, поставка и пусконаладка по всей России. Техно-Сиб — 25 лет на рынке.");
+    setMeta("keywords", "инъектор для мяса, инъектор рассола, промышленный инъектор, инъектор Daribo, инъектор XiaoJin, инъектор INWESTPOL, оборудование для маринования мяса, купить инъектор для мяса");
+    setMeta("og:title", "Инъекторы для мяса — промышленное оборудование для маринования | Техно-Сиб", true);
+    setMeta("og:description", "Промышленные инъекторы для равномерного маринования мяса. Подбор модели под ваш продукт, поставка и сервис по всей России.", true);
+    setMeta("og:url", "https://meatmassagers.ru/injector", true);
+    setMeta("og:type", "website", true);
+    setMeta("og:image", "https://cdn.poehali.dev/files/31cdb492-7133-4082-ab8b-95564d292c21.jpg", true);
+    const link = document.querySelector("link[rel='canonical']") || document.createElement("link");
+    link.setAttribute("rel", "canonical");
+    link.setAttribute("href", "https://meatmassagers.ru/injector");
+    if (!link.parentNode) document.head.appendChild(link);
+
+    const schema = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "https://meatmassagers.ru/injector",
+          "url": "https://meatmassagers.ru/injector",
+          "name": "Инъекторы для мяса — купить промышленный инъектор рассола",
+          "description": "Промышленные инъекторы для мяса от Daribo, XiaoJin, INWESTPOL. Точная дозировка рассола, работа с вязкими маринадами.",
+          "isPartOf": { "@id": "https://meatmassagers.ru/#website" }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://meatmassagers.ru/#website",
+          "url": "https://meatmassagers.ru",
+          "name": "Техно-Сиб — оборудование для маринования и посола мяса",
+          "publisher": { "@id": "https://meatmassagers.ru/#org" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://meatmassagers.ru/#org",
+          "name": "Техно-Сиб",
+          "url": "https://meatmassagers.ru",
+          "telephone": "+7-800-505-91-24",
+          "email": "massagers@t-sib.ru",
+          "address": { "@type": "PostalAddress", "addressCountry": "RU", "addressLocality": "Новосибирск" },
+          "foundingDate": "2001",
+          "description": "Поставщик профессионального пищевого оборудования с 2001 года. Вакуумные массажеры и инъекторы для мяса."
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://meatmassagers.ru/" },
+            { "@type": "ListItem", "position": 2, "name": "Инъекторы для мяса", "item": "https://meatmassagers.ru/injector" }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            { "@type": "Question", "name": "Что происходит при засоре одной иглы?", "acceptedAnswer": { "@type": "Answer", "text": "При конструкции с регистром давления засор одной иглы не влияет на остальные — давление перераспределяется." }},
+            { "@type": "Question", "name": "Работает ли с вязкими маринадами и специями?", "acceptedAnswer": { "@type": "Answer", "text": "Да. Инъекторы работают при давлении до 4,3 бар, что позволяет использовать густые маринады, соусы с частицами и специями без засора системы." }},
+            { "@type": "Question", "name": "Можно ли работать с тушками птицы и костью?", "acceptedAnswer": { "@type": "Answer", "text": "Да. Модели с подпружиненными иглами специально рассчитаны на работу с тушками птицы и продуктом на кости." }},
+            { "@type": "Question", "name": "Как устроена мойка оборудования?", "acceptedAnswer": { "@type": "Answer", "text": "Конвейер снимается без инструмента за 1–2 минуты. Полная мойка занимает 15–30 минут." }},
+            { "@type": "Question", "name": "Что нужно для подбора оборудования?", "acceptedAnswer": { "@type": "Answer", "text": "Достаточно указать: продукт, объём в смену, тип сырья, цель обработки, вязкость маринада. Остальное уточним на звонке." }}
+          ]
+        }
+      ]
+    };
+    let scriptEl = document.getElementById("schema-injector");
+    if (!scriptEl) { scriptEl = document.createElement("script"); scriptEl.id = "schema-injector"; scriptEl.setAttribute("type", "application/ld+json"); document.head.appendChild(scriptEl); }
+    scriptEl.textContent = JSON.stringify(schema);
+
+    return () => {
+      document.title = "Массажеры и инъекторы от Техносиб";
+      const canonical = document.querySelector("link[rel='canonical']");
+      if (canonical) canonical.remove();
+      const schemaEl = document.getElementById("schema-injector");
+      if (schemaEl) schemaEl.remove();
+    };
+  }, []);
+
+  useEffect(() => {
     const ids = ["hero","pain","catalog","benefits","compare","selector","service","about","faq","contacts"];
     setVisibleSections((prev) => ({ ...prev, hero: true }));
     const observers: Record<string, IntersectionObserver> = {};
