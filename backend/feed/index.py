@@ -1,7 +1,7 @@
 """
 YML-фид товаров для meatmassagers.ru.
 Парсит каталог t-sib.ru и генерирует стандартный YML (Яндекс.Маркет)
-с URL товаров вида https://meatmassagers.ru/#product-{id}.
+с URL товаров: массажёры — /#product-{id}, инъекторы — /injector/#product-{id}.
 """
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -84,7 +84,10 @@ def build_yml(xml_data: bytes) -> str:
             if p_name and p_val:
                 params.append((p_name, p_val))
 
-        item_url = f"{SITE_URL}/#product-{offer_id}"
+        if cat_id == "223":
+            item_url = f"{SITE_URL}/injector/#product-{offer_id}"
+        else:
+            item_url = f"{SITE_URL}/#product-{offer_id}"
 
         lines.append(f'    <offer id="{offer_id}" available="true">')
         lines.append(f"      <url>{escape_xml(item_url)}</url>")

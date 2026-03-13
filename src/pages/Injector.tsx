@@ -443,7 +443,7 @@ const Injector = () => {
                             {item.extra_params.map((p, pi) => (<div key={pi} className="flex items-start gap-2 text-base"><Icon name="ChevronRight" size={16} className="text-primary flex-shrink-0 mt-0.5" /><span className="text-muted-foreground"><span className="font-medium text-foreground">{p.name}:</span> {p.value}</span></div>))}
                           </div>
                           <div className="flex flex-col gap-2 mt-2">
-                            <button onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }} className="w-full py-4 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md">Узнать подробней</button>
+                            <button onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }} className="w-full py-4 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md">Оставить заявку</button>
                             <div className="flex gap-2">
                               <button onClick={() => { setSelectedItem(item); setSelectedSlide(0); }} className="flex-1 py-3.5 border-2 border-primary/30 text-primary rounded-xl text-base font-semibold hover:border-primary hover:bg-primary/5 transition-all">Подробнее</button>
                               {(() => { const qty = getQuantity(item.id); return qty > 0 ? (<div className="flex items-center gap-1 border-2 border-primary rounded-xl px-2"><button onClick={() => removeItem(item.id)} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">−</button><span className="w-5 text-center font-bold text-primary text-sm">{qty}</span><button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">+</button></div>) : (<button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="py-3.5 px-4 border-2 border-primary/30 text-primary rounded-xl hover:border-primary hover:bg-primary/5 transition-all" title="В корзину"><Icon name="ShoppingCart" size={18} /></button>); })()}
@@ -472,7 +472,7 @@ const Injector = () => {
               <div className="flex flex-col sm:flex-row gap-0">
                 <div className="bg-gray-50 p-4 sm:p-6 flex flex-col gap-3 sm:w-80 flex-shrink-0">
                   <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm" style={{ aspectRatio: "4/3" }}>
-                    <img src={selectedItem.pictures[selectedSlide]} alt={selectedItem.name} className="w-full h-full object-contain p-3" />
+                    <img src={selectedItem.pictures[selectedSlide]} alt={selectedItem.name} className="w-full h-full object-contain p-3 cursor-zoom-in" onClick={() => { setLightboxPhotos(selectedItem.pictures); setLightboxIndex(selectedSlide); setLightboxOpen(true); }} />
                     {selectedItem.pictures.length > 1 && (<><button onClick={() => setSelectedSlide((s) => (s - 1 + selectedItem.pictures.length) % selectedItem.pictures.length)} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow flex items-center justify-center hover:bg-primary/5"><Icon name="ChevronLeft" size={16} /></button><button onClick={() => setSelectedSlide((s) => (s + 1) % selectedItem.pictures.length)} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow flex items-center justify-center hover:bg-primary/5"><Icon name="ChevronRight" size={16} /></button></>)}
                   </div>
                   {selectedItem.pictures.length > 1 && (<div className="flex gap-2 overflow-x-auto pb-1">{selectedItem.pictures.map((pic, pi) => (<button key={pi} onClick={() => setSelectedSlide(pi)} className={`flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${pi === selectedSlide ? "border-primary shadow-md" : "border-transparent opacity-60 hover:opacity-100"}`}><img src={pic} alt="" className="w-full h-full object-contain bg-white p-1" /></button>))}</div>)}
@@ -481,13 +481,13 @@ const Injector = () => {
                   {selectedItem.brand && (<span className="text-xs font-bold text-primary uppercase tracking-widest">{selectedItem.brand}</span>)}
                   <h2 className="text-xl sm:text-2xl font-display font-black text-foreground leading-tight">{selectedItem.name}</h2>
                   {selectedItem.price_display && (<p className="text-2xl sm:text-3xl font-black text-primary">{selectedItem.price_display}</p>)}
-                  <button onClick={() => { setSelectedItem(null); setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }} className="hidden sm:block mt-2 w-full py-3 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md">Узнать подробней</button>
+                  <button onClick={() => { setSelectedItem(null); setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }} className="hidden sm:block mt-2 w-full py-3 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md">Оставить заявку</button>
                 </div>
               </div>
               <div className="px-5 sm:px-6 pb-6 flex flex-col gap-4 border-t border-border/40">
                 {selectedItem.all_params.length > 0 && (<div className="pt-4"><p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Характеристики</p><div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">{selectedItem.all_params.map((p, pi) => (<div key={pi} className="flex justify-between gap-4 py-1.5 border-b border-border/40 text-sm"><span className="text-muted-foreground">{p.name}</span><span className="font-medium text-foreground text-right">{p.value}</span></div>))}</div></div>)}
                 {selectedItem.description && (<div><p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Описание</p><div className="text-sm text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: selectedItem.description }} /></div>)}
-                <button onClick={() => { setSelectedItem(null); setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }} className="sm:hidden w-full py-4 bg-primary text-white rounded-xl text-lg font-bold hover:bg-primary/90 transition-all shadow-md">Узнать подробней</button>
+                <button onClick={() => { setSelectedItem(null); setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }} className="sm:hidden w-full py-4 bg-primary text-white rounded-xl text-lg font-bold hover:bg-primary/90 transition-all shadow-md">Оставить заявку</button>
               </div>
             </div>
           </div>
@@ -499,7 +499,7 @@ const Injector = () => {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-8" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setInquiryItem(null)} className="absolute top-4 right-4 w-10 h-10 bg-background hover:bg-primary/10 rounded-xl flex items-center justify-center transition-colors"><Icon name="X" size={18} className="text-muted-foreground" /></button>
-            <h3 className="text-2xl font-display font-black text-foreground mb-1">Узнать подробней</h3>
+            <h3 className="text-2xl font-display font-black text-foreground mb-1">Оставить заявку</h3>
             <p className="text-sm text-muted-foreground mb-6 leading-relaxed"><span className="font-medium text-foreground">{inquiryItem.name}</span></p>
             <div className="space-y-3">
               <input type="text" placeholder="Ваше имя" value={inquiryName} onChange={(e) => setInquiryName(e.target.value)} className={inputCls} />

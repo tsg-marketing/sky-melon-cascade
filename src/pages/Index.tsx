@@ -675,7 +675,7 @@ const Index = () => {
                               onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }}
                               className="w-full py-4 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md"
                             >
-                              Узнать подробней
+                              Оставить заявку
                             </button>
                             <div className="flex gap-2">
                               <button
@@ -764,7 +764,8 @@ const Index = () => {
                     <img
                       src={selectedItem.pictures[selectedSlide]}
                       alt={selectedItem.name}
-                      className="w-full h-full object-contain p-3"
+                      className="w-full h-full object-contain p-3 cursor-zoom-in"
+                      onClick={() => { setLightboxPhotos(selectedItem.pictures); setLightboxIndex(selectedSlide); setLightboxOpen(true); }}
                     />
                     {selectedItem.pictures.length > 1 && (
                       <>
@@ -811,7 +812,7 @@ const Index = () => {
                     onClick={() => { setSelectedItem(null); setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }}
                     className="hidden sm:block mt-2 w-full py-3 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md"
                   >
-                    Узнать подробней
+                    Оставить заявку
                   </button>
                 </div>
               </div>
@@ -847,7 +848,7 @@ const Index = () => {
                   onClick={() => { setSelectedItem(null); setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }}
                   className="sm:hidden w-full py-4 bg-primary text-white rounded-xl text-lg font-bold hover:bg-primary/90 transition-all shadow-md"
                 >
-                  Узнать подробней
+                  Оставить заявку
                 </button>
               </div>
             </div>
@@ -869,7 +870,7 @@ const Index = () => {
             >
               <Icon name="X" size={16} />
             </button>
-            <h3 className="text-2xl font-display font-black text-foreground mb-1">Узнать подробней</h3>
+            <h3 className="text-2xl font-display font-black text-foreground mb-1">Оставить заявку</h3>
                 <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                   <span className="font-medium text-foreground">{inquiryItem.name}</span>
                 </p>

@@ -5,8 +5,8 @@
       "method": "GET",
       "path": "/",
       "expectedStatus": 200,
-      "expectedBody": "<?xml",
-      "bodyMatcher": "contains"
+      "expectedBody": {"yml_catalog": "string"},
+      "bodyMatcher": "partial"
     }
   ]
 }
