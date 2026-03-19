@@ -378,59 +378,62 @@ const Index = () => {
 
       {/* HEADER */}
       <header className="fixed top-0 w-full bg-white/90 backdrop-blur-xl border-b border-border z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3 sm:gap-6">
-          <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0 min-w-0">
-            <div className="flex flex-col min-w-0">
-              <img
-                src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg"
-                alt="Техносиб"
-                className="h-8 sm:h-9 w-auto object-contain"
-              />
-              <span className="text-xs text-muted-foreground leading-tight mt-0.5 hidden sm:block">Оборудование для маринования и посола мяса</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+          <div className="flex items-center gap-3 sm:gap-6">
+            <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0 min-w-0">
+              <div className="flex flex-col min-w-0">
+                <img
+                  src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg"
+                  alt="Техносиб"
+                  className="h-8 sm:h-9 w-auto object-contain"
+                />
+                <span className="text-xs text-muted-foreground leading-tight mt-0.5 hidden sm:block">Оборудование для маринования и посола мяса</span>
+              </div>
+              <nav className="hidden lg:flex gap-6 text-sm font-semibold">
+                {navLinks.map((l) => (
+                  <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
+                    {l.label}
+                  </a>
+                ))}
+              </nav>
             </div>
-            <nav className="hidden lg:flex gap-6 text-sm font-semibold">
-              {navLinks.map((l) => (
-                <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
-                  {l.label}
-                </a>
-              ))}
-            </nav>
+
+            <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-shrink-0">
+              <a href="tel:88005059124" className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-foreground hover:text-primary transition-colors whitespace-nowrap">
+                <Icon name="Phone" size={14} className="text-primary" />
+                <span className="hidden sm:inline">8 800 505-91-24</span>
+                <span className="sm:hidden">Звонок</span>
+              </a>
+
+              <button
+                onClick={() => navigate("/cart")}
+                className="relative flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2 sm:gap-2 border-2 border-primary/30 text-primary rounded-full text-sm font-semibold hover:border-primary hover:bg-primary/5 transition-all"
+              >
+                <Icon name="ShoppingCart" size={16} />
+                <span className="hidden sm:inline">Корзина</span>
+                {totalCount > 0 && (
+                  <span className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    {totalCount}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => { setModalProduct(""); setModalOpen(true); }}
+                className="hidden sm:block px-5 py-2 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm whitespace-nowrap"
+              >
+                Рассчитать решение
+              </button>
+
+              <button className="lg:hidden p-2 text-muted-foreground flex-shrink-0" onClick={() => setMenuOpen(!menuOpen)}>
+                <Icon name={menuOpen ? "X" : "Menu"} size={22} />
+              </button>
+            </div>
           </div>
-
-          <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-shrink-0">
-            <a href="tel:88005059124" className="hidden md:flex items-center gap-1.5 text-sm font-bold text-foreground hover:text-primary transition-colors whitespace-nowrap">
-              <Icon name="Phone" size={14} className="text-primary" />
-              8 800 505-91-24
-            </a>
-
-            <button
-              onClick={() => navigate("/cart")}
-              className="relative flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2 sm:gap-2 border-2 border-primary/30 text-primary rounded-full text-sm font-semibold hover:border-primary hover:bg-primary/5 transition-all"
-            >
-              <Icon name="ShoppingCart" size={16} />
-              <span className="hidden sm:inline">Корзина</span>
-              {totalCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                  {totalCount}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => { setModalProduct(""); setModalOpen(true); }}
-              className="hidden sm:block px-5 py-2 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm whitespace-nowrap"
-            >
-              Рассчитать решение
-            </button>
-
-            <button className="lg:hidden p-2 text-muted-foreground flex-shrink-0" onClick={() => setMenuOpen(!menuOpen)}>
-              <Icon name={menuOpen ? "X" : "Menu"} size={22} />
-            </button>
-          </div>
+          <p className="text-[10px] text-muted-foreground leading-tight mt-1 sm:hidden">Оборудование для маринования и посола мяса</p>
         </div>
         {menuOpen && (
           <div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4">
-            <span className="text-xs text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>
             {navLinks.map((l) => (
               <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>
                 {l.label}
