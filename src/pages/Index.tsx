@@ -399,8 +399,8 @@ const Index = () => {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-shrink-0">
-              <a href="tel:88005059124" className="flex items-center gap-1 text-[11px] sm:text-sm font-bold text-foreground hover:text-primary transition-colors whitespace-nowrap">
-                <Icon name="Phone" size={13} className="text-primary flex-shrink-0" />
+              <a href="tel:88005059124" className="hidden sm:flex items-center gap-1.5 text-sm font-bold text-foreground hover:text-primary transition-colors whitespace-nowrap">
+                <Icon name="Phone" size={14} className="text-primary" />
                 8 800 505-91-24
               </a>
 
@@ -429,7 +429,15 @@ const Index = () => {
               </button>
             </div>
           </div>
-          <p className="text-[10px] text-muted-foreground leading-tight mt-1 sm:hidden">Оборудование для маринования и посола мяса</p>
+          <div className="sm:hidden mt-1.5 flex items-center justify-between">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[10px] text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>
+              <a href="tel:88005059124" className="flex items-center gap-1 text-[11px] font-bold text-primary hover:text-primary/80 transition-colors">
+                <Icon name="Phone" size={11} className="flex-shrink-0" />
+                8 800 505-91-24
+              </a>
+            </div>
+          </div>
         </div>
         {menuOpen && (
           <div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4">
