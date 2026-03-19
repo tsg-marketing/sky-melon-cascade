@@ -399,10 +399,9 @@ const Index = () => {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-shrink-0">
-              <a href="tel:88005059124" className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-foreground hover:text-primary transition-colors whitespace-nowrap">
-                <Icon name="Phone" size={14} className="text-primary" />
-                <span className="hidden sm:inline">8 800 505-91-24</span>
-                <span className="sm:hidden">Звонок</span>
+              <a href="tel:88005059124" className="flex items-center gap-1 text-[11px] sm:text-sm font-bold text-foreground hover:text-primary transition-colors whitespace-nowrap">
+                <Icon name="Phone" size={13} className="text-primary flex-shrink-0" />
+                8 800 505-91-24
               </a>
 
               <button
@@ -444,7 +443,7 @@ const Index = () => {
       </header>
 
       {/* ЭКРАН 1: HERO */}
-      <section id="hero" className="relative pt-28 pb-20 px-6 min-h-screen flex items-center bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
+      <section id="hero" className="relative pt-24 sm:pt-28 pb-12 sm:pb-20 px-4 sm:px-6 min-h-screen flex items-center bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
         <div className="absolute inset-0 lg:hidden" style={{ backgroundImage: "url(https://cdn.poehali.dev/files/a80d03fc-2480-4c9b-a141-456c301f7d59.jpg)", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat", opacity: 0.13 }} />
         <div className="absolute top-24 right-0 w-[600px] h-[600px] bg-primary/6 rounded-full blur-3xl pointer-events-none" />
 
@@ -455,15 +454,15 @@ const Index = () => {
               <span className="inline-block text-xs font-semibold tracking-widest text-primary uppercase border border-primary/30 rounded-full px-4 py-1.5 mb-6 bg-primary/5">
                 Поставка и внедрение
               </span>
-              <h1 className="text-5xl lg:text-6xl xl:text-7xl font-display font-black leading-[1.05] tracking-tight mb-6 text-foreground">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-display font-black leading-[1.05] tracking-tight mb-4 sm:mb-6 text-foreground">
                 Стабильный посол и{" "}
                 <span className="text-primary">выше выход</span>{" "}
                 с вакуумными массажерами
               </h1>
-              <p className="text-2xl font-semibold text-foreground leading-relaxed mb-3 max-w-xl">
+              <p className="text-lg sm:text-2xl font-semibold text-foreground leading-relaxed mb-3 max-w-xl">
                 От ведущих производителей мясного оборудования Daribo (Дарибо), Niro-Tech (Ниро-Тех), INWESTPOL (Инвестпол)
               </p>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-8 sm:mb-10 max-w-xl">
                 Ускоряем цикл, выравниваем качество партии, снижаем риск брака. Подбираем оборудование и настройки под ветчину, копчёности, деликатесы, фабрики-кухни.
               </p>
 
