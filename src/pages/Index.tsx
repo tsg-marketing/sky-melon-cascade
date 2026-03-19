@@ -733,6 +733,35 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Блок видео */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">
+            Посмотрите как работает наше оборудование
+          </h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="rounded-2xl overflow-hidden shadow-lg aspect-video">
+              <iframe
+                src="https://rutube.ru/play/embed/99e84618d0e0ebc97d43362e093a19f4/"
+                frameBorder="0"
+                allow="clipboard-write; autoplay"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+            <div className="rounded-2xl overflow-hidden shadow-lg aspect-video">
+              <iframe
+                src="https://rutube.ru/play/embed/8c16046437a008e25b1f6e67fa00e4ea/"
+                frameBorder="0"
+                allow="clipboard-write; autoplay"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Модал: детальная карточка товара */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={() => setSelectedItem(null)}>
