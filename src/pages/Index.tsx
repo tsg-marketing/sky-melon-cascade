@@ -431,9 +431,9 @@ const Index = () => {
           </div>
           <div className="sm:hidden mt-1.5 flex items-center justify-between">
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>
-              <a href="tel:88005059124" className="flex items-center gap-1 text-[11px] font-bold text-primary hover:text-primary/80 transition-colors">
-                <Icon name="Phone" size={11} className="flex-shrink-0" />
+              <span className="text-xs text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>
+              <a href="tel:88005059124" className="flex items-center gap-1 text-sm font-bold text-primary hover:text-primary/80 transition-colors">
+                <Icon name="Phone" size={14} className="flex-shrink-0" />
                 8 800 505-91-24
               </a>
             </div>
