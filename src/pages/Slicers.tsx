@@ -88,6 +88,63 @@ const CONSENT_TEXT = (
   </p>
 );
 
+const QUIZ_QUESTIONS = [
+  { q: "Что вы планируете нарезать чаще всего?", options: ["Мясо / ветчина / бекон", "Колбасы / деликатесы", "Сыр", "Рыба", "Овощи / другая продукция"] },
+  { q: "Какая у вас требуемая производительность?", options: ["До 50 кг/день", "50–200 кг/день", "200–500 кг/день", "Более 500 кг/день / непрерывная работа"] },
+  { q: "Какой формат и точность нарезки вам нужны?", options: ["0–3 мм (очень тонко)", "0–10 мм (универсально)", "0–20+ мм (толще / порции)", "Важна максимальная стабильность толщины"] },
+  { q: "Какие требования к оборудованию важны?", options: ["Полуавтомат", "Автомат / интеграция в линию", "Настольный / компактный", "Напольный / высокая производительность", "Простая мойка и санитария (HACCP)"] },
+];
+
+const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswers: Record<string, string>) => void }) => {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const isLast = step === QUIZ_QUESTIONS.length;
+  const phoneValid = isValidPhone(phone);
+  const choose = (opt: string) => { setAnswers([...answers, opt]); setStep(step + 1); };
+  const handleSubmit = () => {
+    if (!name.trim() || !phoneValid) return;
+    const quizAnswers: Record<string, string> = {};
+    QUIZ_QUESTIONS.forEach((q, i) => { quizAnswers[q.q] = answers[i] || ""; });
+    onSent(name, phone, quizAnswers);
+  };
+  return (
+    <div className="max-w-2xl mx-auto">
+      {!isLast ? (
+        <div>
+          <div className="flex items-center gap-3 mb-8">
+            {QUIZ_QUESTIONS.map((_, i) => (<div key={i} className={`h-2 flex-1 rounded-full transition-all ${i < step ? "bg-primary" : i === step ? "bg-primary/50" : "bg-border"}`} />))}
+          </div>
+          <p className="text-sm text-muted-foreground mb-2">Вопрос {step + 1} из {QUIZ_QUESTIONS.length}</p>
+          <h3 className="text-3xl font-bold text-foreground mb-8">{QUIZ_QUESTIONS[step].q}</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {QUIZ_QUESTIONS[step].options.map((opt, i) => (
+              <button key={i} onClick={() => choose(opt)} className="p-5 text-left bg-white border-2 border-border rounded-2xl hover:border-primary hover:bg-primary/5 transition-all font-semibold text-lg text-foreground">{opt}</button>
+            ))}
+          </div>
+          {step > 0 && (<button onClick={() => { setStep(step - 1); setAnswers(answers.slice(0, -1)); }} className="mt-6 text-sm text-muted-foreground hover:text-primary transition-colors">← Назад</button>)}
+        </div>
+      ) : (
+        <div className="p-8 bg-white border-2 border-primary/20 rounded-3xl shadow-sm">
+          <h3 className="font-display font-bold text-3xl mb-2 text-foreground text-center">Осталось совсем немного!</h3>
+          <p className="text-muted-foreground text-base mb-8 text-center">Оставьте контакты — технолог подберёт слайсер и пришлёт КП</p>
+          <div className="space-y-4">
+            <input type="text" placeholder="Ваше имя" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
+            <div>
+              <input type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={e => setPhone(formatPhone(phone, e.target.value))} onBlur={() => setPhoneTouched(true)} className={phoneTouched && !phoneValid ? inputError : inputCls} />
+              {phoneTouched && !phoneValid && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
+            </div>
+            <button onClick={handleSubmit} disabled={!name.trim() || !phoneValid} className="w-full py-4 bg-primary text-white rounded-xl font-bold text-xl hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40">Отправить</button>
+            {CONSENT_TEXT}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Slicers = () => {
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
   const { addItem, removeItem, getQuantity, totalCount } = useCart();
@@ -202,7 +259,7 @@ const Slicers = () => {
   }, []);
 
   useEffect(() => {
-    const ids = ["hero","benefits","catalog","compare","service","about","faq","contacts"];
+    const ids = ["hero","benefits","catalog","compare","service","selector","about","faq","contacts"];
     setVisibleSections((prev) => ({ ...prev, hero: true }));
     const observers: Record<string, IntersectionObserver> = {};
     ids.forEach((id) => {
@@ -467,6 +524,17 @@ const Slicers = () => {
             ))}
           </div>
           <div className="text-center"><a href="#contacts" className={btnPrimary + " inline-flex items-center gap-2"}>Уточнить условия<Icon name="ArrowRight" size={18} /></a></div>
+        </div>
+      </section>
+
+      <section id="selector" className="py-12 px-6 bg-background">
+        <div className="max-w-4xl mx-auto">
+          <div className={`text-center mb-16 transition-all duration-1000 ${vis("selector") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+            <span className="text-xs font-semibold tracking-widest text-primary uppercase">Подбор оборудования</span>
+            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Ответьте на 4 вопроса — получите решение</h2>
+            <p className="text-lg text-muted-foreground mt-4">Технолог подберёт слайсер и пришлёт КП в течение 2 часов</p>
+          </div>
+          <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, topic: 'слайсеры', formType: 'quiz' })} />
         </div>
       </section>
 
