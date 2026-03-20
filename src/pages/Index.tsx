@@ -449,15 +449,6 @@ const Index = () => {
             ))}
           </div>
         )}
-        <div className="border-t border-border/50 bg-primary/5">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex items-center gap-2 text-xs sm:text-sm overflow-x-auto">
-            <span className="font-semibold text-primary whitespace-nowrap">Массажеры</span>
-            <span className="text-muted-foreground">·</span>
-            <a href="/injector" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">Инъекторы</a>
-            <span className="text-muted-foreground">·</span>
-            <a href="/slicers" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">Слайсеры</a>
-          </div>
-        </div>
       </header>
 
       {/* ЭКРАН 1: HERO */}

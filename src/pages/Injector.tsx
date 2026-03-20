@@ -337,15 +337,6 @@ const Injector = () => {
           </div>
         </div>
         {menuOpen && (<div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4"><span className="text-xs text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>{navLinks.map((l) => (<a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>{l.label}</a>))}</div>)}
-        <div className="border-t border-border/50 bg-primary/5">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex items-center gap-2 text-xs sm:text-sm overflow-x-auto">
-            <a href="/" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">Массажеры</a>
-            <span className="text-muted-foreground">·</span>
-            <span className="font-semibold text-primary whitespace-nowrap">Инъекторы</span>
-            <span className="text-muted-foreground">·</span>
-            <a href="/slicers" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">Слайсеры</a>
-          </div>
-        </div>
       </header>
 
       <section id="hero" className="relative pt-28 pb-20 px-6 min-h-screen flex items-center bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
