@@ -8,12 +8,14 @@ import xml.etree.ElementTree as ET
 import time
 
 FEED_URL = "https://t-sib.ru/upload/catalog.xml"
-TARGET_CATEGORIES = {"229", "223"}
+TARGET_CATEGORIES = {"229", "223", "230", "459"}
 SITE_URL = "https://meatmassagers.ru"
 
 CATEGORY_NAMES = {
     "229": "Массажёры мяса",
     "223": "Инъекторы",
+    "230": "Слайсеры",
+    "459": "Слайсеры",
 }
 
 _cache = None
@@ -86,6 +88,8 @@ def build_yml(xml_data: bytes) -> str:
 
         if cat_id == "223":
             item_url = f"{SITE_URL}/injector/#product-{offer_id}"
+        elif cat_id in ("230", "459"):
+            item_url = f"{SITE_URL}/slicers/#product-{offer_id}"
         else:
             item_url = f"{SITE_URL}/#product-{offer_id}"
 

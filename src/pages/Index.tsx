@@ -365,6 +365,7 @@ const Index = () => {
 
   const navLinks = [
     { href: "/injector",       label: "Инъекторы" },
+    { href: "/slicers",        label: "Слайсеры" },
     { href: "#catalog",        label: "Каталог" },
     { href: "#advantages",     label: "Преимущества" },
     { href: "#selector",       label: "Подбор" },
@@ -448,6 +449,16 @@ const Index = () => {
             ))}
           </div>
         )}
+        <div className="border-t border-border/50 bg-primary/5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex items-center gap-1 text-xs sm:text-sm overflow-x-auto">
+            <span className="text-muted-foreground whitespace-nowrap">Оборудование:</span>
+            <span className="font-semibold text-primary whitespace-nowrap">Массажеры</span>
+            <span className="text-muted-foreground">·</span>
+            <a href="/injector" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">Инъекторы</a>
+            <span className="text-muted-foreground">·</span>
+            <a href="/slicers" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">Слайсеры</a>
+          </div>
+        </div>
       </header>
 
       {/* ЭКРАН 1: HERO */}
@@ -1464,11 +1475,9 @@ const Index = () => {
             <div>
               <p className="font-semibold text-sm text-foreground mb-3">Оборудование</p>
               <div className="space-y-2">
-                {["#solutions", "#catalog"].map((href, i) => (
-                  <a key={i} href={href} className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                    {["Вакуумные массажеры и инъекторы", "Каталог"][i]}
-                  </a>
-                ))}
+                <a href="#catalog" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Каталог массажеров</a>
+                <a href="/injector" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Инъекторы</a>
+                <a href="/slicers" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Слайсеры</a>
               </div>
             </div>
             <div>
