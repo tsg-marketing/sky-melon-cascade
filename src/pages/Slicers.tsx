@@ -272,8 +272,7 @@ const Slicers = () => {
         </div>
         {menuOpen && (<div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4"><span className="text-xs text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>{navLinks.map((l) => (<a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>{l.label}</a>))}</div>)}
         <div className="border-t border-border/50 bg-primary/5">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex items-center gap-1 text-xs sm:text-sm overflow-x-auto">
-            <span className="text-muted-foreground whitespace-nowrap">Оборудование:</span>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex items-center gap-2 text-xs sm:text-sm overflow-x-auto">
             <a href="/" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">Массажеры</a>
             <span className="text-muted-foreground">·</span>
             <a href="/injector" className="text-foreground hover:text-primary transition-colors whitespace-nowrap">Инъекторы</a>
@@ -283,23 +282,21 @@ const Slicers = () => {
         </div>
       </header>
 
-      <section id="hero" className="relative pt-28 pb-20 px-6 min-h-screen flex items-center bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
+      <section id="hero" className="relative pt-20 sm:pt-24 pb-10 sm:pb-14 px-4 sm:px-6 bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
         <div className="absolute top-24 right-0 w-[600px] h-[600px] bg-primary/6 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-7xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div className={`transition-all duration-1000 ${vis("hero") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-              <span className="inline-block text-xs font-semibold tracking-widest text-primary uppercase border border-primary/30 rounded-full px-4 py-1.5 mb-6 bg-primary/5">Поставка и внедрение</span>
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-display font-black leading-[1.05] tracking-tight mb-6 text-foreground">Слайсеры для точной нарезки{" "}<span className="text-primary">мяса и овощей</span></h1>
-              <p className="text-2xl font-semibold text-foreground leading-relaxed mb-3 max-w-xl">От ведущих производителей мясного оборудования</p>
-              <div className="flex flex-col sm:flex-row gap-4 mt-10">
+              <span className="inline-block text-xs font-semibold tracking-widest text-primary uppercase border border-primary/30 rounded-full px-4 py-1.5 mb-4 bg-primary/5">Поставка и внедрение</span>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-display font-black leading-[1.05] tracking-tight mb-4 text-foreground">Слайсеры для точной нарезки{" "}<span className="text-primary">мяса и овощей</span></h1>
+              <p className="text-xl sm:text-2xl font-semibold text-foreground leading-relaxed mb-6 max-w-xl">От ведущих производителей мясного оборудования</p>
+              <div className="flex flex-col sm:flex-row gap-4">
                 <button onClick={() => setModalOpen(true)} className="px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 text-center">Рассчитать решение</button>
                 <a href="#catalog" className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all text-center">Смотреть оборудование</a>
               </div>
             </div>
             <div className={`hidden lg:block transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
-              <div className="w-full rounded-3xl bg-gray-100 flex items-center justify-center" style={{ aspectRatio: "4/3" }}>
-                <p className="text-muted-foreground text-lg">Фото будет добавлено позже</p>
-              </div>
+              <img src="https://cdn.poehali.dev/files/7308cb6f-19e3-4561-ab04-3797adef2d37.jpg" alt="Слайсер DRB-120" className="w-full h-auto object-contain lg:scale-110" />
             </div>
           </div>
         </div>
