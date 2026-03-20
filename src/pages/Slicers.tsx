@@ -344,7 +344,7 @@ const Slicers = () => {
               </div>
             </div>
             <div className={`hidden lg:block transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
-              <img src="https://cdn.poehali.dev/files/7308cb6f-19e3-4561-ab04-3797adef2d37.jpg" alt="Слайсер DRB-120" className="w-full h-auto object-contain lg:scale-110" />
+              <img src="https://cdn.poehali.dev/files/88c2481b-fd8b-4f5f-9015-582ce1edcb78.jpg" alt="Слайсер Daribo" className="w-full h-auto object-contain lg:scale-110" />
             </div>
           </div>
         </div>
