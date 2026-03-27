@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Injector from "./pages/Injector";
 import Slicers from "./pages/Slicers";
 import Cart from "./pages/Cart";
+import CalculatorMassager from "./pages/CalculatorMassager";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/injector" element={<Injector />} />
           <Route path="/slicers" element={<Slicers />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/calculator_massager" element={<CalculatorMassager />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
