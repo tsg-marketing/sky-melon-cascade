@@ -18,6 +18,7 @@ const LOGO_URL =
 const ACCENT = "#e8712a";
 const MEAT_DENSITY = 1.05;
 const MAINTENANCE_RATE = 0.01;
+const YIELD_INCREASE = 0.10;
 
 interface FormData {
   volumePerDay: number;
@@ -36,7 +37,6 @@ interface FormData {
   loadFactor: number;
   cycleTime: number;
   newEnergyKwh: number;
-  newLossPercent: number;
   newWorkers: number;
   energyCostPerKwh: number;
   marginPerKg: number;
@@ -50,6 +50,7 @@ interface CalcResults {
   benefit5y: number;
   savingsStaff: number;
   savingsLoss: number;
+  yieldBenefit: number;
   savingsEnergy: number;
   savingsRepair: number;
   totalSavings: number;
@@ -61,7 +62,6 @@ interface CalcResults {
   oldCostRepair: number;
   oldCostTotal: number;
   newCostStaff: number;
-  newCostLoss: number;
   newCostEnergy: number;
   newCostMaintenance: number;
   newCostTotal: number;
@@ -101,7 +101,6 @@ const DEFAULTS: FormData = {
   loadFactor: 0.7,
   cycleTime: 4,
   newEnergyKwh: 7.5,
-  newLossPercent: 2,
   newWorkers: 1,
   energyCostPerKwh: 8,
   marginPerKg: 80,
@@ -334,11 +333,6 @@ export default function CalculatorMassager() {
       oldCostStaff + oldCostLoss + oldCostEnergy + oldCostRepair;
 
     const newCostStaff = d.newWorkers * d.avgSalary;
-    const newCostLoss =
-      d.volumePerDay *
-      d.workDaysPerMonth *
-      (d.newLossPercent / 100) *
-      d.rawCostPerKg;
     const energyPerHour = d.cycleTime > 0 ? d.newEnergyKwh / d.cycleTime : 0;
     const newCostEnergy =
       energyPerHour *
@@ -348,14 +342,20 @@ export default function CalculatorMassager() {
       d.energyCostPerKwh;
     const newCostMaintenance = (d.equipmentCost * MAINTENANCE_RATE) / 12;
     const newCostTotal =
-      newCostStaff + newCostLoss + newCostEnergy + newCostMaintenance;
+      newCostStaff + newCostEnergy + newCostMaintenance;
+
+    const yieldBenefit =
+      d.volumePerDay *
+      d.workDaysPerMonth *
+      YIELD_INCREASE *
+      d.rawCostPerKg;
 
     const savingsStaff = oldCostStaff - newCostStaff;
-    const savingsLoss = oldCostLoss - newCostLoss;
+    const savingsLoss = oldCostLoss;
     const savingsEnergy = oldCostEnergy - newCostEnergy;
     const savingsRepair = oldCostRepair - newCostMaintenance;
     const totalSavings =
-      savingsStaff + savingsLoss + savingsEnergy + savingsRepair;
+      savingsStaff + savingsLoss + yieldBenefit + savingsEnergy + savingsRepair;
 
     const cycleLoad = d.drumVolume * d.loadFactor * MEAT_DENSITY;
     const cyclesPerShift =
@@ -409,6 +409,7 @@ export default function CalculatorMassager() {
       benefit5y: benefit5y_val,
       savingsStaff,
       savingsLoss,
+      yieldBenefit,
       savingsEnergy,
       savingsRepair,
       totalSavings,
@@ -420,7 +421,6 @@ export default function CalculatorMassager() {
       oldCostRepair,
       oldCostTotal,
       newCostStaff,
-      newCostLoss,
       newCostEnergy,
       newCostMaintenance,
       newCostTotal,
@@ -656,15 +656,6 @@ export default function CalculatorMassager() {
                 step={0.5}
               />
               <NumberInput
-                label="Процент потерь сырья с новым оборудованием (%)"
-                value={form.newLossPercent}
-                onChange={(v) => set("newLossPercent", v)}
-                placeholder="2"
-                step={0.5}
-                tooltip="Современные вакуумные мясомассажёры снижают потери до 1–3%"
-                suffix="%"
-              />
-              <NumberInput
                 label="Количество рабочих с новым оборудованием"
                 value={form.newWorkers}
                 onChange={(v) => set("newWorkers", v)}
@@ -781,6 +772,7 @@ export default function CalculatorMassager() {
               </h3>
               <SavingsRow label="Экономия на персонале" value={results.savingsStaff} />
               <SavingsRow label="Экономия на потерях сырья" value={results.savingsLoss} />
+              <SavingsRow label="Увеличение выхода продукции (+10%)" value={results.yieldBenefit} />
               <SavingsRow label="Экономия на электроэнергии" value={results.savingsEnergy} />
               <SavingsRow label="Экономия на ремонте / ТО" value={results.savingsRepair} />
               <SavingsRow label="Итого экономия" value={results.totalSavings} bold />
@@ -848,7 +840,6 @@ export default function CalculatorMassager() {
                   <div className="space-y-2">
                     {[
                       { l: "Персонал", v: results.newCostStaff },
-                      { l: "Потери сырья", v: results.newCostLoss },
                       { l: "Электроэнергия", v: results.newCostEnergy },
                       { l: "ТО оборудования", v: results.newCostMaintenance },
                     ].map((row) => (
@@ -1149,9 +1140,9 @@ export default function CalculatorMassager() {
                   <AccordionContent className="text-sm text-gray-600 leading-relaxed">
                     <p className="mb-2">Ежемесячные затраты при работе с новым мясомассажёром:</p>
                     <p className="mb-2">1. <strong>Затраты на персонал</strong> = Количество рабочих с новым оборудованием × Зарплата с налогами. Современные мясомассажёры автоматизируют процесс и позволяют сократить штат участка.</p>
-                    <p className="mb-2">2. <strong>Потери сырья</strong> рассчитываются аналогично, но с пониженным процентом потерь. Вакуумные мясомассажёры обеспечивают потери на уровне 1–3%.</p>
-                    <p className="mb-2">3. <strong>Затраты на электроэнергию</strong> = (Мощность оборудования (кВт·ч) / Время цикла (ч)) × Длительность смены (ч) × Количество смен × Рабочих дней × Тариф.</p>
-                    <p>4. <strong>Затраты на техническое обслуживание</strong> = 1% от стоимости оборудования в год / 12 месяцев. Это усреднённая оценка, включающая плановое ТО, замену расходных материалов и мелкий ремонт.</p>
+                    <p className="mb-2">2. <strong>Затраты на электроэнергию</strong> = (Мощность оборудования (кВт·ч) / Время цикла (ч)) × Длительность смены (ч) × Количество смен × Рабочих дней × Тариф.</p>
+                    <p className="mb-2">3. <strong>Затраты на техническое обслуживание</strong> = 1% от стоимости оборудования в год / 12 месяцев. Это усреднённая оценка, включающая плановое ТО, замену расходных материалов и мелкий ремонт.</p>
+                    <p>Потери сырья при работе с новым оборудованием не учитываются как отдельная статья расходов, поскольку вакуумный мясомассажёр не только устраняет потери, но и увеличивает выход готовой продукции на 10% за счёт лучшего впитывания рассола и маринада.</p>
                   </AccordionContent>
                 </AccordionItem>
 
@@ -1160,15 +1151,16 @@ export default function CalculatorMassager() {
                     Расчёт экономии
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-gray-600 leading-relaxed">
-                    <p className="mb-2">Ежемесячная экономия = Текущие затраты − Новые затраты.</p>
+                    <p className="mb-2">Ежемесячная экономия = Текущие затраты − Новые затраты + Выгода от увеличения выхода продукции.</p>
                     <p className="mb-2">Экономия складывается из:</p>
                     <ul className="list-disc list-inside mb-2 space-y-1">
                       <li>Экономия на персонале (сокращение штата участка)</li>
-                      <li>Экономия на потерях сырья (снижение процента потерь)</li>
+                      <li>Экономия на потерях сырья (полное устранение потерь при переходе на вакуумный массажёр)</li>
+                      <li>Увеличение выхода готовой продукции на 10% — за счёт лучшего впитывания рассола и маринада вакуумный мясомассажёр увеличивает массу готового продукта. Выгода = Объём производства (кг/сут) × Рабочих дней × 10% × Стоимость сырья (руб/кг)</li>
                       <li>Разница в затратах на электроэнергию (может быть как экономией, так и дополнительным расходом)</li>
                       <li>Разница в затратах на ремонт/ТО</li>
                     </ul>
-                    <p>Отдельные компоненты экономии могут быть отрицательными (например, электроэнергия при переходе с ручного труда), но общая экономия, как правило, положительная за счёт существенного сокращения потерь сырья и персонала.</p>
+                    <p>Отдельные компоненты экономии могут быть отрицательными (например, электроэнергия при переходе с ручного труда), но общая экономия, как правило, положительная за счёт устранения потерь, увеличения выхода продукции и сокращения персонала.</p>
                   </AccordionContent>
                 </AccordionItem>
 
@@ -1215,6 +1207,7 @@ export default function CalculatorMassager() {
                     <p className="mb-2">Калькулятор использует следующие допущения:</p>
                     <ul className="list-disc list-inside space-y-1 mb-2">
                       <li>Плотность мясного сырья: 1,05 кг/л</li>
+                      <li>Увеличение выхода готовой продукции с новым оборудованием: +10% от объёма сырья (за счёт лучшего впитывания рассола и маринада в вакуумном барабане)</li>
                       <li>Затраты на ТО нового оборудования: 1% от стоимости в год</li>
                       <li>Расчёт не учитывает инфляцию, изменение цен на сырьё и электроэнергию</li>
                       <li>Расчёт не учитывает стоимость кредита (если оборудование приобретается в кредит/лизинг)</li>
