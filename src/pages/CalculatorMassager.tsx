@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 import Icon from "@/components/ui/icon";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -62,6 +62,8 @@ interface CalcResults {
   oldCostRepair: number;
   oldCostTotal: number;
   newCostStaff: number;
+  newLossPercent: number;
+  newCostLoss: number;
   newCostEnergy: number;
   newCostMaintenance: number;
   newCostTotal: number;
@@ -121,45 +123,41 @@ function fmtDecimal(n: number, digits = 1): string {
     .replace(".", ",");
 }
 
-function TooltipIcon({ text }: { text: string }) {
+function ClickTooltip({ children, content, className = "" }: { children: ReactNode; content: ReactNode; className?: string }) {
+  const [open, setOpen] = useState(false);
   return (
-    <Tooltip>
+    <Tooltip open={open} onOpenChange={setOpen}>
       <TooltipTrigger asChild>
-        <button
-          type="button"
-          className="inline-flex items-center justify-center w-5 h-5 rounded-full border border-gray-300 text-gray-400 hover:text-[#e8712a] hover:border-[#e8712a] transition-colors ml-1.5 flex-shrink-0"
-        >
-          <Icon name="HelpCircle" size={13} />
+        <button type="button" onClick={() => setOpen((p) => !p)} className={className}>
+          {children}
         </button>
       </TooltipTrigger>
-      <TooltipContent
-        side="top"
-        className="max-w-xs text-sm bg-gray-800 text-white px-3 py-2 rounded-lg"
-      >
-        {text}
+      <TooltipContent side="top" className="max-w-sm text-xs bg-gray-800 text-white px-4 py-3 rounded-lg whitespace-pre-line leading-relaxed z-[100]">
+        {content}
       </TooltipContent>
     </Tooltip>
   );
 }
 
+function TooltipIcon({ text }: { text: string }) {
+  return (
+    <ClickTooltip
+      content={text}
+      className="inline-flex items-center justify-center w-5 h-5 rounded-full border border-gray-300 text-gray-400 hover:text-[#e8712a] hover:border-[#e8712a] transition-colors ml-1.5 flex-shrink-0"
+    >
+      <Icon name="HelpCircle" size={13} />
+    </ClickTooltip>
+  );
+}
+
 function FormulaTooltip({ text }: { text: string }) {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-400 hover:text-[#e8712a] hover:bg-[#e8712a]/10 transition-colors ml-1.5 flex-shrink-0 text-xs font-bold"
-        >
-          ?
-        </button>
-      </TooltipTrigger>
-      <TooltipContent
-        side="top"
-        className="max-w-sm text-xs bg-gray-800 text-white px-4 py-3 rounded-lg whitespace-pre-line leading-relaxed"
-      >
-        {text}
-      </TooltipContent>
-    </Tooltip>
+    <ClickTooltip
+      content={text}
+      className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-400 hover:text-[#e8712a] hover:bg-[#e8712a]/10 transition-colors ml-1.5 flex-shrink-0 text-xs font-bold"
+    >
+      ?
+    </ClickTooltip>
   );
 }
 
@@ -360,6 +358,12 @@ export default function CalculatorMassager() {
       oldCostStaff + oldCostLoss + oldCostEnergy + oldCostRepair;
 
     const newCostStaff = d.newWorkers * d.avgSalary;
+    const newLossPercent = d.currentLossPercent / 2;
+    const newCostLoss =
+      d.volumePerDay *
+      d.workDaysPerMonth *
+      (newLossPercent / 100) *
+      d.rawCostPerKg;
     const energyPerHour = d.cycleTime > 0 ? d.newEnergyKwh / d.cycleTime : 0;
     const newCostEnergy =
       energyPerHour *
@@ -369,7 +373,7 @@ export default function CalculatorMassager() {
       d.energyCostPerKwh;
     const newCostMaintenance = (d.equipmentCost * MAINTENANCE_RATE) / 12;
     const newCostTotal =
-      newCostStaff + newCostEnergy + newCostMaintenance;
+      newCostStaff + newCostLoss + newCostEnergy + newCostMaintenance;
 
     const yieldBenefit =
       d.volumePerDay *
@@ -378,7 +382,7 @@ export default function CalculatorMassager() {
       d.rawCostPerKg;
 
     const savingsStaff = oldCostStaff - newCostStaff;
-    const savingsLoss = oldCostLoss;
+    const savingsLoss = oldCostLoss - newCostLoss;
     const savingsEnergy = oldCostEnergy - newCostEnergy;
     const savingsRepair = oldCostRepair - newCostMaintenance;
     const totalSavings =
@@ -448,6 +452,8 @@ export default function CalculatorMassager() {
       oldCostRepair,
       oldCostTotal,
       newCostStaff,
+      newLossPercent,
+      newCostLoss,
       newCostEnergy,
       newCostMaintenance,
       newCostTotal,
@@ -542,11 +548,11 @@ export default function CalculatorMassager() {
           <Card title="Текущее производство" icon="Factory">
             <div className="grid sm:grid-cols-2 gap-x-6">
               <NumberInput
-                label="Объём производства (кг/сутки)"
+                label="Объём производства готовой продукции (кг/сутки)"
                 value={form.volumePerDay}
                 onChange={(v) => set("volumePerDay", v)}
                 placeholder="например, 1000"
-                tooltip="Общий объём мясного сырья, проходящий через участок массирования за сутки"
+                tooltip="Объём готовой продукции, выходящий с участка массирования за сутки"
               />
               <div className="mb-4">
                 <label className="flex items-center text-sm font-medium text-[#333] mb-1.5">
@@ -802,8 +808,8 @@ export default function CalculatorMassager() {
                 Из чего складывается экономия
               </h3>
               <SavingsRow label="Экономия на персонале" value={results.savingsStaff} tooltip={`Было: ${form.currentWorkers} чел × ${fmt(form.avgSalary)} ₽ = ${fmt(results.oldCostStaff)} ₽\nСтало: ${form.newWorkers} чел × ${fmt(form.avgSalary)} ₽ = ${fmt(results.newCostStaff)} ₽\nЭкономия: ${fmt(results.oldCostStaff)} − ${fmt(results.newCostStaff)} = ${fmt(results.savingsStaff)} ₽`} />
-              <SavingsRow label="Экономия на потерях сырья" value={results.savingsLoss} tooltip={`${fmt(form.volumePerDay)} кг/сут × ${form.workDaysPerMonth} дн × ${form.currentLossPercent}% × ${fmt(form.rawCostPerKg)} ₽/кг\n= ${fmt(results.savingsLoss)} ₽/мес\n\nС новым оборудованием потери сырья устранены полностью`} />
-              <SavingsRow label="Увеличение выхода продукции (+10%)" value={results.yieldBenefit} tooltip={`${fmt(form.volumePerDay)} кг/сут × ${form.workDaysPerMonth} дн × 10% × ${fmt(form.rawCostPerKg)} ₽/кг\n= ${fmt(results.yieldBenefit)} ₽/мес\n\nВакуумный массажёр увеличивает выход продукции на 10%`} />
+              <SavingsRow label="Снижение потерь сырья (−50%)" value={results.savingsLoss} tooltip={`Было: ${fmt(form.volumePerDay)} кг × ${form.workDaysPerMonth} дн × ${form.currentLossPercent}% × ${fmt(form.rawCostPerKg)} ₽ = ${fmt(results.oldCostLoss)} ₽\nСтало: ${fmt(form.volumePerDay)} кг × ${form.workDaysPerMonth} дн × ${fmtDecimal(results.newLossPercent)}% × ${fmt(form.rawCostPerKg)} ₽ = ${fmt(results.newCostLoss)} ₽\n\nПотери снижены на 50%: ${form.currentLossPercent}% → ${fmtDecimal(results.newLossPercent)}%\nЭкономия: ${fmt(results.savingsLoss)} ₽/мес`} />
+              <SavingsRow label="Увеличение выхода продукции (+10%)" value={results.yieldBenefit} tooltip={`При том же объёме сырья выход готовой продукции растёт на 10%\n\n${fmt(form.volumePerDay)} кг/сут × ${form.workDaysPerMonth} дн × 10% × ${fmt(form.rawCostPerKg)} ₽/кг\n= ${fmt(results.yieldBenefit)} ₽/мес`} />
               <SavingsRow label="Экономия на электроэнергии" value={results.savingsEnergy} tooltip={`Было: ${fmt(form.oldEnergyPerDay)} кВт·ч/сут × ${form.workDaysPerMonth} дн × ${fmt(form.energyCostPerKwh)} ₽ = ${fmt(results.oldCostEnergy)} ₽\nСтало: ${fmtDecimal(form.newEnergyKwh / (form.cycleTime || 1))} кВт·ч × ${form.shiftHours} ч × ${form.shiftsPerDay} см × ${form.workDaysPerMonth} дн × ${fmt(form.energyCostPerKwh)} ₽ = ${fmt(results.newCostEnergy)} ₽\nРазница: ${fmt(results.savingsEnergy)} ₽`} />
               <SavingsRow label="Экономия на ремонте / ТО" value={results.savingsRepair} tooltip={`Было: ремонт ${fmt(form.oldRepairPerMonth)} ₽/мес\nСтало: ТО = ${fmt(form.equipmentCost)} × 1% / 12 = ${fmt(results.newCostMaintenance)} ₽/мес\nРазница: ${fmt(results.savingsRepair)} ₽`} />
               <SavingsRow label="Итого экономия" value={results.totalSavings} bold tooltip={`${fmt(results.savingsStaff)} + ${fmt(results.savingsLoss)} + ${fmt(results.yieldBenefit)} + (${fmt(results.savingsEnergy)}) + (${fmt(results.savingsRepair)})\n= ${fmt(results.totalSavings)} ₽/мес`} />
@@ -870,11 +876,12 @@ export default function CalculatorMassager() {
                   </div>
                   <div className="text-2xl font-extrabold text-[#e8712a] mb-4 flex items-center gap-1">
                     {fmt(results.newCostTotal)} ₽
-                    <FormulaTooltip text={`${fmt(results.newCostStaff)} + ${fmt(results.newCostEnergy)} + ${fmt(results.newCostMaintenance)}`} />
+                    <FormulaTooltip text={`${fmt(results.newCostStaff)} + ${fmt(results.newCostLoss)} + ${fmt(results.newCostEnergy)} + ${fmt(results.newCostMaintenance)}`} />
                   </div>
                   <div className="space-y-2">
                     {[
                       { l: "Персонал", v: results.newCostStaff, t: `${form.newWorkers} чел × ${fmt(form.avgSalary)} ₽` },
+                      { l: "Потери сырья", v: results.newCostLoss, t: `${fmt(form.volumePerDay)} кг × ${form.workDaysPerMonth} дн × ${fmtDecimal(results.newLossPercent)}% × ${fmt(form.rawCostPerKg)} ₽/кг\nПотери снижены на 50%: ${form.currentLossPercent}% → ${fmtDecimal(results.newLossPercent)}%` },
                       { l: "Электроэнергия", v: results.newCostEnergy, t: `${fmtDecimal(form.newEnergyKwh / (form.cycleTime || 1))} кВт·ч × ${form.shiftHours} ч × ${form.shiftsPerDay} см × ${form.workDaysPerMonth} дн × ${fmt(form.energyCostPerKwh)} ₽` },
                       { l: "ТО оборудования", v: results.newCostMaintenance, t: `${fmt(form.equipmentCost)} ₽ × 1% / 12 мес` },
                     ].map((row) => (
@@ -1197,9 +1204,9 @@ export default function CalculatorMassager() {
                   <AccordionContent className="text-sm text-gray-600 leading-relaxed">
                     <p className="mb-2">Ежемесячные затраты при работе с новым мясомассажёром:</p>
                     <p className="mb-2">1. <strong>Затраты на персонал</strong> = Количество рабочих с новым оборудованием × Зарплата с налогами. Современные мясомассажёры автоматизируют процесс и позволяют сократить штат участка.</p>
-                    <p className="mb-2">2. <strong>Затраты на электроэнергию</strong> = (Мощность оборудования (кВт·ч) / Время цикла (ч)) × Длительность смены (ч) × Количество смен × Рабочих дней × Тариф.</p>
-                    <p className="mb-2">3. <strong>Затраты на техническое обслуживание</strong> = 1% от стоимости оборудования в год / 12 месяцев. Это усреднённая оценка, включающая плановое ТО, замену расходных материалов и мелкий ремонт.</p>
-                    <p>Потери сырья при работе с новым оборудованием не учитываются как отдельная статья расходов, поскольку вакуумный мясомассажёр не только устраняет потери, но и увеличивает выход готовой продукции на 10% за счёт лучшего впитывания рассола и маринада.</p>
+                    <p className="mb-2">2. <strong>Потери сырья</strong> — рассчитываются аналогично текущим, но процент потерь снижается на 50% от текущего значения. Вакуумные мясомассажёры существенно сокращают потери за счёт герметичной обработки в закрытом барабане.</p>
+                    <p className="mb-2">3. <strong>Затраты на электроэнергию</strong> = (Мощность оборудования (кВт·ч) / Время цикла (ч)) × Длительность смены (ч) × Количество смен × Рабочих дней × Тариф.</p>
+                    <p>4. <strong>Затраты на техническое обслуживание</strong> = 1% от стоимости оборудования в год / 12 месяцев. Это усреднённая оценка, включающая плановое ТО, замену расходных материалов и мелкий ремонт.</p>
                   </AccordionContent>
                 </AccordionItem>
 
@@ -1212,12 +1219,12 @@ export default function CalculatorMassager() {
                     <p className="mb-2">Экономия складывается из:</p>
                     <ul className="list-disc list-inside mb-2 space-y-1">
                       <li>Экономия на персонале (сокращение штата участка)</li>
-                      <li>Экономия на потерях сырья (полное устранение потерь при переходе на вакуумный массажёр)</li>
-                      <li>Увеличение выхода готовой продукции на 10% — за счёт лучшего впитывания рассола и маринада вакуумный мясомассажёр увеличивает массу готового продукта. Выгода = Объём производства (кг/сут) × Рабочих дней × 10% × Стоимость сырья (руб/кг)</li>
+                      <li>Снижение потерь сырья — новое оборудование сокращает процент потерь на 50% от текущего уровня. Экономия = Стоимость потерь до − Стоимость потерь после</li>
+                      <li>Увеличение выхода готовой продукции на 10% — при том же объёме сырья вакуумный мясомассажёр увеличивает массу готового продукта за счёт лучшего впитывания рассола и маринада. Выгода = Объём (кг/сут) × Рабочих дней × 10% × Стоимость сырья (руб/кг)</li>
                       <li>Разница в затратах на электроэнергию (может быть как экономией, так и дополнительным расходом)</li>
                       <li>Разница в затратах на ремонт/ТО</li>
                     </ul>
-                    <p>Отдельные компоненты экономии могут быть отрицательными (например, электроэнергия при переходе с ручного труда), но общая экономия, как правило, положительная за счёт устранения потерь, увеличения выхода продукции и сокращения персонала.</p>
+                    <p>Отдельные компоненты экономии могут быть отрицательными (например, электроэнергия при переходе с ручного труда), но общая экономия, как правило, положительная за счёт снижения потерь, увеличения выхода продукции и сокращения персонала.</p>
                   </AccordionContent>
                 </AccordionItem>
 
@@ -1264,7 +1271,8 @@ export default function CalculatorMassager() {
                     <p className="mb-2">Калькулятор использует следующие допущения:</p>
                     <ul className="list-disc list-inside space-y-1 mb-2">
                       <li>Плотность мясного сырья: 1,05 кг/л</li>
-                      <li>Увеличение выхода готовой продукции с новым оборудованием: +10% от объёма сырья (за счёт лучшего впитывания рассола и маринада в вакуумном барабане)</li>
+                      <li>Снижение потерь сырья с новым оборудованием: на 50% от текущего уровня</li>
+                      <li>Увеличение выхода готовой продукции: +10% при том же объёме сырья (за счёт лучшего впитывания рассола и маринада в вакуумном барабане)</li>
                       <li>Затраты на ТО нового оборудования: 1% от стоимости в год</li>
                       <li>Расчёт не учитывает инфляцию, изменение цен на сырьё и электроэнергию</li>
                       <li>Расчёт не учитывает стоимость кредита (если оборудование приобретается в кредит/лизинг)</li>
