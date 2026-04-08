@@ -142,6 +142,27 @@ function TooltipIcon({ text }: { text: string }) {
   );
 }
 
+function FormulaTooltip({ text }: { text: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-400 hover:text-[#e8712a] hover:bg-[#e8712a]/10 transition-colors ml-1.5 flex-shrink-0 text-xs font-bold"
+        >
+          ?
+        </button>
+      </TooltipTrigger>
+      <TooltipContent
+        side="top"
+        className="max-w-sm text-xs bg-gray-800 text-white px-4 py-3 rounded-lg whitespace-pre-line leading-relaxed"
+      >
+        {text}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 function NumberInput({
   label,
   value,
@@ -229,11 +250,13 @@ function MetricCard({
   value,
   sub,
   icon,
+  tooltip,
 }: {
   label: string;
   value: string;
   sub: string;
   icon: string;
+  tooltip?: string;
 }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6 flex flex-col items-center text-center">
@@ -243,8 +266,9 @@ function MetricCard({
       >
         <Icon name={icon} fallback="TrendingUp" size={24} className="text-[#e8712a]" />
       </div>
-      <div className="text-2xl sm:text-3xl font-extrabold text-[#333] mb-1">
+      <div className="text-2xl sm:text-3xl font-extrabold text-[#333] mb-1 flex items-center gap-1">
         {value}
+        {tooltip && <FormulaTooltip text={tooltip} />}
       </div>
       <div className="text-sm font-semibold text-[#333]">{label}</div>
       <div className="text-xs text-gray-500 mt-0.5">{sub}</div>
@@ -256,10 +280,12 @@ function SavingsRow({
   label,
   value,
   bold,
+  tooltip,
 }: {
   label: string;
   value: number;
   bold?: boolean;
+  tooltip?: string;
 }) {
   const isNeg = value < 0;
   return (
@@ -269,9 +295,10 @@ function SavingsRow({
       }`}
     >
       <span
-        className={`text-sm ${bold ? "font-bold text-[#333]" : "text-gray-600"}`}
+        className={`text-sm flex items-center ${bold ? "font-bold text-[#333]" : "text-gray-600"}`}
       >
         {label}
+        {tooltip && <FormulaTooltip text={tooltip} />}
       </span>
       <span
         className={`text-sm font-semibold tabular-nums ${
@@ -744,24 +771,28 @@ export default function CalculatorMassager() {
                 value={paybackDisplay()}
                 sub="простой срок окупаемости"
                 icon="Clock"
+                tooltip={`Полные инвестиции / Ежемесячная выгода\n${fmt(results.totalInvestment)} ₽ / ${fmt(results.totalMonthlyBenefit)} ₽/мес\n\nИнвестиции: ${fmt(form.equipmentCost)} + ${fmt(form.deliveryCost)} = ${fmt(results.totalInvestment)} ₽`}
               />
               <MetricCard
                 label="Ежемесячная экономия"
                 value={`${fmt(results.totalMonthlyBenefit)} ₽`}
                 sub="экономия в месяц"
                 icon="PiggyBank"
+                tooltip={`Экономия на затратах + Доп. прибыль\n${fmt(results.totalSavings)} + ${fmt(results.additionalProfit)} = ${fmt(results.totalMonthlyBenefit)} ₽/мес`}
               />
               <MetricCard
                 label="ROI за 1 год"
                 value={`${fmtDecimal(results.roi1y)}%`}
                 sub="возврат на инвестиции"
                 icon="TrendingUp"
+                tooltip={`(Выгода за 12 мес − Инвестиции) / Инвестиции × 100%\n(${fmt(results.benefit1y)} − ${fmt(results.totalInvestment)}) / ${fmt(results.totalInvestment)} × 100%\n= ${fmtDecimal(results.roi1y)}%`}
               />
               <MetricCard
                 label="Выгода за 5 лет"
                 value={`${fmt(results.benefit5y)} ₽`}
                 sub="общая выгода за 5 лет"
                 icon="BadgeRussianRuble"
+                tooltip={`Ежемесячная выгода × 60 мес\n${fmt(results.totalMonthlyBenefit)} × 60 = ${fmt(results.benefit5y)} ₽`}
               />
             </div>
 
@@ -770,23 +801,25 @@ export default function CalculatorMassager() {
                 <Icon name="PieChart" fallback="BarChart" size={20} className="text-[#e8712a]" />
                 Из чего складывается экономия
               </h3>
-              <SavingsRow label="Экономия на персонале" value={results.savingsStaff} />
-              <SavingsRow label="Экономия на потерях сырья" value={results.savingsLoss} />
-              <SavingsRow label="Увеличение выхода продукции (+10%)" value={results.yieldBenefit} />
-              <SavingsRow label="Экономия на электроэнергии" value={results.savingsEnergy} />
-              <SavingsRow label="Экономия на ремонте / ТО" value={results.savingsRepair} />
-              <SavingsRow label="Итого экономия" value={results.totalSavings} bold />
+              <SavingsRow label="Экономия на персонале" value={results.savingsStaff} tooltip={`Было: ${form.currentWorkers} чел × ${fmt(form.avgSalary)} ₽ = ${fmt(results.oldCostStaff)} ₽\nСтало: ${form.newWorkers} чел × ${fmt(form.avgSalary)} ₽ = ${fmt(results.newCostStaff)} ₽\nЭкономия: ${fmt(results.oldCostStaff)} − ${fmt(results.newCostStaff)} = ${fmt(results.savingsStaff)} ₽`} />
+              <SavingsRow label="Экономия на потерях сырья" value={results.savingsLoss} tooltip={`${fmt(form.volumePerDay)} кг/сут × ${form.workDaysPerMonth} дн × ${form.currentLossPercent}% × ${fmt(form.rawCostPerKg)} ₽/кг\n= ${fmt(results.savingsLoss)} ₽/мес\n\nС новым оборудованием потери сырья устранены полностью`} />
+              <SavingsRow label="Увеличение выхода продукции (+10%)" value={results.yieldBenefit} tooltip={`${fmt(form.volumePerDay)} кг/сут × ${form.workDaysPerMonth} дн × 10% × ${fmt(form.rawCostPerKg)} ₽/кг\n= ${fmt(results.yieldBenefit)} ₽/мес\n\nВакуумный массажёр увеличивает выход продукции на 10%`} />
+              <SavingsRow label="Экономия на электроэнергии" value={results.savingsEnergy} tooltip={`Было: ${fmt(form.oldEnergyPerDay)} кВт·ч/сут × ${form.workDaysPerMonth} дн × ${fmt(form.energyCostPerKwh)} ₽ = ${fmt(results.oldCostEnergy)} ₽\nСтало: ${fmtDecimal(form.newEnergyKwh / (form.cycleTime || 1))} кВт·ч × ${form.shiftHours} ч × ${form.shiftsPerDay} см × ${form.workDaysPerMonth} дн × ${fmt(form.energyCostPerKwh)} ₽ = ${fmt(results.newCostEnergy)} ₽\nРазница: ${fmt(results.savingsEnergy)} ₽`} />
+              <SavingsRow label="Экономия на ремонте / ТО" value={results.savingsRepair} tooltip={`Было: ремонт ${fmt(form.oldRepairPerMonth)} ₽/мес\nСтало: ТО = ${fmt(form.equipmentCost)} × 1% / 12 = ${fmt(results.newCostMaintenance)} ₽/мес\nРазница: ${fmt(results.savingsRepair)} ₽`} />
+              <SavingsRow label="Итого экономия" value={results.totalSavings} bold tooltip={`${fmt(results.savingsStaff)} + ${fmt(results.savingsLoss)} + ${fmt(results.yieldBenefit)} + (${fmt(results.savingsEnergy)}) + (${fmt(results.savingsRepair)})\n= ${fmt(results.totalSavings)} ₽/мес`} />
               {form.hasDemand && results.additionalProfit > 0 && (
                 <>
                   <div className="mt-4 pt-4 border-t border-gray-100">
                     <SavingsRow
                       label="Дополнительная прибыль от роста объёмов"
                       value={results.additionalProfit}
+                      tooltip={`Запас: ${fmt(Math.round(results.surplusKg))} кг/мес × ${fmt(form.marginPerKg)} ₽/кг маржа\n= ${fmt(results.additionalProfit)} ₽/мес`}
                     />
                     <SavingsRow
                       label="Общая ежемесячная выгода"
                       value={results.totalMonthlyBenefit}
                       bold
+                      tooltip={`Экономия ${fmt(results.totalSavings)} + Доп. прибыль ${fmt(results.additionalProfit)}\n= ${fmt(results.totalMonthlyBenefit)} ₽/мес`}
                     />
                   </div>
                 </>
@@ -803,18 +836,19 @@ export default function CalculatorMassager() {
                   <div className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">
                     Текущие затраты в месяц
                   </div>
-                  <div className="text-2xl font-extrabold text-[#333] mb-4">
+                  <div className="text-2xl font-extrabold text-[#333] mb-4 flex items-center gap-1">
                     {fmt(results.oldCostTotal)} ₽
+                    <FormulaTooltip text={`${fmt(results.oldCostStaff)} + ${fmt(results.oldCostLoss)} + ${fmt(results.oldCostEnergy)} + ${fmt(results.oldCostRepair)}`} />
                   </div>
                   <div className="space-y-2">
                     {[
-                      { l: "Персонал", v: results.oldCostStaff },
-                      { l: "Потери сырья", v: results.oldCostLoss },
-                      { l: "Электроэнергия", v: results.oldCostEnergy },
-                      { l: "Ремонт", v: results.oldCostRepair },
+                      { l: "Персонал", v: results.oldCostStaff, t: `${form.currentWorkers} чел × ${fmt(form.avgSalary)} ₽` },
+                      { l: "Потери сырья", v: results.oldCostLoss, t: `${fmt(form.volumePerDay)} кг × ${form.workDaysPerMonth} дн × ${form.currentLossPercent}% × ${fmt(form.rawCostPerKg)} ₽/кг` },
+                      { l: "Электроэнергия", v: results.oldCostEnergy, t: `${fmt(form.oldEnergyPerDay)} кВт·ч/сут × ${form.workDaysPerMonth} дн × ${fmt(form.energyCostPerKwh)} ₽` },
+                      { l: "Ремонт", v: results.oldCostRepair, t: `Указано пользователем: ${fmt(form.oldRepairPerMonth)} ₽/мес` },
                     ].map((row) => (
                       <div key={row.l} className="flex justify-between text-sm">
-                        <span className="text-gray-500">{row.l}</span>
+                        <span className="text-gray-500 flex items-center">{row.l}<FormulaTooltip text={row.t} /></span>
                         <span className="font-medium text-[#333] tabular-nums">
                           {fmt(row.v)} ₽
                         </span>
@@ -834,17 +868,18 @@ export default function CalculatorMassager() {
                   <div className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">
                     Новые затраты в месяц
                   </div>
-                  <div className="text-2xl font-extrabold text-[#e8712a] mb-4">
+                  <div className="text-2xl font-extrabold text-[#e8712a] mb-4 flex items-center gap-1">
                     {fmt(results.newCostTotal)} ₽
+                    <FormulaTooltip text={`${fmt(results.newCostStaff)} + ${fmt(results.newCostEnergy)} + ${fmt(results.newCostMaintenance)}`} />
                   </div>
                   <div className="space-y-2">
                     {[
-                      { l: "Персонал", v: results.newCostStaff },
-                      { l: "Электроэнергия", v: results.newCostEnergy },
-                      { l: "ТО оборудования", v: results.newCostMaintenance },
+                      { l: "Персонал", v: results.newCostStaff, t: `${form.newWorkers} чел × ${fmt(form.avgSalary)} ₽` },
+                      { l: "Электроэнергия", v: results.newCostEnergy, t: `${fmtDecimal(form.newEnergyKwh / (form.cycleTime || 1))} кВт·ч × ${form.shiftHours} ч × ${form.shiftsPerDay} см × ${form.workDaysPerMonth} дн × ${fmt(form.energyCostPerKwh)} ₽` },
+                      { l: "ТО оборудования", v: results.newCostMaintenance, t: `${fmt(form.equipmentCost)} ₽ × 1% / 12 мес` },
                     ].map((row) => (
                       <div key={row.l} className="flex justify-between text-sm">
-                        <span className="text-gray-500">{row.l}</span>
+                        <span className="text-gray-500 flex items-center">{row.l}<FormulaTooltip text={row.t} /></span>
                         <span className="font-medium text-[#333] tabular-nums">
                           {fmt(row.v)} ₽
                         </span>
@@ -898,18 +933,21 @@ export default function CalculatorMassager() {
                     {[
                       {
                         period: "1 год",
+                        months: 12,
                         benefit: results.benefit1y,
                         net: results.netBenefit1y,
                         roi: results.roi1yVal,
                       },
                       {
                         period: "3 года",
+                        months: 36,
                         benefit: results.benefit3y,
                         net: results.netBenefit3y,
                         roi: results.roi3yVal,
                       },
                       {
                         period: "5 лет",
+                        months: 60,
                         benefit: results.benefit5y,
                         net: results.netBenefit5y,
                         roi: results.roi5yVal,
@@ -920,22 +958,31 @@ export default function CalculatorMassager() {
                           {row.period}
                         </td>
                         <td className="py-3 px-4 text-right tabular-nums text-[#333]">
-                          {fmt(row.benefit)} ₽
+                          <span className="inline-flex items-center gap-1">
+                            {fmt(row.benefit)} ₽
+                            <FormulaTooltip text={`${fmt(results.totalMonthlyBenefit)} ₽/мес × ${row.months} мес`} />
+                          </span>
                         </td>
                         <td
                           className={`py-3 px-4 text-right tabular-nums font-semibold ${
                             row.net < 0 ? "text-red-500" : "text-green-600"
                           }`}
                         >
-                          {row.net < 0 ? "−" : ""}
-                          {fmt(Math.abs(row.net))} ₽
+                          <span className="inline-flex items-center gap-1">
+                            {row.net < 0 ? "−" : ""}
+                            {fmt(Math.abs(row.net))} ₽
+                            <FormulaTooltip text={`${fmt(row.benefit)} − ${fmt(results.totalInvestment)} (инвестиции)`} />
+                          </span>
                         </td>
                         <td
                           className={`py-3 pl-4 text-right tabular-nums font-bold ${
                             row.roi < 0 ? "text-red-500" : "text-[#e8712a]"
                           }`}
                         >
-                          {fmtDecimal(row.roi)}%
+                          <span className="inline-flex items-center gap-1">
+                            {fmtDecimal(row.roi)}%
+                            <FormulaTooltip text={`(${fmt(row.benefit)} − ${fmt(results.totalInvestment)}) / ${fmt(results.totalInvestment)} × 100%`} />
+                          </span>
                         </td>
                       </tr>
                     ))}
@@ -954,35 +1001,45 @@ export default function CalculatorMassager() {
                   {
                     l: "Загрузка одного цикла",
                     v: `${fmt(Math.round(results.cycleLoad))} кг`,
+                    t: `${fmt(form.drumVolume)} л × ${form.loadFactor.toFixed(2)} × 1,05 кг/л`,
                   },
-                  { l: "Циклов за смену", v: `${results.cyclesPerShift}` },
+                  {
+                    l: "Циклов за смену",
+                    v: `${results.cyclesPerShift}`,
+                    t: `${form.shiftHours} ч / ${form.cycleTime} ч = ${results.cyclesPerShift} (округлено вниз)`,
+                  },
                   {
                     l: "Производительность за смену",
                     v: `${fmt(Math.round(results.prodPerShift))} кг`,
+                    t: `${fmt(Math.round(results.cycleLoad))} кг × ${results.cyclesPerShift} циклов`,
                   },
                   {
                     l: "Производительность за сутки",
                     v: `${fmt(Math.round(results.prodPerDay))} кг`,
+                    t: `${fmt(Math.round(results.prodPerShift))} кг × ${form.shiftsPerDay} смен`,
                   },
                   {
                     l: "Производительность за месяц",
                     v: `${fmt(Math.round(results.prodPerMonth))} кг`,
+                    t: `${fmt(Math.round(results.prodPerDay))} кг × ${form.workDaysPerMonth} дней`,
                   },
                   {
                     l: "Текущий объём за месяц",
                     v: `${fmt(results.currentMonthlyVolume)} кг`,
+                    t: `${fmt(form.volumePerDay)} кг/сут × ${form.workDaysPerMonth} дней`,
                   },
                   {
                     l: "Запас производительности",
                     v: `+${fmt(Math.round(results.surplusKg))} кг (+${fmtDecimal(results.surplusPercent, 0)}%)`,
                     highlight: true,
+                    t: `${fmt(Math.round(results.prodPerMonth))} − ${fmt(results.currentMonthlyVolume)} = ${fmt(Math.round(results.surplusKg))} кг`,
                   },
                 ].map((row) => (
                   <div
                     key={row.l}
                     className="flex justify-between py-2 border-b border-gray-50"
                   >
-                    <span className="text-sm text-gray-600">{row.l}</span>
+                    <span className="text-sm text-gray-600 flex items-center">{row.l}<FormulaTooltip text={row.t} /></span>
                     <span
                       className={`text-sm font-semibold tabular-nums ${
                         row.highlight ? "text-[#e8712a]" : "text-[#333]"
