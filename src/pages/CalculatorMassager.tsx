@@ -16,97 +16,105 @@ import {
 const LOGO_URL =
   "https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg";
 const ACCENT = "#e8712a";
-const MEAT_DENSITY = 1.05;
-const MAINTENANCE_RATE = 0.01;
-const YIELD_INCREASE = 0.10;
+const BRINE_INJECTION_RATE = 0.35;
 
 interface FormData {
-  volumePerDay: number;
-  shiftsPerDay: number;
-  shiftHours: number;
+  rawMeatPerDay: number;
   workDaysPerMonth: number;
-  currentWorkers: number;
-  avgSalary: number;
-  currentLossPercent: number;
+
+  oldBrineRetention: number;
+  oldThermoLoss: number;
+  oldDefectPercent: number;
+  oldBrineLossKg: number;
+  oldEnergyPerCycle: number;
+  oldCyclesPerDay: number;
+  oldWorkers: number;
+
+  newBrineRetention: number;
+  newThermoLoss: number;
+  newDefectPercent: number;
+  newBrineLossKg: number;
+  newEnergyPerCycle: number;
+  newCyclesPerDay: number;
+  newWorkers: number;
+
   rawCostPerKg: number;
-  oldEnergyPerDay: number;
-  oldRepairPerMonth: number;
+  brineCostPerKg: number;
+  energyCostPerKwh: number;
+  laborCostPerHour: number;
+  laborHoursSaved: number;
+
   equipmentCost: number;
   deliveryCost: number;
-  drumVolume: number;
-  loadFactor: number;
-  cycleTime: number;
-  newEnergyKwh: number;
-  newWorkers: number;
-  energyCostPerKwh: number;
-  marginPerKg: number;
-  hasDemand: boolean;
 }
 
 interface CalcResults {
+  oldBrineKg: number;
+  oldMassAfter: number;
+  oldThermoLossKg: number;
+  oldYieldKg: number;
+  oldYieldPercent: number;
+  oldDefectKg: number;
+
+  newBrineKg: number;
+  newMassAfter: number;
+  newThermoLossKg: number;
+  newYieldKg: number;
+  newYieldPercent: number;
+  newDefectKg: number;
+
+  diffYieldKg: number;
+  diffDefectKg: number;
+  diffBrineLossKg: number;
+  diffEnergyKwh: number;
+
+  savYieldPerDay: number;
+  savDefectPerDay: number;
+  savBrinePerDay: number;
+  savEnergyPerDay: number;
+  savLaborPerDay: number;
+  totalSavPerDay: number;
+  totalSavPerMonth: number;
+  totalSavPerYear: number;
+
+  totalInvestment: number;
   paybackMonths: number;
-  monthlySavings: number;
   roi1y: number;
-  benefit5y: number;
-  savingsStaff: number;
-  savingsLoss: number;
-  yieldBenefit: number;
-  savingsEnergy: number;
-  savingsRepair: number;
-  totalSavings: number;
-  additionalProfit: number;
-  totalMonthlyBenefit: number;
-  oldCostStaff: number;
-  oldCostLoss: number;
-  oldCostEnergy: number;
-  oldCostRepair: number;
-  oldCostTotal: number;
-  newCostStaff: number;
-  newLossPercent: number;
-  newCostLoss: number;
-  newCostEnergy: number;
-  newCostMaintenance: number;
-  newCostTotal: number;
-  roi1yVal: number;
-  roi3yVal: number;
-  roi5yVal: number;
-  benefit1y: number;
-  benefit3y: number;
+  roi3y: number;
+  roi5y: number;
   netBenefit1y: number;
   netBenefit3y: number;
   netBenefit5y: number;
-  cycleLoad: number;
-  cyclesPerShift: number;
-  prodPerShift: number;
-  prodPerDay: number;
-  prodPerMonth: number;
-  currentMonthlyVolume: number;
-  surplusKg: number;
-  surplusPercent: number;
-  totalInvestment: number;
 }
 
 const DEFAULTS: FormData = {
-  volumePerDay: 1000,
-  shiftsPerDay: 1,
-  shiftHours: 8,
+  rawMeatPerDay: 1000,
   workDaysPerMonth: 22,
-  currentWorkers: 4,
-  avgSalary: 65000,
-  currentLossPercent: 5,
+
+  oldBrineRetention: 82,
+  oldThermoLoss: 9,
+  oldDefectPercent: 4,
+  oldBrineLossKg: 70,
+  oldEnergyPerCycle: 17.5,
+  oldCyclesPerDay: 1.5,
+  oldWorkers: 4,
+
+  newBrineRetention: 94,
+  newThermoLoss: 7,
+  newDefectPercent: 0.75,
+  newBrineLossKg: 20,
+  newEnergyPerCycle: 10,
+  newCyclesPerDay: 2.5,
+  newWorkers: 2,
+
   rawCostPerKg: 350,
-  oldEnergyPerDay: 0,
-  oldRepairPerMonth: 0,
+  brineCostPerKg: 80,
+  energyCostPerKwh: 8,
+  laborCostPerHour: 350,
+  laborHoursSaved: 2,
+
   equipmentCost: 2800000,
   deliveryCost: 150000,
-  drumVolume: 1200,
-  loadFactor: 0.7,
-  cycleTime: 4,
-  newEnergyKwh: 7.5,
-  newWorkers: 1,
-  energyCostPerKwh: 8,
-  marginPerKg: 80,
-  hasDemand: true,
 };
 
 function fmt(n: number): string {
@@ -211,6 +219,52 @@ function NumberInput({
   );
 }
 
+function SliderInput({
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  step = 1,
+  tooltip,
+  suffix = "%",
+  decimals = 0,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  tooltip?: string;
+  suffix?: string;
+  decimals?: number;
+}) {
+  const display = decimals > 0 ? value.toFixed(decimals).replace(".", ",") : String(value);
+  return (
+    <div className="mb-4">
+      <label className="flex items-center text-sm font-medium text-[#333] mb-1.5 flex-wrap">
+        <span>{label}: <strong>{display}{suffix}</strong></span>
+        {tooltip && <TooltipIcon text={tooltip} />}
+      </label>
+      <div className="pt-2 pb-1 px-1">
+        <Slider
+          value={[value]}
+          onValueChange={([v]) => onChange(v)}
+          min={min}
+          max={max}
+          step={step}
+          className="[&_[role=slider]]:bg-[#e8712a] [&_[role=slider]]:border-[#e8712a] [&_span[data-orientation=horizontal]>span]:bg-[#e8712a]"
+        />
+        <div className="flex justify-between text-xs text-gray-400 mt-1">
+          <span>{decimals > 0 ? min.toFixed(decimals).replace(".", ",") : min}{suffix}</span>
+          <span>{decimals > 0 ? max.toFixed(decimals).replace(".", ",") : max}{suffix}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Card({
   title,
   subtitle,
@@ -304,7 +358,7 @@ function SavingsRow({
         }`}
       >
         {isNeg ? "−" : ""}
-        {fmt(Math.abs(value))} ₽/мес
+        {fmt(Math.abs(value))} ₽/сут
       </span>
     </div>
   );
@@ -336,144 +390,105 @@ export default function CalculatorMassager() {
   }, []);
 
   const set = useCallback(
-    (key: keyof FormData, value: number | boolean) =>
+    (key: keyof FormData, value: number) =>
       setForm((prev) => ({ ...prev, [key]: value })),
     []
   );
 
   const calculate = () => {
     const d = form;
+
+    const brineAdded = d.rawMeatPerDay * BRINE_INJECTION_RATE;
+
+    const oldBrineKg = brineAdded * (d.oldBrineRetention / 100);
+    const oldMassAfter = d.rawMeatPerDay + oldBrineKg;
+    const oldThermoLossKg = oldMassAfter * (d.oldThermoLoss / 100);
+    const oldYieldKg = oldMassAfter - oldThermoLossKg;
+    const oldYieldPercent = (oldYieldKg / d.rawMeatPerDay) * 100;
+    const oldDefectKg = d.rawMeatPerDay * (d.oldDefectPercent / 100);
+
+    const newBrineKg = brineAdded * (d.newBrineRetention / 100);
+    const newMassAfter = d.rawMeatPerDay + newBrineKg;
+    const newThermoLossKg = newMassAfter * (d.newThermoLoss / 100);
+    const newYieldKg = newMassAfter - newThermoLossKg;
+    const newYieldPercent = (newYieldKg / d.rawMeatPerDay) * 100;
+    const newDefectKg = d.rawMeatPerDay * (d.newDefectPercent / 100);
+
+    const diffYieldKg = newYieldKg - oldYieldKg;
+    const diffDefectKg = oldDefectKg - newDefectKg;
+    const diffBrineLossKg = d.oldBrineLossKg - d.newBrineLossKg;
+    const diffEnergyKwh =
+      d.oldEnergyPerCycle * d.oldCyclesPerDay -
+      d.newEnergyPerCycle * d.newCyclesPerDay;
+
+    const savYieldPerDay = diffYieldKg * d.rawCostPerKg;
+    const savDefectPerDay = diffDefectKg * d.rawCostPerKg;
+    const savBrinePerDay = diffBrineLossKg * d.brineCostPerKg;
+    const savEnergyPerDay = diffEnergyKwh * d.energyCostPerKwh;
+    const savLaborPerDay = d.laborHoursSaved * d.laborCostPerHour;
+    const totalSavPerDay =
+      savYieldPerDay + savDefectPerDay + savBrinePerDay + savEnergyPerDay + savLaborPerDay;
+    const totalSavPerMonth = totalSavPerDay * d.workDaysPerMonth;
+    const totalSavPerYear = totalSavPerMonth * 12;
+
     const totalInvestment = d.equipmentCost + d.deliveryCost;
-
-    const oldCostStaff = d.currentWorkers * d.avgSalary;
-    const oldCostLoss =
-      d.volumePerDay *
-      d.workDaysPerMonth *
-      (d.currentLossPercent / 100) *
-      d.rawCostPerKg;
-    const oldCostEnergy =
-      d.oldEnergyPerDay * d.workDaysPerMonth * d.energyCostPerKwh;
-    const oldCostRepair = d.oldRepairPerMonth;
-    const oldCostTotal =
-      oldCostStaff + oldCostLoss + oldCostEnergy + oldCostRepair;
-
-    const newCostStaff = d.newWorkers * d.avgSalary;
-    const newLossPercent = d.currentLossPercent / 2;
-    const newCostLoss =
-      d.volumePerDay *
-      d.workDaysPerMonth *
-      (newLossPercent / 100) *
-      d.rawCostPerKg;
-    const energyPerHour = d.cycleTime > 0 ? d.newEnergyKwh / d.cycleTime : 0;
-    const newCostEnergy =
-      energyPerHour *
-      d.shiftHours *
-      d.shiftsPerDay *
-      d.workDaysPerMonth *
-      d.energyCostPerKwh;
-    const newCostMaintenance = (d.equipmentCost * MAINTENANCE_RATE) / 12;
-    const newCostTotal =
-      newCostStaff + newCostLoss + newCostEnergy + newCostMaintenance;
-
-    const yieldBenefit =
-      d.volumePerDay *
-      d.workDaysPerMonth *
-      YIELD_INCREASE *
-      d.rawCostPerKg;
-
-    const savingsStaff = oldCostStaff - newCostStaff;
-    const savingsLoss = oldCostLoss - newCostLoss;
-    const savingsEnergy = oldCostEnergy - newCostEnergy;
-    const savingsRepair = oldCostRepair - newCostMaintenance;
-    const totalSavings =
-      savingsStaff + savingsLoss + yieldBenefit + savingsEnergy + savingsRepair;
-
-    const cycleLoad = d.drumVolume * d.loadFactor * MEAT_DENSITY;
-    const cyclesPerShift =
-      d.cycleTime > 0 ? Math.floor(d.shiftHours / d.cycleTime) : 0;
-    const prodPerShift = cycleLoad * cyclesPerShift;
-    const prodPerDay = prodPerShift * d.shiftsPerDay;
-    const prodPerMonth = prodPerDay * d.workDaysPerMonth;
-    const currentMonthlyVolume = d.volumePerDay * d.workDaysPerMonth;
-    const surplusKg = Math.max(0, prodPerMonth - currentMonthlyVolume);
-    const surplusPercent =
-      currentMonthlyVolume > 0
-        ? (surplusKg / currentMonthlyVolume) * 100
-        : 0;
-
-    let additionalProfit = 0;
-    if (d.hasDemand && surplusKg > 0) {
-      additionalProfit = surplusKg * d.marginPerKg;
-    }
-
-    const totalMonthlyBenefit = totalSavings + additionalProfit;
     const paybackMonths =
-      totalMonthlyBenefit > 0
-        ? totalInvestment / totalMonthlyBenefit
-        : Infinity;
-
-    const benefit1y = totalMonthlyBenefit * 12;
-    const benefit3y = totalMonthlyBenefit * 36;
-    const benefit5y_val = totalMonthlyBenefit * 60;
-
-    const netBenefit1y = benefit1y - totalInvestment;
-    const netBenefit3y = benefit3y - totalInvestment;
-    const netBenefit5y = benefit5y_val - totalInvestment;
+      totalSavPerMonth > 0 ? totalInvestment / totalSavPerMonth : Infinity;
 
     const roi1y =
       totalInvestment > 0
-        ? ((benefit1y - totalInvestment) / totalInvestment) * 100
+        ? ((totalSavPerYear - totalInvestment) / totalInvestment) * 100
         : 0;
     const roi3y =
       totalInvestment > 0
-        ? ((benefit3y - totalInvestment) / totalInvestment) * 100
+        ? ((totalSavPerYear * 3 - totalInvestment) / totalInvestment) * 100
         : 0;
     const roi5y =
       totalInvestment > 0
-        ? ((benefit5y_val - totalInvestment) / totalInvestment) * 100
+        ? ((totalSavPerYear * 5 - totalInvestment) / totalInvestment) * 100
         : 0;
 
+    const netBenefit1y = totalSavPerYear - totalInvestment;
+    const netBenefit3y = totalSavPerYear * 3 - totalInvestment;
+    const netBenefit5y = totalSavPerYear * 5 - totalInvestment;
+
     setResults({
+      oldBrineKg,
+      oldMassAfter,
+      oldThermoLossKg,
+      oldYieldKg,
+      oldYieldPercent,
+      oldDefectKg,
+
+      newBrineKg,
+      newMassAfter,
+      newThermoLossKg,
+      newYieldKg,
+      newYieldPercent,
+      newDefectKg,
+
+      diffYieldKg,
+      diffDefectKg,
+      diffBrineLossKg,
+      diffEnergyKwh,
+
+      savYieldPerDay,
+      savDefectPerDay,
+      savBrinePerDay,
+      savEnergyPerDay,
+      savLaborPerDay,
+      totalSavPerDay,
+      totalSavPerMonth,
+      totalSavPerYear,
+
+      totalInvestment,
       paybackMonths,
-      monthlySavings: totalSavings,
       roi1y,
-      benefit5y: benefit5y_val,
-      savingsStaff,
-      savingsLoss,
-      yieldBenefit,
-      savingsEnergy,
-      savingsRepair,
-      totalSavings,
-      additionalProfit,
-      totalMonthlyBenefit,
-      oldCostStaff,
-      oldCostLoss,
-      oldCostEnergy,
-      oldCostRepair,
-      oldCostTotal,
-      newCostStaff,
-      newLossPercent,
-      newCostLoss,
-      newCostEnergy,
-      newCostMaintenance,
-      newCostTotal,
-      roi1yVal: roi1y,
-      roi3yVal: roi3y,
-      roi5yVal: roi5y,
-      benefit1y,
-      benefit3y,
+      roi3y,
+      roi5y,
       netBenefit1y,
       netBenefit3y,
       netBenefit5y,
-      cycleLoad,
-      cyclesPerShift,
-      prodPerShift,
-      prodPerDay,
-      prodPerMonth,
-      currentMonthlyVolume,
-      surplusKg,
-      surplusPercent,
-      totalInvestment,
     });
     setShowResults(true);
     setTimeout(() => {
@@ -514,7 +529,7 @@ export default function CalculatorMassager() {
   return (
     <div className="min-h-screen" style={{ background: "#fafafa", color: "#333", fontFamily: "'Inter', 'Onest', system-ui, sans-serif" }}>
       <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 text-center text-sm text-amber-800">
-        ⚠️ Внутренний инструмент. Калькулятор находится на проверке. Не размещайте ссылку на эту страницу в каталоге товаров до согласования с руководством.
+        Внутренний инструмент. Калькулятор находится на проверке. Не размещайте ссылку на эту страницу в каталоге товаров до согласования с руководством.
       </div>
 
       <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
@@ -537,7 +552,7 @@ export default function CalculatorMassager() {
             Калькулятор окупаемости мясомассажёра
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-2">
-            Рассчитайте срок окупаемости, ежемесячную экономию и ROI за 2 минуты
+            Сравните старый и новый массажёр: выход продукции, потери, брак, энергия. Рассчитайте экономию и срок окупаемости за 2 минуты.
           </p>
           <p className="text-xs text-gray-400 max-w-xl mx-auto">
             Результат расчёта носит ориентировочный характер. Для точного расчёта свяжитесь с нашими специалистами.
@@ -545,203 +560,230 @@ export default function CalculatorMassager() {
         </div>
 
         <div className="space-y-6">
-          <Card title="Текущее производство" icon="Factory">
+          <Card
+            title="Параметры производства"
+            subtitle="Общие параметры загрузки и графика работы"
+            icon="Factory"
+          >
             <div className="grid sm:grid-cols-2 gap-x-6">
               <NumberInput
-                label="Объём производства готовой продукции (кг/сутки)"
-                value={form.volumePerDay}
-                onChange={(v) => set("volumePerDay", v)}
-                placeholder="например, 1000"
-                tooltip="Объём готовой продукции, выходящий с участка массирования за сутки"
-              />
-              <div className="mb-4">
-                <label className="flex items-center text-sm font-medium text-[#333] mb-1.5">
-                  Количество смен в сутки
-                </label>
-                <select
-                  value={form.shiftsPerDay}
-                  onChange={(e) => set("shiftsPerDay", parseInt(e.target.value))}
-                  className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-[#333] text-sm focus:outline-none focus:ring-2 focus:ring-[#e8712a]/30 focus:border-[#e8712a] transition-all"
-                >
-                  <option value={1}>1 смена</option>
-                  <option value={2}>2 смены</option>
-                  <option value={3}>3 смены</option>
-                </select>
-              </div>
-              <NumberInput
-                label="Длительность смены (часов)"
-                value={form.shiftHours}
-                onChange={(v) => set("shiftHours", v)}
-                placeholder="8"
+                label="Загрузка мясного сырья (кг/сутки)"
+                value={form.rawMeatPerDay}
+                onChange={(v) => set("rawMeatPerDay", v)}
+                placeholder="1000"
+                tooltip="Количество мясного сырья, загружаемого в массажёр за сутки"
+                suffix="кг"
               />
               <NumberInput
                 label="Рабочих дней в месяц"
                 value={form.workDaysPerMonth}
                 onChange={(v) => set("workDaysPerMonth", v)}
                 placeholder="22"
+                suffix="дн."
               />
             </div>
           </Card>
 
           <Card
-            title="Текущие затраты"
-            subtitle="Укажите параметры текущего процесса массирования (ручной труд или старое оборудование)"
-            icon="Wallet"
+            title="Текущее оборудование (старый массажёр)"
+            subtitle="Параметры процесса массирования на существующем оборудовании"
+            icon="Warehouse"
+          >
+            <div className="grid sm:grid-cols-2 gap-x-6">
+              <SliderInput
+                label="Удержание рассола"
+                value={form.oldBrineRetention}
+                onChange={(v) => set("oldBrineRetention", v)}
+                min={70}
+                max={90}
+                step={1}
+                tooltip="Процент рассола, который удерживается в мясе после массирования. У старых массажёров обычно 80-85%."
+              />
+              <SliderInput
+                label="Потери при термообработке"
+                value={form.oldThermoLoss}
+                onChange={(v) => set("oldThermoLoss", v)}
+                min={5}
+                max={15}
+                step={0.5}
+                tooltip="Потеря массы при термообработке (варке, копчении). У старого оборудования обычно 8-10%."
+              />
+              <SliderInput
+                label="Технологический брак"
+                value={form.oldDefectPercent}
+                onChange={(v) => set("oldDefectPercent", v)}
+                min={1}
+                max={8}
+                step={0.5}
+                tooltip="Процент брака от загрузки сырья. При старом оборудовании обычно 3-5%."
+              />
+              <NumberInput
+                label="Потери рассола в отжим/слив (кг)"
+                value={form.oldBrineLossKg}
+                onChange={(v) => set("oldBrineLossKg", v)}
+                placeholder="70"
+                tooltip="Количество рассола, теряемого при сливе/отжиме за сутки"
+                suffix="кг"
+              />
+              <NumberInput
+                label="Расход электроэнергии (кВт·ч/цикл)"
+                value={form.oldEnergyPerCycle}
+                onChange={(v) => set("oldEnergyPerCycle", v)}
+                placeholder="17.5"
+                step={0.5}
+                tooltip="Потребление электроэнергии за один цикл массирования. У старых массажёров обычно 15-20 кВт·ч."
+                suffix="кВт·ч"
+              />
+              <NumberInput
+                label="Количество циклов в сутки"
+                value={form.oldCyclesPerDay}
+                onChange={(v) => set("oldCyclesPerDay", v)}
+                placeholder="1.5"
+                step={0.5}
+                tooltip="Сколько полных циклов массирования выполняется за сутки. У старых массажёров обычно 1-2."
+                suffix="шт"
+              />
+              <NumberInput
+                label="Рабочих на участке"
+                value={form.oldWorkers}
+                onChange={(v) => set("oldWorkers", v)}
+                placeholder="4"
+                suffix="чел."
+              />
+            </div>
+          </Card>
+
+          <Card
+            title="Новое оборудование (вакуумный массажёр)"
+            subtitle="Параметры нового вакуумного массажёра"
+            icon="Cog"
+          >
+            <div className="grid sm:grid-cols-2 gap-x-6">
+              <SliderInput
+                label="Удержание рассола"
+                value={form.newBrineRetention}
+                onChange={(v) => set("newBrineRetention", v)}
+                min={85}
+                max={99}
+                step={1}
+                tooltip="Процент удержания рассола у нового вакуумного массажёра. Обычно 92-96%."
+              />
+              <SliderInput
+                label="Потери при термообработке"
+                value={form.newThermoLoss}
+                onChange={(v) => set("newThermoLoss", v)}
+                min={3}
+                max={10}
+                step={0.5}
+                tooltip="Потери при термообработке с новым оборудованием. Обычно 6-8% благодаря лучшему удержанию влаги."
+              />
+              <SliderInput
+                label="Технологический брак"
+                value={form.newDefectPercent}
+                onChange={(v) => set("newDefectPercent", v)}
+                min={0.1}
+                max={5}
+                step={0.1}
+                decimals={1}
+                tooltip="Процент брака с новым оборудованием. Вакуумные массажёры обеспечивают равномерное распределение рассола, снижая брак до 0,5-1%."
+              />
+              <NumberInput
+                label="Потери рассола в отжим/слив (кг)"
+                value={form.newBrineLossKg}
+                onChange={(v) => set("newBrineLossKg", v)}
+                placeholder="20"
+                tooltip="Потери рассола при работе нового оборудования. Значительно ниже за счёт вакуумной технологии."
+                suffix="кг"
+              />
+              <NumberInput
+                label="Расход электроэнергии (кВт·ч/цикл)"
+                value={form.newEnergyPerCycle}
+                onChange={(v) => set("newEnergyPerCycle", v)}
+                placeholder="10"
+                step={0.5}
+                tooltip="Потребление электроэнергии за один цикл. У новых вакуумных массажёров обычно 8-12 кВт·ч."
+                suffix="кВт·ч"
+              />
+              <NumberInput
+                label="Количество циклов в сутки"
+                value={form.newCyclesPerDay}
+                onChange={(v) => set("newCyclesPerDay", v)}
+                placeholder="2.5"
+                step={0.5}
+                tooltip="Количество циклов за сутки. Новое оборудование позволяет делать 2-3 цикла."
+                suffix="шт"
+              />
+              <NumberInput
+                label="Рабочих на участке"
+                value={form.newWorkers}
+                onChange={(v) => set("newWorkers", v)}
+                placeholder="2"
+                suffix="чел."
+              />
+            </div>
+          </Card>
+
+          <Card
+            title="Стоимости и инвестиции"
+            subtitle="Цены на сырьё, энергию, труд и стоимость оборудования"
+            icon="BadgeRussianRuble"
           >
             <div className="grid sm:grid-cols-2 gap-x-6">
               <NumberInput
-                label="Количество рабочих на участке массирования"
-                value={form.currentWorkers}
-                onChange={(v) => set("currentWorkers", v)}
-                placeholder="4"
-              />
-              <NumberInput
-                label="Средняя зарплата одного рабочего с налогами (₽/мес)"
-                value={form.avgSalary}
-                onChange={(v) => set("avgSalary", v)}
-                placeholder="65 000"
-              />
-              <NumberInput
-                label="Текущий процент потерь сырья (%)"
-                value={form.currentLossPercent}
-                onChange={(v) => set("currentLossPercent", v)}
-                placeholder="5"
-                step={0.5}
-                tooltip="Потери при ручном массировании обычно 4–8%, при старом оборудовании 3–5%"
-                suffix="%"
-              />
-              <NumberInput
-                label="Стоимость сырья (₽/кг)"
+                label="Стоимость сырья / готовой продукции (руб/кг)"
                 value={form.rawCostPerKg}
                 onChange={(v) => set("rawCostPerKg", v)}
                 placeholder="350"
+                tooltip="Средняя стоимость 1 кг готовой продукции. Используется для расчёта экономии от дополнительного выхода и снижения брака."
+                suffix="руб/кг"
               />
               <NumberInput
-                label="Потребление электроэнергии старым оборудованием (кВт·ч/сутки)"
-                value={form.oldEnergyPerDay}
-                onChange={(v) => set("oldEnergyPerDay", v)}
-                placeholder="0"
-                tooltip="Укажите 0, если сейчас массирование выполняется вручную"
+                label="Стоимость рассола / ингредиентов (руб/кг)"
+                value={form.brineCostPerKg}
+                onChange={(v) => set("brineCostPerKg", v)}
+                placeholder="80"
+                tooltip="Средняя стоимость 1 кг рассола и ингредиентов для массирования."
+                suffix="руб/кг"
               />
               <NumberInput
-                label="Затраты на ремонт старого оборудования (₽/мес)"
-                value={form.oldRepairPerMonth}
-                onChange={(v) => set("oldRepairPerMonth", v)}
-                placeholder="0"
-                tooltip="Укажите 0, если сейчас нет оборудования"
-              />
-            </div>
-          </Card>
-
-          <Card title="Параметры нового мясомассажёра" icon="Cog">
-            <div className="grid sm:grid-cols-2 gap-x-6">
-              <NumberInput
-                label="Стоимость мясомассажёра (₽)"
-                value={form.equipmentCost}
-                onChange={(v) => set("equipmentCost", v)}
-                placeholder="2 800 000"
-              />
-              <NumberInput
-                label="Стоимость доставки и монтажа (₽)"
-                value={form.deliveryCost}
-                onChange={(v) => set("deliveryCost", v)}
-                placeholder="150 000"
-              />
-              <NumberInput
-                label="Объём барабана (литров)"
-                value={form.drumVolume}
-                onChange={(v) => set("drumVolume", v)}
-                placeholder="1200"
-              />
-              <div className="mb-4">
-                <label className="flex items-center text-sm font-medium text-[#333] mb-1.5 flex-wrap">
-                  <span>Коэффициент загрузки барабана: <strong>{form.loadFactor.toFixed(2)}</strong></span>
-                  <TooltipIcon text="Оптимальная загрузка барабана — 60–80% от полного объёма. Зависит от типа продукции." />
-                </label>
-                <div className="pt-2 pb-1 px-1">
-                  <Slider
-                    value={[form.loadFactor]}
-                    onValueChange={([v]) => set("loadFactor", v)}
-                    min={0.5}
-                    max={0.9}
-                    step={0.05}
-                    className="[&_[role=slider]]:bg-[#e8712a] [&_[role=slider]]:border-[#e8712a] [&_span[data-orientation=horizontal]>span]:bg-[#e8712a]"
-                  />
-                  <div className="flex justify-between text-xs text-gray-400 mt-1">
-                    <span>0,50</span>
-                    <span>0,90</span>
-                  </div>
-                </div>
-              </div>
-              <NumberInput
-                label="Время одного цикла массирования (часов)"
-                value={form.cycleTime}
-                onChange={(v) => set("cycleTime", v)}
-                placeholder="4"
-                step={0.5}
-                tooltip="Стандартный цикл массирования — от 2 до 12 часов в зависимости от рецептуры"
-              />
-              <NumberInput
-                label="Потребление электроэнергии нового оборудования (кВт·ч)"
-                value={form.newEnergyKwh}
-                onChange={(v) => set("newEnergyKwh", v)}
-                placeholder="7.5"
-                step={0.5}
-              />
-              <NumberInput
-                label="Количество рабочих с новым оборудованием"
-                value={form.newWorkers}
-                onChange={(v) => set("newWorkers", v)}
-                placeholder="1"
-              />
-            </div>
-          </Card>
-
-          <Card title="Дополнительные параметры" icon="SlidersHorizontal">
-            <div className="grid sm:grid-cols-2 gap-x-6">
-              <NumberInput
-                label="Стоимость электроэнергии (₽/кВт·ч)"
+                label="Тариф электроэнергии (руб/кВт·ч)"
                 value={form.energyCostPerKwh}
                 onChange={(v) => set("energyCostPerKwh", v)}
                 placeholder="8"
+                suffix="руб"
               />
               <NumberInput
-                label="Маржа на 1 кг готовой продукции (₽/кг)"
-                value={form.marginPerKg}
-                onChange={(v) => set("marginPerKg", v)}
-                placeholder="80"
-                tooltip="Средняя прибыль с 1 кг готовой продукции после вычета себестоимости. Нужна для расчёта дополнительной прибыли при росте объёмов."
+                label="Стоимость человеко-часа (руб)"
+                value={form.laborCostPerHour}
+                onChange={(v) => set("laborCostPerHour", v)}
+                placeholder="350"
+                tooltip="Средняя стоимость одного человеко-часа работы на участке массирования с учётом налогов."
+                suffix="руб/ч"
               />
-              <div className="mb-4 sm:col-span-2">
-                <label className="flex items-center text-sm font-medium text-[#333] mb-1.5 flex-wrap">
-                  <span>Есть спрос на дополнительный объём продукции?</span>
-                  <TooltipIcon text="Если у вас есть возможность продать больше продукции, калькулятор учтёт дополнительную прибыль от роста производительности" />
-                </label>
-                <div className="flex gap-3 mt-1">
-                  <button
-                    type="button"
-                    onClick={() => set("hasDemand", true)}
-                    className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
-                      form.hasDemand
-                        ? "bg-[#e8712a] text-white shadow-md"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
-                  >
-                    Да
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => set("hasDemand", false)}
-                    className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${
-                      !form.hasDemand
-                        ? "bg-[#e8712a] text-white shadow-md"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
-                  >
-                    Нет
-                  </button>
-                </div>
-              </div>
+              <NumberInput
+                label="Экономия трудозатрат (чел·ч/сутки)"
+                value={form.laborHoursSaved}
+                onChange={(v) => set("laborHoursSaved", v)}
+                placeholder="2"
+                step={0.5}
+                tooltip="Сокращение трудозатрат в человеко-часах за сутки при переходе на новое оборудование."
+                suffix="чел·ч"
+              />
+              <div className="hidden sm:block" />
+              <NumberInput
+                label="Стоимость оборудования (руб)"
+                value={form.equipmentCost}
+                onChange={(v) => set("equipmentCost", v)}
+                placeholder="2 800 000"
+                suffix="руб"
+              />
+              <NumberInput
+                label="Доставка и монтаж (руб)"
+                value={form.deliveryCost}
+                onChange={(v) => set("deliveryCost", v)}
+                placeholder="150 000"
+                suffix="руб"
+              />
             </div>
           </Card>
 
@@ -773,142 +815,202 @@ export default function CalculatorMassager() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <MetricCard
+                label="Экономия в сутки"
+                value={`${fmt(results.totalSavPerDay)} ₽`}
+                sub="суммарная экономия за рабочий день"
+                icon="CalendarCheck"
+                tooltip={`${fmt(results.savYieldPerDay)} + ${fmt(results.savDefectPerDay)} + ${fmt(results.savBrinePerDay)} + ${fmt(results.savEnergyPerDay)} + ${fmt(results.savLaborPerDay)}\n= ${fmt(results.totalSavPerDay)} ₽/сут`}
+              />
+              <MetricCard
+                label="Экономия в месяц"
+                value={`${fmt(results.totalSavPerMonth)} ₽`}
+                sub={`${form.workDaysPerMonth} рабочих дней`}
+                icon="PiggyBank"
+                tooltip={`${fmt(results.totalSavPerDay)} ₽/сут × ${form.workDaysPerMonth} дн\n= ${fmt(results.totalSavPerMonth)} ₽/мес`}
+              />
+              <MetricCard
                 label="Срок окупаемости"
                 value={paybackDisplay()}
                 sub="простой срок окупаемости"
                 icon="Clock"
-                tooltip={`Полные инвестиции / Ежемесячная выгода\n${fmt(results.totalInvestment)} ₽ / ${fmt(results.totalMonthlyBenefit)} ₽/мес\n\nИнвестиции: ${fmt(form.equipmentCost)} + ${fmt(form.deliveryCost)} = ${fmt(results.totalInvestment)} ₽`}
-              />
-              <MetricCard
-                label="Ежемесячная экономия"
-                value={`${fmt(results.totalMonthlyBenefit)} ₽`}
-                sub="экономия в месяц"
-                icon="PiggyBank"
-                tooltip={`Экономия на затратах + Доп. прибыль\n${fmt(results.totalSavings)} + ${fmt(results.additionalProfit)} = ${fmt(results.totalMonthlyBenefit)} ₽/мес`}
+                tooltip={`Инвестиции / Экономия в месяц\n${fmt(results.totalInvestment)} ₽ / ${fmt(results.totalSavPerMonth)} ₽/мес\n= ${fmtDecimal(results.paybackMonths)} мес.\n\nИнвестиции: ${fmt(form.equipmentCost)} + ${fmt(form.deliveryCost)} = ${fmt(results.totalInvestment)} ₽`}
               />
               <MetricCard
                 label="ROI за 1 год"
                 value={`${fmtDecimal(results.roi1y)}%`}
                 sub="возврат на инвестиции"
                 icon="TrendingUp"
-                tooltip={`(Выгода за 12 мес − Инвестиции) / Инвестиции × 100%\n(${fmt(results.benefit1y)} − ${fmt(results.totalInvestment)}) / ${fmt(results.totalInvestment)} × 100%\n= ${fmtDecimal(results.roi1y)}%`}
-              />
-              <MetricCard
-                label="Выгода за 5 лет"
-                value={`${fmt(results.benefit5y)} ₽`}
-                sub="общая выгода за 5 лет"
-                icon="BadgeRussianRuble"
-                tooltip={`Ежемесячная выгода × 60 мес\n${fmt(results.totalMonthlyBenefit)} × 60 = ${fmt(results.benefit5y)} ₽`}
+                tooltip={`(Экономия за год − Инвестиции) / Инвестиции × 100%\n(${fmt(results.totalSavPerYear)} − ${fmt(results.totalInvestment)}) / ${fmt(results.totalInvestment)} × 100%\n= ${fmtDecimal(results.roi1y)}%`}
               />
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-7">
               <h3 className="text-lg font-bold text-[#333] mb-4 flex items-center gap-2">
-                <Icon name="PieChart" fallback="BarChart" size={20} className="text-[#e8712a]" />
-                Из чего складывается экономия
+                <Icon name="ArrowLeftRight" fallback="BarChart" size={20} className="text-[#e8712a]" />
+                Сравнительная таблица процесса
               </h3>
-              <SavingsRow label="Экономия на персонале" value={results.savingsStaff} tooltip={`Было: ${form.currentWorkers} чел × ${fmt(form.avgSalary)} ₽ = ${fmt(results.oldCostStaff)} ₽\nСтало: ${form.newWorkers} чел × ${fmt(form.avgSalary)} ₽ = ${fmt(results.newCostStaff)} ₽\nЭкономия: ${fmt(results.oldCostStaff)} − ${fmt(results.newCostStaff)} = ${fmt(results.savingsStaff)} ₽`} />
-              <SavingsRow label="Снижение потерь сырья (−50%)" value={results.savingsLoss} tooltip={`Было: ${fmt(form.volumePerDay)} кг × ${form.workDaysPerMonth} дн × ${form.currentLossPercent}% × ${fmt(form.rawCostPerKg)} ₽ = ${fmt(results.oldCostLoss)} ₽\nСтало: ${fmt(form.volumePerDay)} кг × ${form.workDaysPerMonth} дн × ${fmtDecimal(results.newLossPercent)}% × ${fmt(form.rawCostPerKg)} ₽ = ${fmt(results.newCostLoss)} ₽\n\nПотери снижены на 50%: ${form.currentLossPercent}% → ${fmtDecimal(results.newLossPercent)}%\nЭкономия: ${fmt(results.savingsLoss)} ₽/мес`} />
-              <SavingsRow label="Увеличение выхода продукции (+10%)" value={results.yieldBenefit} tooltip={`При том же объёме сырья выход готовой продукции растёт на 10%\n\n${fmt(form.volumePerDay)} кг/сут × ${form.workDaysPerMonth} дн × 10% × ${fmt(form.rawCostPerKg)} ₽/кг\n= ${fmt(results.yieldBenefit)} ₽/мес`} />
-              <SavingsRow label="Экономия на электроэнергии" value={results.savingsEnergy} tooltip={`Было: ${fmt(form.oldEnergyPerDay)} кВт·ч/сут × ${form.workDaysPerMonth} дн × ${fmt(form.energyCostPerKwh)} ₽ = ${fmt(results.oldCostEnergy)} ₽\nСтало: ${fmtDecimal(form.newEnergyKwh / (form.cycleTime || 1))} кВт·ч × ${form.shiftHours} ч × ${form.shiftsPerDay} см × ${form.workDaysPerMonth} дн × ${fmt(form.energyCostPerKwh)} ₽ = ${fmt(results.newCostEnergy)} ₽\nРазница: ${fmt(results.savingsEnergy)} ₽`} />
-              <SavingsRow label="Экономия на ремонте / ТО" value={results.savingsRepair} tooltip={`Было: ремонт ${fmt(form.oldRepairPerMonth)} ₽/мес\nСтало: ТО = ${fmt(form.equipmentCost)} × 1% / 12 = ${fmt(results.newCostMaintenance)} ₽/мес\nРазница: ${fmt(results.savingsRepair)} ₽`} />
-              <SavingsRow label="Итого экономия" value={results.totalSavings} bold tooltip={`${fmt(results.savingsStaff)} + ${fmt(results.savingsLoss)} + ${fmt(results.yieldBenefit)} + (${fmt(results.savingsEnergy)}) + (${fmt(results.savingsRepair)})\n= ${fmt(results.totalSavings)} ₽/мес`} />
-              {form.hasDemand && results.additionalProfit > 0 && (
-                <>
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <SavingsRow
-                      label="Дополнительная прибыль от роста объёмов"
-                      value={results.additionalProfit}
-                      tooltip={`Запас: ${fmt(Math.round(results.surplusKg))} кг/мес × ${fmt(form.marginPerKg)} ₽/кг маржа\n= ${fmt(results.additionalProfit)} ₽/мес`}
-                    />
-                    <SavingsRow
-                      label="Общая ежемесячная выгода"
-                      value={results.totalMonthlyBenefit}
-                      bold
-                      tooltip={`Экономия ${fmt(results.totalSavings)} + Доп. прибыль ${fmt(results.additionalProfit)}\n= ${fmt(results.totalMonthlyBenefit)} ₽/мес`}
-                    />
-                  </div>
-                </>
-              )}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b-2 border-gray-200">
+                      <th className="text-left py-3 pr-4 font-semibold text-gray-500">Параметр</th>
+                      <th className="text-right py-3 px-4 font-semibold text-gray-500">Старый</th>
+                      <th className="text-right py-3 px-4 font-semibold text-[#e8712a]">Новый</th>
+                      <th className="text-right py-3 pl-4 font-semibold text-gray-500">Разница</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      {
+                        label: "Загрузка мясного сырья",
+                        old: `${fmt(form.rawMeatPerDay)} кг`,
+                        new_: `${fmt(form.rawMeatPerDay)} кг`,
+                        diff: "—",
+                        diffClass: "",
+                      },
+                      {
+                        label: "Удержание рассола",
+                        old: `${form.oldBrineRetention}%`,
+                        new_: `${form.newBrineRetention}%`,
+                        diff: `+${form.newBrineRetention - form.oldBrineRetention}%`,
+                        diffClass: "text-green-600",
+                      },
+                      {
+                        label: "Удержанный рассол",
+                        old: `${fmt(Math.round(results.oldBrineKg))} кг`,
+                        new_: `${fmt(Math.round(results.newBrineKg))} кг`,
+                        diff: `+${fmt(Math.round(results.newBrineKg - results.oldBrineKg))} кг`,
+                        diffClass: "text-green-600",
+                        tooltip: `Рассол добавлен = ${fmt(form.rawMeatPerDay)} × ${BRINE_INJECTION_RATE} = ${fmt(Math.round(form.rawMeatPerDay * BRINE_INJECTION_RATE))} кг\nСтарый: ${fmt(Math.round(form.rawMeatPerDay * BRINE_INJECTION_RATE))} × ${form.oldBrineRetention}% = ${fmt(Math.round(results.oldBrineKg))} кг\nНовый: ${fmt(Math.round(form.rawMeatPerDay * BRINE_INJECTION_RATE))} × ${form.newBrineRetention}% = ${fmt(Math.round(results.newBrineKg))} кг`,
+                      },
+                      {
+                        label: "Масса после массирования",
+                        old: `${fmt(Math.round(results.oldMassAfter))} кг`,
+                        new_: `${fmt(Math.round(results.newMassAfter))} кг`,
+                        diff: `+${fmt(Math.round(results.newMassAfter - results.oldMassAfter))} кг`,
+                        diffClass: "text-green-600",
+                      },
+                      {
+                        label: "Потери при термообработке",
+                        old: `${form.oldThermoLoss}% (${fmt(Math.round(results.oldThermoLossKg))} кг)`,
+                        new_: `${form.newThermoLoss}% (${fmt(Math.round(results.newThermoLossKg))} кг)`,
+                        diff: `−${fmt(Math.round(results.oldThermoLossKg - results.newThermoLossKg))} кг`,
+                        diffClass: "text-green-600",
+                      },
+                      {
+                        label: "Выход готовой продукции",
+                        old: `${fmt(Math.round(results.oldYieldKg))} кг (${fmtDecimal(results.oldYieldPercent)}%)`,
+                        new_: `${fmt(Math.round(results.newYieldKg))} кг (${fmtDecimal(results.newYieldPercent)}%)`,
+                        diff: `+${fmt(Math.round(results.diffYieldKg))} кг (+${fmtDecimal(results.newYieldPercent - results.oldYieldPercent)}%)`,
+                        diffClass: "text-green-600 font-bold",
+                        tooltip: `Старый: ${fmt(Math.round(results.oldMassAfter))} − ${fmt(Math.round(results.oldThermoLossKg))} = ${fmt(Math.round(results.oldYieldKg))} кг\nНовый: ${fmt(Math.round(results.newMassAfter))} − ${fmt(Math.round(results.newThermoLossKg))} = ${fmt(Math.round(results.newYieldKg))} кг\nРазница: +${fmt(Math.round(results.diffYieldKg))} кг`,
+                      },
+                      {
+                        label: "Технологический брак",
+                        old: `${fmtDecimal(form.oldDefectPercent)}% (${fmt(Math.round(results.oldDefectKg))} кг)`,
+                        new_: `${fmtDecimal(form.newDefectPercent)}% (${fmt(Math.round(results.newDefectKg))} кг)`,
+                        diff: `−${fmt(Math.round(results.diffDefectKg))} кг`,
+                        diffClass: "text-green-600",
+                      },
+                      {
+                        label: "Потери рассола в отжим/слив",
+                        old: `${fmt(form.oldBrineLossKg)} кг`,
+                        new_: `${fmt(form.newBrineLossKg)} кг`,
+                        diff: `−${fmt(results.diffBrineLossKg)} кг`,
+                        diffClass: "text-green-600",
+                      },
+                      {
+                        label: "Расход электроэнергии/сутки",
+                        old: `${fmtDecimal(form.oldEnergyPerCycle * form.oldCyclesPerDay)} кВт·ч`,
+                        new_: `${fmtDecimal(form.newEnergyPerCycle * form.newCyclesPerDay)} кВт·ч`,
+                        diff: `${results.diffEnergyKwh >= 0 ? "−" : "+"}${fmtDecimal(Math.abs(results.diffEnergyKwh))} кВт·ч`,
+                        diffClass: results.diffEnergyKwh >= 0 ? "text-green-600" : "text-red-500",
+                        tooltip: `Старый: ${fmtDecimal(form.oldEnergyPerCycle)} кВт·ч × ${fmtDecimal(form.oldCyclesPerDay)} цикл = ${fmtDecimal(form.oldEnergyPerCycle * form.oldCyclesPerDay)} кВт·ч/сут\nНовый: ${fmtDecimal(form.newEnergyPerCycle)} кВт·ч × ${fmtDecimal(form.newCyclesPerDay)} цикл = ${fmtDecimal(form.newEnergyPerCycle * form.newCyclesPerDay)} кВт·ч/сут`,
+                      },
+                      {
+                        label: "Количество циклов в сутки",
+                        old: `${fmtDecimal(form.oldCyclesPerDay)}`,
+                        new_: `${fmtDecimal(form.newCyclesPerDay)}`,
+                        diff: `+${fmtDecimal(form.newCyclesPerDay - form.oldCyclesPerDay)}`,
+                        diffClass: "text-green-600",
+                      },
+                      {
+                        label: "Рабочие на участке",
+                        old: `${form.oldWorkers} чел.`,
+                        new_: `${form.newWorkers} чел.`,
+                        diff: `−${form.oldWorkers - form.newWorkers} чел.`,
+                        diffClass: form.oldWorkers > form.newWorkers ? "text-green-600" : "",
+                      },
+                    ].map((row) => (
+                      <tr key={row.label} className="border-b border-gray-50">
+                        <td className="py-2.5 pr-4 text-gray-600 flex items-center">
+                          {row.label}
+                          {row.tooltip && <FormulaTooltip text={row.tooltip} />}
+                        </td>
+                        <td className="py-2.5 px-4 text-right tabular-nums text-[#333]">{row.old}</td>
+                        <td className="py-2.5 px-4 text-right tabular-nums text-[#333] font-medium">{row.new_}</td>
+                        <td className={`py-2.5 pl-4 text-right tabular-nums font-semibold ${row.diffClass}`}>{row.diff}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-7">
-              <h3 className="text-lg font-bold text-[#333] mb-6 flex items-center gap-2">
-                <Icon name="ArrowLeftRight" fallback="BarChart" size={20} className="text-[#e8712a]" />
-                Сравнение затрат: до и после
+              <h3 className="text-lg font-bold text-[#333] mb-4 flex items-center gap-2">
+                <Icon name="PieChart" fallback="BarChart" size={20} className="text-[#e8712a]" />
+                Структура экономии (в сутки)
               </h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <div className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">
-                    Текущие затраты в месяц
-                  </div>
-                  <div className="text-2xl font-extrabold text-[#333] mb-4 flex items-center gap-1">
-                    {fmt(results.oldCostTotal)} ₽
-                    <FormulaTooltip text={`${fmt(results.oldCostStaff)} + ${fmt(results.oldCostLoss)} + ${fmt(results.oldCostEnergy)} + ${fmt(results.oldCostRepair)}`} />
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { l: "Персонал", v: results.oldCostStaff, t: `${form.currentWorkers} чел × ${fmt(form.avgSalary)} ₽` },
-                      { l: "Потери сырья", v: results.oldCostLoss, t: `${fmt(form.volumePerDay)} кг × ${form.workDaysPerMonth} дн × ${form.currentLossPercent}% × ${fmt(form.rawCostPerKg)} ₽/кг` },
-                      { l: "Электроэнергия", v: results.oldCostEnergy, t: `${fmt(form.oldEnergyPerDay)} кВт·ч/сут × ${form.workDaysPerMonth} дн × ${fmt(form.energyCostPerKwh)} ₽` },
-                      { l: "Ремонт", v: results.oldCostRepair, t: `Указано пользователем: ${fmt(form.oldRepairPerMonth)} ₽/мес` },
-                    ].map((row) => (
-                      <div key={row.l} className="flex justify-between text-sm">
-                        <span className="text-gray-500 flex items-center">{row.l}<FormulaTooltip text={row.t} /></span>
-                        <span className="font-medium text-[#333] tabular-nums">
-                          {fmt(row.v)} ₽
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-3 h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-red-400"
-                      style={{
-                        width: `${Math.min(100, results.oldCostTotal > 0 ? 100 : 0)}%`,
-                      }}
-                    />
-                  </div>
+              <SavingsRow
+                label={`Дополнительный выход продукции (+${fmt(Math.round(results.diffYieldKg))} кг)`}
+                value={results.savYieldPerDay}
+                tooltip={`+${fmt(Math.round(results.diffYieldKg))} кг × ${fmt(form.rawCostPerKg)} руб/кг\n= ${fmt(results.savYieldPerDay)} руб/сут`}
+              />
+              <SavingsRow
+                label={`Снижение брака (−${fmt(Math.round(results.diffDefectKg))} кг)`}
+                value={results.savDefectPerDay}
+                tooltip={`−${fmt(Math.round(results.diffDefectKg))} кг × ${fmt(form.rawCostPerKg)} руб/кг\n= ${fmt(results.savDefectPerDay)} руб/сут`}
+              />
+              <SavingsRow
+                label={`Экономия рассола и ингредиентов (−${fmt(results.diffBrineLossKg)} кг)`}
+                value={results.savBrinePerDay}
+                tooltip={`−${fmt(results.diffBrineLossKg)} кг × ${fmt(form.brineCostPerKg)} руб/кг\n= ${fmt(results.savBrinePerDay)} руб/сут`}
+              />
+              <SavingsRow
+                label={`Экономия электроэнергии (−${fmtDecimal(Math.abs(results.diffEnergyKwh))} кВт·ч)`}
+                value={results.savEnergyPerDay}
+                tooltip={`−${fmtDecimal(Math.abs(results.diffEnergyKwh))} кВт·ч × ${fmt(form.energyCostPerKwh)} руб\n= ${fmt(results.savEnergyPerDay)} руб/сут`}
+              />
+              <SavingsRow
+                label={`Снижение трудозатрат (−${fmtDecimal(form.laborHoursSaved)} чел·ч)`}
+                value={results.savLaborPerDay}
+                tooltip={`−${fmtDecimal(form.laborHoursSaved)} чел·ч × ${fmt(form.laborCostPerHour)} руб\n= ${fmt(results.savLaborPerDay)} руб/сут`}
+              />
+              <SavingsRow
+                label="ИТОГО экономия в сутки"
+                value={results.totalSavPerDay}
+                bold
+                tooltip={`${fmt(results.savYieldPerDay)} + ${fmt(results.savDefectPerDay)} + ${fmt(results.savBrinePerDay)} + ${fmt(results.savEnergyPerDay)} + ${fmt(results.savLaborPerDay)}\n= ${fmt(results.totalSavPerDay)} руб/сут`}
+              />
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-sm font-semibold text-[#333] flex items-center">
+                    Экономия в месяц ({form.workDaysPerMonth} смен)
+                    <FormulaTooltip text={`${fmt(results.totalSavPerDay)} × ${form.workDaysPerMonth} = ${fmt(results.totalSavPerMonth)} руб/мес`} />
+                  </span>
+                  <span className="text-lg font-extrabold text-[#e8712a] tabular-nums">
+                    {fmt(results.totalSavPerMonth)} ₽
+                  </span>
                 </div>
-                <div>
-                  <div className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">
-                    Новые затраты в месяц
-                  </div>
-                  <div className="text-2xl font-extrabold text-[#e8712a] mb-4 flex items-center gap-1">
-                    {fmt(results.newCostTotal)} ₽
-                    <FormulaTooltip text={`${fmt(results.newCostStaff)} + ${fmt(results.newCostLoss)} + ${fmt(results.newCostEnergy)} + ${fmt(results.newCostMaintenance)}`} />
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { l: "Персонал", v: results.newCostStaff, t: `${form.newWorkers} чел × ${fmt(form.avgSalary)} ₽` },
-                      { l: "Потери сырья", v: results.newCostLoss, t: `${fmt(form.volumePerDay)} кг × ${form.workDaysPerMonth} дн × ${fmtDecimal(results.newLossPercent)}% × ${fmt(form.rawCostPerKg)} ₽/кг\nПотери снижены на 50%: ${form.currentLossPercent}% → ${fmtDecimal(results.newLossPercent)}%` },
-                      { l: "Электроэнергия", v: results.newCostEnergy, t: `${fmtDecimal(form.newEnergyKwh / (form.cycleTime || 1))} кВт·ч × ${form.shiftHours} ч × ${form.shiftsPerDay} см × ${form.workDaysPerMonth} дн × ${fmt(form.energyCostPerKwh)} ₽` },
-                      { l: "ТО оборудования", v: results.newCostMaintenance, t: `${fmt(form.equipmentCost)} ₽ × 1% / 12 мес` },
-                    ].map((row) => (
-                      <div key={row.l} className="flex justify-between text-sm">
-                        <span className="text-gray-500 flex items-center">{row.l}<FormulaTooltip text={row.t} /></span>
-                        <span className="font-medium text-[#333] tabular-nums">
-                          {fmt(row.v)} ₽
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-3 h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        backgroundColor: ACCENT,
-                        width: `${
-                          results.oldCostTotal > 0
-                            ? Math.min(
-                                100,
-                                (results.newCostTotal / results.oldCostTotal) * 100
-                              )
-                            : 0
-                        }%`,
-                      }}
-                    />
-                  </div>
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-sm font-semibold text-[#333] flex items-center">
+                    Экономия в год
+                    <FormulaTooltip text={`${fmt(results.totalSavPerMonth)} × 12 = ${fmt(results.totalSavPerYear)} руб/год`} />
+                  </span>
+                  <span className="text-lg font-extrabold text-[#e8712a] tabular-nums">
+                    {fmt(results.totalSavPerYear)} ₽
+                  </span>
                 </div>
               </div>
             </div>
@@ -926,7 +1028,7 @@ export default function CalculatorMassager() {
                         Период
                       </th>
                       <th className="text-right py-3 px-4 font-semibold text-gray-500">
-                        Общая выгода
+                        Общая экономия
                       </th>
                       <th className="text-right py-3 px-4 font-semibold text-gray-500">
                         За вычетом инвестиций
@@ -941,23 +1043,23 @@ export default function CalculatorMassager() {
                       {
                         period: "1 год",
                         months: 12,
-                        benefit: results.benefit1y,
+                        benefit: results.totalSavPerYear,
                         net: results.netBenefit1y,
-                        roi: results.roi1yVal,
+                        roi: results.roi1y,
                       },
                       {
                         period: "3 года",
                         months: 36,
-                        benefit: results.benefit3y,
+                        benefit: results.totalSavPerYear * 3,
                         net: results.netBenefit3y,
-                        roi: results.roi3yVal,
+                        roi: results.roi3y,
                       },
                       {
                         period: "5 лет",
                         months: 60,
-                        benefit: results.benefit5y,
+                        benefit: results.totalSavPerYear * 5,
                         net: results.netBenefit5y,
-                        roi: results.roi5yVal,
+                        roi: results.roi5y,
                       },
                     ].map((row) => (
                       <tr key={row.period} className="border-b border-gray-50">
@@ -967,7 +1069,7 @@ export default function CalculatorMassager() {
                         <td className="py-3 px-4 text-right tabular-nums text-[#333]">
                           <span className="inline-flex items-center gap-1">
                             {fmt(row.benefit)} ₽
-                            <FormulaTooltip text={`${fmt(results.totalMonthlyBenefit)} ₽/мес × ${row.months} мес`} />
+                            <FormulaTooltip text={`${fmt(results.totalSavPerMonth)} ₽/мес × ${row.months} мес`} />
                           </span>
                         </td>
                         <td
@@ -995,67 +1097,6 @@ export default function CalculatorMassager() {
                     ))}
                   </tbody>
                 </table>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-7">
-              <h3 className="text-lg font-bold text-[#333] mb-4 flex items-center gap-2">
-                <Icon name="Gauge" fallback="Activity" size={20} className="text-[#e8712a]" />
-                Производительность нового мясомассажёра
-              </h3>
-              <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2">
-                {[
-                  {
-                    l: "Загрузка одного цикла",
-                    v: `${fmt(Math.round(results.cycleLoad))} кг`,
-                    t: `${fmt(form.drumVolume)} л × ${form.loadFactor.toFixed(2)} × 1,05 кг/л`,
-                  },
-                  {
-                    l: "Циклов за смену",
-                    v: `${results.cyclesPerShift}`,
-                    t: `${form.shiftHours} ч / ${form.cycleTime} ч = ${results.cyclesPerShift} (округлено вниз)`,
-                  },
-                  {
-                    l: "Производительность за смену",
-                    v: `${fmt(Math.round(results.prodPerShift))} кг`,
-                    t: `${fmt(Math.round(results.cycleLoad))} кг × ${results.cyclesPerShift} циклов`,
-                  },
-                  {
-                    l: "Производительность за сутки",
-                    v: `${fmt(Math.round(results.prodPerDay))} кг`,
-                    t: `${fmt(Math.round(results.prodPerShift))} кг × ${form.shiftsPerDay} смен`,
-                  },
-                  {
-                    l: "Производительность за месяц",
-                    v: `${fmt(Math.round(results.prodPerMonth))} кг`,
-                    t: `${fmt(Math.round(results.prodPerDay))} кг × ${form.workDaysPerMonth} дней`,
-                  },
-                  {
-                    l: "Текущий объём за месяц",
-                    v: `${fmt(results.currentMonthlyVolume)} кг`,
-                    t: `${fmt(form.volumePerDay)} кг/сут × ${form.workDaysPerMonth} дней`,
-                  },
-                  {
-                    l: "Запас производительности",
-                    v: `+${fmt(Math.round(results.surplusKg))} кг (+${fmtDecimal(results.surplusPercent, 0)}%)`,
-                    highlight: true,
-                    t: `${fmt(Math.round(results.prodPerMonth))} − ${fmt(results.currentMonthlyVolume)} = ${fmt(Math.round(results.surplusKg))} кг`,
-                  },
-                ].map((row) => (
-                  <div
-                    key={row.l}
-                    className="flex justify-between py-2 border-b border-gray-50"
-                  >
-                    <span className="text-sm text-gray-600 flex items-center">{row.l}<FormulaTooltip text={row.t} /></span>
-                    <span
-                      className={`text-sm font-semibold tabular-nums ${
-                        row.highlight ? "text-[#e8712a]" : "text-[#333]"
-                      }`}
-                    >
-                      {row.v}
-                    </span>
-                  </div>
-                ))}
               </div>
             </div>
 
@@ -1169,74 +1210,36 @@ export default function CalculatorMassager() {
                 Методология расчёта
               </h3>
               <Accordion type="multiple" className="w-full">
-                <AccordionItem value="perf">
+                <AccordionItem value="process">
                   <AccordionTrigger className="text-sm font-semibold text-[#333] hover:text-[#e8712a]">
-                    Производительность оборудования
+                    Расчёт технологического процесса
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-gray-600 leading-relaxed">
-                    <p className="mb-2">Производительность нового мясомассажёра рассчитывается по формуле:</p>
-                    <p className="mb-2"><strong>Загрузка одного цикла (кг)</strong> = Объём барабана (л) × Коэффициент загрузки × Плотность мяса</p>
-                    <p className="mb-2">Плотность мяса принимается равной 1,05 кг/л — среднее значение для различных видов мясного сырья.</p>
-                    <p className="mb-2"><strong>Количество циклов за смену</strong> = Длительность смены (ч) / Время одного цикла (ч), округлённое вниз до целого числа.</p>
-                    <p className="mb-2">Производительность за смену = Загрузка одного цикла × Количество циклов.</p>
-                    <p className="mb-2">Производительность за сутки = Производительность за смену × Количество смен.</p>
-                    <p>Производительность за месяц = Производительность за сутки × Рабочих дней в месяц.</p>
+                    <p className="mb-2">Модель основана на сравнении двух массажёров при одинаковой загрузке мясного сырья.</p>
+                    <p className="mb-2"><strong>Объём добавленного рассола</strong> = Загрузка сырья (кг) x 0,35 (35% от массы сырья --- стандартная инъекция).</p>
+                    <p className="mb-2"><strong>Удержанный рассол</strong> = Добавленный рассол x Процент удержания (%). У старых массажёров удержание 80-85%, у вакуумных --- 92-96%.</p>
+                    <p className="mb-2"><strong>Масса после массирования</strong> = Загрузка сырья + Удержанный рассол.</p>
+                    <p className="mb-2"><strong>Потери при термообработке</strong> = Масса после массирования x Процент потерь (%). У старых 8-10%, у новых 6-8%.</p>
+                    <p className="mb-2"><strong>Выход готовой продукции</strong> = Масса после массирования - Потери при термообработке.</p>
+                    <p><strong>Технологический брак</strong> = Загрузка сырья x Процент брака (%). У старых 3-5%, у вакуумных 0,5-1%.</p>
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="old-cost">
-                  <AccordionTrigger className="text-sm font-semibold text-[#333] hover:text-[#e8712a]">
-                    Расчёт текущих затрат
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-gray-600 leading-relaxed">
-                    <p className="mb-2">Текущие ежемесячные затраты на участке массирования складываются из четырёх компонентов:</p>
-                    <p className="mb-2">1. <strong>Затраты на персонал</strong> = Количество рабочих × Зарплата с налогами.</p>
-                    <p className="mb-2">2. <strong>Потери сырья</strong> = Объём производства (кг/сут) × Рабочих дней × Процент потерь (%) / 100 × Стоимость сырья (руб/кг). Потери при ручном массировании обычно составляют 4–8%, при использовании устаревшего оборудования — 3–5%.</p>
-                    <p className="mb-2">3. <strong>Затраты на электроэнергию</strong> = Потребление старого оборудования (кВт·ч/сут) × Рабочих дней × Тариф (руб/кВт·ч). При ручном труде этот параметр равен нулю.</p>
-                    <p>4. <strong>Затраты на ремонт</strong> старого оборудования — указываются пользователем.</p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="new-cost">
-                  <AccordionTrigger className="text-sm font-semibold text-[#333] hover:text-[#e8712a]">
-                    Расчёт новых затрат
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-gray-600 leading-relaxed">
-                    <p className="mb-2">Ежемесячные затраты при работе с новым мясомассажёром:</p>
-                    <p className="mb-2">1. <strong>Затраты на персонал</strong> = Количество рабочих с новым оборудованием × Зарплата с налогами. Современные мясомассажёры автоматизируют процесс и позволяют сократить штат участка.</p>
-                    <p className="mb-2">2. <strong>Потери сырья</strong> — рассчитываются аналогично текущим, но процент потерь снижается на 50% от текущего значения. Вакуумные мясомассажёры существенно сокращают потери за счёт герметичной обработки в закрытом барабане.</p>
-                    <p className="mb-2">3. <strong>Затраты на электроэнергию</strong> = (Мощность оборудования (кВт·ч) / Время цикла (ч)) × Длительность смены (ч) × Количество смен × Рабочих дней × Тариф.</p>
-                    <p>4. <strong>Затраты на техническое обслуживание</strong> = 1% от стоимости оборудования в год / 12 месяцев. Это усреднённая оценка, включающая плановое ТО, замену расходных материалов и мелкий ремонт.</p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="savings">
+                <AccordionItem value="economy">
                   <AccordionTrigger className="text-sm font-semibold text-[#333] hover:text-[#e8712a]">
                     Расчёт экономии
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-gray-600 leading-relaxed">
-                    <p className="mb-2">Ежемесячная экономия = Текущие затраты − Новые затраты + Выгода от увеличения выхода продукции.</p>
-                    <p className="mb-2">Экономия складывается из:</p>
+                    <p className="mb-2">Суточная экономия складывается из пяти компонентов:</p>
                     <ul className="list-disc list-inside mb-2 space-y-1">
-                      <li>Экономия на персонале (сокращение штата участка)</li>
-                      <li>Снижение потерь сырья — новое оборудование сокращает процент потерь на 50% от текущего уровня. Экономия = Стоимость потерь до − Стоимость потерь после</li>
-                      <li>Увеличение выхода готовой продукции на 10% — при том же объёме сырья вакуумный мясомассажёр увеличивает массу готового продукта за счёт лучшего впитывания рассола и маринада. Выгода = Объём (кг/сут) × Рабочих дней × 10% × Стоимость сырья (руб/кг)</li>
-                      <li>Разница в затратах на электроэнергию (может быть как экономией, так и дополнительным расходом)</li>
-                      <li>Разница в затратах на ремонт/ТО</li>
+                      <li><strong>Дополнительный выход продукции</strong> = Разница выхода (кг) x Стоимость продукции (руб/кг)</li>
+                      <li><strong>Снижение брака</strong> = Разница брака (кг) x Стоимость продукции (руб/кг)</li>
+                      <li><strong>Экономия рассола и ингредиентов</strong> = Разница потерь рассола (кг) x Стоимость рассола (руб/кг)</li>
+                      <li><strong>Экономия электроэнергии</strong> = Разница потребления (кВт·ч/сут) x Тариф (руб/кВт·ч)</li>
+                      <li><strong>Снижение трудозатрат</strong> = Сэкономленные человеко-часы x Стоимость чел·ч</li>
                     </ul>
-                    <p>Отдельные компоненты экономии могут быть отрицательными (например, электроэнергия при переходе с ручного труда), но общая экономия, как правило, положительная за счёт снижения потерь, увеличения выхода продукции и сокращения персонала.</p>
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="extra-profit">
-                  <AccordionTrigger className="text-sm font-semibold text-[#333] hover:text-[#e8712a]">
-                    Дополнительная прибыль от роста объёмов
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-gray-600 leading-relaxed">
-                    <p className="mb-2">Если производительность нового мясомассажёра превышает текущий объём производства и есть спрос на дополнительную продукцию, калькулятор учитывает дополнительную прибыль:</p>
-                    <p className="mb-2"><strong>Прирост объёма (кг/мес)</strong> = Производительность нового оборудования (кг/мес) − Текущий объём (кг/мес).</p>
-                    <p className="mb-2"><strong>Дополнительная прибыль</strong> = Прирост объёма × Маржа на 1 кг готовой продукции.</p>
-                    <p>Этот параметр учитывается только если пользователь указал наличие спроса на дополнительный объём. В противном случае дополнительная прибыль принимается равной нулю.</p>
+                    <p className="mb-2"><strong>Экономия в месяц</strong> = Экономия в сутки x Рабочих дней в месяц.</p>
+                    <p><strong>Экономия в год</strong> = Экономия в месяц x 12.</p>
                   </AccordionContent>
                 </AccordionItem>
 
@@ -1245,10 +1248,9 @@ export default function CalculatorMassager() {
                     Срок окупаемости
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-gray-600 leading-relaxed">
-                    <p className="mb-2"><strong>Простой срок окупаемости</strong> = Полные инвестиции / Ежемесячная выгода.</p>
-                    <p className="mb-2">Полные инвестиции = Стоимость оборудования + Стоимость доставки и монтажа.</p>
-                    <p className="mb-2">Ежемесячная выгода = Экономия + Дополнительная прибыль (если применимо).</p>
-                    <p>Калькулятор показывает два варианта: без учёта дополнительной прибыли (консервативный) и с учётом (оптимистичный).</p>
+                    <p className="mb-2"><strong>Простой срок окупаемости</strong> = Полные инвестиции / Ежемесячная экономия.</p>
+                    <p className="mb-2">Полные инвестиции = Стоимость оборудования + Доставка и монтаж.</p>
+                    <p>Калькулятор не учитывает стоимость кредита/лизинга. Для лизинговых расчётов обращайтесь к нашим менеджерам.</p>
                   </AccordionContent>
                 </AccordionItem>
 
@@ -1257,9 +1259,9 @@ export default function CalculatorMassager() {
                     ROI — возврат на инвестиции
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-gray-600 leading-relaxed">
-                    <p className="mb-2"><strong>ROI за период</strong> = ((Ежемесячная выгода × Количество месяцев) − Полные инвестиции) / Полные инвестиции × 100%.</p>
+                    <p className="mb-2"><strong>ROI за период</strong> = ((Экономия за период - Инвестиции) / Инвестиции) x 100%.</p>
                     <p className="mb-2">Калькулятор показывает ROI за три периода: 1 год, 3 года и 5 лет.</p>
-                    <p>Положительный ROI означает, что инвестиции окупились и принесли прибыль. Например, ROI 71% за 1 год означает, что каждый вложенный рубль вернул 1 руб. 71 коп.</p>
+                    <p>Положительный ROI означает, что инвестиции окупились и принесли прибыль. Например, ROI 309% за 1 год означает, что каждый вложенный рубль принёс 3 руб. 09 коп. чистой прибыли сверх вложений.</p>
                   </AccordionContent>
                 </AccordionItem>
 
@@ -1270,10 +1272,9 @@ export default function CalculatorMassager() {
                   <AccordionContent className="text-sm text-gray-600 leading-relaxed">
                     <p className="mb-2">Калькулятор использует следующие допущения:</p>
                     <ul className="list-disc list-inside space-y-1 mb-2">
-                      <li>Плотность мясного сырья: 1,05 кг/л</li>
-                      <li>Снижение потерь сырья с новым оборудованием: на 50% от текущего уровня</li>
-                      <li>Увеличение выхода готовой продукции: +10% при том же объёме сырья (за счёт лучшего впитывания рассола и маринада в вакуумном барабане)</li>
-                      <li>Затраты на ТО нового оборудования: 1% от стоимости в год</li>
+                      <li>Объём инъецированного рассола: 35% от массы сырья (стандартная норма инъекции)</li>
+                      <li>Значения по умолчанию для старого оборудования основаны на средних отраслевых показателях</li>
+                      <li>Значения по умолчанию для нового оборудования основаны на характеристиках вакуумных массажёров</li>
                       <li>Расчёт не учитывает инфляцию, изменение цен на сырьё и электроэнергию</li>
                       <li>Расчёт не учитывает стоимость кредита (если оборудование приобретается в кредит/лизинг)</li>
                       <li>Фактические показатели могут отличаться в зависимости от типа продукции, рецептуры, условий производства и квалификации персонала</li>
