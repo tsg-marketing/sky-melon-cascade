@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import FUNC2URL from "../../backend/func2url.json";
+const SEND_TELEGRAM_URL = "https://functions.poehali.dev/95b872c9-2e30-4495-905b-400b33e28973";
 import {
   Accordion,
   AccordionItem,
@@ -523,7 +523,7 @@ export default function CalculatorMassager() {
     if (!fosName.trim() || !isValidPhone(fosPhone) || fosSending) return;
     setFosSending(true);
     try {
-      await fetch((FUNC2URL as Record<string, string>)["send-telegram"], {
+      await fetch(SEND_TELEGRAM_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
