@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { useLeadForm } from "@/hooks/useLeadForm";
+import FUNC2URL from "../../backend/func2url.json";
 import {
   Accordion,
   AccordionItem,
@@ -385,7 +385,6 @@ function formatPhone(prev: string, next: string): string {
 }
 
 export default function CalculatorMassager() {
-  const { sendLead, sending } = useLeadForm();
   const [form, setForm] = useState<FormData>({ ...DEFAULTS });
   const [results, setResults] = useState<CalcResults | null>(null);
   const [showResults, setShowResults] = useState(false);
@@ -394,6 +393,7 @@ export default function CalculatorMassager() {
   const [fosPhone, setFosPhone] = useState("");
   const [fosPhoneTouched, setFosPhoneTouched] = useState(false);
   const [fosSent, setFosSent] = useState(false);
+  const [fosSending, setFosSending] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -520,20 +520,30 @@ export default function CalculatorMassager() {
   };
 
   const handleFosSubmit = async () => {
-    if (!fosName.trim() || !isValidPhone(fosPhone) || sending) return;
-    await sendLead({
-      name: fosName,
-      phone: fosPhone,
-      comment: `Калькулятор окупаемости мясомассажёра`,
-      formType: "modal",
-      topic: "calculator_massager",
-    });
+    if (!fosName.trim() || !isValidPhone(fosPhone) || fosSending) return;
+    setFosSending(true);
+    try {
+      await fetch((FUNC2URL as Record<string, string>)["send-telegram"], {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: fosName,
+          phone: fosPhone,
+          message: `Лид из калькулятора окупаемости мясомассажёра\nhttps://meatmassagers.ru/calculator_massager`,
+        }),
+      });
+    } catch (_e) { /* ignore */ }
+    setFosSending(false);
     setFosSent(true);
     setFosOpen(false);
     setShowResults(true);
-    setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 100);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    try { (window as any).ym?.(107258870, "reachGoal", "send_FOS"); } catch (_e) { /* noop */ }
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    });
   };
 
   const reset = () => {
@@ -1404,11 +1414,11 @@ export default function CalculatorMassager() {
               </div>
               <button
                 onClick={handleFosSubmit}
-                disabled={!fosName.trim() || !isValidPhone(fosPhone) || sending}
+                disabled={!fosName.trim() || !isValidPhone(fosPhone) || fosSending}
                 className="w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-[0.98] disabled:opacity-40"
                 style={{ backgroundColor: ACCENT }}
               >
-                {sending ? "Отправка..." : "Отправить"}
+                {fosSending ? "Отправка..." : "Отправить"}
               </button>
               <p className="text-xs text-gray-400 leading-relaxed">
                 Отправляя форму, я соглашаюсь с{" "}
