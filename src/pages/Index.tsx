@@ -375,10 +375,8 @@ const Index = () => {
   ];
 
   const equipmentLinks = [
-    { href: "#catalog",               label: "Мясомассажёры" },
     { href: "/injector",              label: "Инъекторы" },
     { href: "/slicers",               label: "Слайсеры" },
-    { href: "/calculator_massager",   label: "Калькулятор окупаемости" },
   ];
 
   return (
@@ -424,6 +422,10 @@ const Index = () => {
                     </div>
                   )}
                 </div>
+                <a href="/calculator_massager" className="text-orange-500 hover:text-orange-600 transition-colors whitespace-nowrap flex items-center gap-1">
+                  <Icon name="Calculator" size={14} />
+                  Калькулятор
+                </a>
                 {navLinks.map((l) => (
                   <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
                     {l.label}
@@ -481,6 +483,11 @@ const Index = () => {
                 {l.label}
               </a>
             ))}
+            <div className="h-px bg-border" />
+            <a href="/calculator_massager" className="flex items-center gap-2 text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors" onClick={() => setMenuOpen(false)}>
+              <Icon name="Calculator" size={14} />
+              Калькулятор окупаемости
+            </a>
             <div className="h-px bg-border" />
             {navLinks.map((l) => (
               <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>
