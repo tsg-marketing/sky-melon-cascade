@@ -1284,6 +1284,17 @@ export default function CalculatorMassager() {
                 </AccordionItem>
               </Accordion>
             </div>
+            <div className="text-center mt-8">
+              <a
+                href="/"
+                className="inline-flex items-center gap-3 px-10 py-5 rounded-xl text-white font-bold text-xl shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
+                style={{ backgroundColor: ACCENT }}
+              >
+                <Icon name="ShoppingCart" size={22} />
+                Выбрать мясомассажёр
+                <Icon name="ArrowRight" size={20} />
+              </a>
+            </div>
           </div>
         )}
       </main>

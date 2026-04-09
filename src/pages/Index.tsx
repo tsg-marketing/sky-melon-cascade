@@ -479,10 +479,18 @@ const Index = () => {
                 <button onClick={() => setModalOpen(true)} className="px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 text-center">
                   Получить предложение
                 </button>
-                <a href="#solutions" className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all text-center">
+                <a href="#catalog" className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all text-center">
                   Смотреть оборудование
                 </a>
               </div>
+              <a
+                href="/calculator_massager"
+                className="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-primary hover:text-primary/80 transition-colors group"
+              >
+                <Icon name="Calculator" size={16} />
+                Посчитайте эффективность нашего мясомассажера за 1 минуту
+                <Icon name="ArrowRight" size={14} className="group-hover:translate-x-1 transition-transform" />
+              </a>
             </div>
 
             <div className={`hidden lg:block transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
@@ -1216,6 +1224,32 @@ const Index = () => {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ─── БАННЕР КАЛЬКУЛЯТОРА ─── */}
+      <section className="py-16 px-6 bg-gradient-to-br from-primary/10 via-primary/5 to-background">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/15 mb-6">
+            <Icon name="Calculator" size={32} className="text-primary" />
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground mb-4">
+            Посчитайте эффективность нашего мясомассажера за 1 минуту
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+            Узнайте, сколько вы сэкономите на сырье, браке и электроэнергии при переходе на вакуумный массажёр. Расчёт по реальным отраслевым данным.
+          </p>
+          <a
+            href="/calculator_massager"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-primary text-white rounded-full font-bold text-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
+          >
+            <Icon name="Calculator" size={22} />
+            Открыть калькулятор
+            <Icon name="ArrowRight" size={20} />
+          </a>
+          <p className="text-sm text-muted-foreground mt-4">
+            Бесплатно, без регистрации. Результат — мгновенно.
+          </p>
         </div>
       </section>
 
