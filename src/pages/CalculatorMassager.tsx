@@ -1310,20 +1310,28 @@ export default function CalculatorMassager() {
                   <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>
                 )}
               </div>
-              <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={fosConsent}
-                  onChange={(e) => setFosConsent(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 accent-[#e8712a] shrink-0"
-                />
-                <span className="text-xs text-gray-400 leading-relaxed">
+              <div
+                className="flex items-start gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50 cursor-pointer select-none"
+                onClick={() => setFosConsent((v) => !v)}
+              >
+                <div
+                  className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                    fosConsent
+                      ? "bg-[#e8712a] border-[#e8712a]"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  {fosConsent && (
+                    <Icon name="Check" size={14} className="text-white" />
+                  )}
+                </div>
+                <span className="text-xs text-gray-500 leading-relaxed">
                   Соглашаюсь с{" "}
-                  <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">политикой обработки персональных данных</a>
+                  <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline" onClick={(e) => e.stopPropagation()}>политикой обработки персональных данных</a>
                   {" "}и даю{" "}
-                  <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">согласие на обработку персональных данных</a>.
+                  <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline" onClick={(e) => e.stopPropagation()}>согласие на обработку персональных данных</a>.
                 </span>
-              </label>
+              </div>
               <button
                 onClick={handleFosSubmit}
                 disabled={!fosName.trim() || !isValidPhone(fosPhone) || !fosConsent || fosSending}
