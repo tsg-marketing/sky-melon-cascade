@@ -528,9 +528,6 @@ export default function CalculatorMassager() {
 
   return (
     <div className="min-h-screen" style={{ background: "#fafafa", color: "#333", fontFamily: "'Inter', 'Onest', system-ui, sans-serif" }}>
-      <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 text-center text-sm text-amber-800">
-        Внутренний инструмент. Калькулятор находится на проверке. Не размещайте ссылку на эту страницу в каталоге товаров до согласования с руководством.
-      </div>
 
       <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-4">

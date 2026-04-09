@@ -485,11 +485,11 @@ const Index = () => {
               </div>
               <a
                 href="/calculator_massager"
-                className="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-primary hover:text-primary/80 transition-colors group"
+                className="inline-flex items-center gap-3 mt-4 px-8 py-4 bg-green-600 text-white rounded-full font-bold text-lg hover:bg-green-700 transition-all shadow-lg shadow-green-600/25 hover:shadow-xl hover:shadow-green-600/30 active:scale-[0.98] group text-center"
               >
-                <Icon name="Calculator" size={16} />
-                Посчитайте эффективность нашего мясомассажера за 1 минуту
-                <Icon name="ArrowRight" size={14} className="group-hover:translate-x-1 transition-transform" />
+                <Icon name="Calculator" size={22} />
+                Посчитайте эффективность за 1 минуту
+                <Icon name="ArrowRight" size={20} className="group-hover:translate-x-1 transition-transform" />
               </a>
             </div>
 
@@ -749,6 +749,26 @@ const Index = () => {
               )}
             </>
           )}
+        </div>
+      </section>
+
+      {/* ─── КНОПКА КАЛЬКУЛЯТОРА ПОД КАТАЛОГОМ ─── */}
+      <section className="py-12 px-6 bg-gradient-to-r from-green-600 to-green-700">
+        <div className="max-w-4xl mx-auto text-center">
+          <h3 className="text-2xl sm:text-3xl font-display font-black text-white mb-3">
+            Узнайте выгоду от нового оборудования
+          </h3>
+          <p className="text-green-100 text-lg mb-6 max-w-xl mx-auto">
+            Калькулятор покажет экономию на сырье, браке и энергии за 1 минуту
+          </p>
+          <a
+            href="/calculator_massager"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-white text-green-700 rounded-full font-bold text-xl hover:bg-green-50 transition-all shadow-xl hover:shadow-2xl active:scale-[0.98] group"
+          >
+            <Icon name="Calculator" size={24} />
+            Открыть калькулятор эффективности
+            <Icon name="ArrowRight" size={22} className="group-hover:translate-x-1 transition-transform" />
+          </a>
         </div>
       </section>
 
