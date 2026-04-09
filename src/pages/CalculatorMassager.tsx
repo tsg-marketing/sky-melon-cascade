@@ -512,6 +512,8 @@ export default function CalculatorMassager() {
         formType: "modal",
       });
     } catch (_e) { /* ignore */ }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    try { (window as unknown as Record<string, any>).ym?.(107258870, 'reachGoal', 'send_FOS'); } catch (_e2) { /* metric */ }
     setFosSending(false);
     setFosSent(true);
     setFosOpen(false);
