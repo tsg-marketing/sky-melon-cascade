@@ -728,7 +728,12 @@ const Index = () => {
                                 <span className="text-muted-foreground"><span className="font-medium text-foreground">{item.productivity.name}:</span> {item.productivity.value}</span>
                               </div>
                             )}
-                            {item.extra_params.filter((p) => p.name !== "GUID").map((p, pi) => (
+                            {item.all_params
+                              .filter((p) => {
+                                const n = p.name.toLowerCase();
+                                return n.includes("бренд") || n.includes("загрузк") || n.includes("объем") || n.includes("объём");
+                              })
+                              .map((p, pi) => (
                               <div key={pi} className="flex items-start gap-2 text-base">
                                 <Icon name="ChevronRight" size={16} className="text-primary flex-shrink-0 mt-0.5" />
                                 <span className="text-muted-foreground"><span className="font-medium text-foreground">{p.name}:</span> {p.value}</span>
