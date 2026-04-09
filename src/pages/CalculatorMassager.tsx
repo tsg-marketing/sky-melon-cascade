@@ -12,8 +12,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-
-const SEND_TELEGRAM_URL = "https://functions.poehali.dev/95b872c9-2e30-4495-905b-400b33e28973";
+import { useLeadForm } from "@/hooks/useLeadForm";
 const LOGO_URL =
   "https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg";
 const ACCENT = "#e8712a";
@@ -394,7 +393,9 @@ export default function CalculatorMassager() {
   const [fosPhoneTouched, setFosPhoneTouched] = useState(false);
   const [fosSent, setFosSent] = useState(false);
   const [fosSending, setFosSending] = useState(false);
+  const [fosConsent, setFosConsent] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const { sendLead } = useLeadForm();
 
   useEffect(() => {
     document.title =
@@ -414,9 +415,7 @@ export default function CalculatorMassager() {
     []
   );
 
-  const calculate = () => {
-    const d = form;
-
+  const computeResults = useCallback((d: FormData) => {
     const brineAdded = d.rawMeatPerDay * BRINE_INJECTION_RATE;
 
     const oldBrineKg = brineAdded * (d.oldBrineRetention / 100);
@@ -471,44 +470,27 @@ export default function CalculatorMassager() {
     const netBenefit3y = totalSavPerYear * 3 - totalInvestment;
     const netBenefit5y = totalSavPerYear * 5 - totalInvestment;
 
-    setResults({
-      oldBrineKg,
-      oldMassAfter,
-      oldThermoLossKg,
-      oldYieldKg,
-      oldYieldPercent,
-      oldDefectKg,
+    return {
+      oldBrineKg, oldMassAfter, oldThermoLossKg, oldYieldKg, oldYieldPercent, oldDefectKg,
+      newBrineKg, newMassAfter, newThermoLossKg, newYieldKg, newYieldPercent, newDefectKg,
+      diffYieldKg, diffDefectKg, diffBrineLossKg, diffEnergyKwh,
+      savYieldPerDay, savDefectPerDay, savBrinePerDay, savEnergyPerDay, savLaborPerDay,
+      totalSavPerDay, totalSavPerMonth, totalSavPerYear,
+      totalInvestment, paybackMonths, roi1y, roi3y, roi5y,
+      netBenefit1y, netBenefit3y, netBenefit5y,
+    };
+  }, []);
 
-      newBrineKg,
-      newMassAfter,
-      newThermoLossKg,
-      newYieldKg,
-      newYieldPercent,
-      newDefectKg,
+  useEffect(() => {
+    if (fosSent && showResults) {
+      setResults(computeResults(form));
+    }
+     
+  }, [form, fosSent, showResults, computeResults]);
 
-      diffYieldKg,
-      diffDefectKg,
-      diffBrineLossKg,
-      diffEnergyKwh,
-
-      savYieldPerDay,
-      savDefectPerDay,
-      savBrinePerDay,
-      savEnergyPerDay,
-      savLaborPerDay,
-      totalSavPerDay,
-      totalSavPerMonth,
-      totalSavPerYear,
-
-      totalInvestment,
-      paybackMonths,
-      roi1y,
-      roi3y,
-      roi5y,
-      netBenefit1y,
-      netBenefit3y,
-      netBenefit5y,
-    });
+  const calculate = () => {
+    const r = computeResults(form);
+    setResults(r);
     if (!fosSent) {
       setFosOpen(true);
       return;
@@ -520,25 +502,20 @@ export default function CalculatorMassager() {
   };
 
   const handleFosSubmit = async () => {
-    if (!fosName.trim() || !isValidPhone(fosPhone) || fosSending) return;
+    if (!fosName.trim() || !isValidPhone(fosPhone) || !fosConsent || fosSending) return;
     setFosSending(true);
     try {
-      await fetch(SEND_TELEGRAM_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: fosName,
-          phone: fosPhone,
-          message: `Лид из калькулятора окупаемости мясомассажёра\nhttps://meatmassagers.ru/calculator_massager`,
-        }),
+      await sendLead({
+        name: fosName,
+        phone: fosPhone,
+        comment: "Лид из калькулятора окупаемости мясомассажёра",
+        formType: "modal",
       });
     } catch (_e) { /* ignore */ }
     setFosSending(false);
     setFosSent(true);
     setFosOpen(false);
     setShowResults(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    try { (window as any).ym?.(107258870, "reachGoal", "send_FOS"); } catch (_e) { /* noop */ }
     requestAnimationFrame(() => {
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1333,20 +1310,28 @@ export default function CalculatorMassager() {
                   <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>
                 )}
               </div>
+              <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={fosConsent}
+                  onChange={(e) => setFosConsent(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 accent-[#e8712a] shrink-0"
+                />
+                <span className="text-xs text-gray-400 leading-relaxed">
+                  Соглашаюсь с{" "}
+                  <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">политикой обработки персональных данных</a>
+                  {" "}и даю{" "}
+                  <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">согласие на обработку персональных данных</a>.
+                </span>
+              </label>
               <button
                 onClick={handleFosSubmit}
-                disabled={!fosName.trim() || !isValidPhone(fosPhone) || fosSending}
-                className="w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-[0.98] disabled:opacity-40"
+                disabled={!fosName.trim() || !isValidPhone(fosPhone) || !fosConsent || fosSending}
+                className="w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ backgroundColor: ACCENT }}
               >
                 {fosSending ? "Отправка..." : "Отправить"}
               </button>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Отправляя форму, я соглашаюсь с{" "}
-                <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">политикой обработки персональных данных</a>
-                {" "}и даю{" "}
-                <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">согласие на обработку персональных данных</a>.
-              </p>
             </div>
           </div>
         </div>
