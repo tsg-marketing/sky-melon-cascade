@@ -728,7 +728,7 @@ const Index = () => {
                                 <span className="text-muted-foreground"><span className="font-medium text-foreground">{item.productivity.name}:</span> {item.productivity.value}</span>
                               </div>
                             )}
-                            {item.extra_params.map((p, pi) => (
+                            {item.extra_params.filter((p) => p.name !== "GUID").map((p, pi) => (
                               <div key={pi} className="flex items-start gap-2 text-base">
                                 <Icon name="ChevronRight" size={16} className="text-primary flex-shrink-0 mt-0.5" />
                                 <span className="text-muted-foreground"><span className="font-medium text-foreground">{p.name}:</span> {p.value}</span>
@@ -938,7 +938,7 @@ const Index = () => {
                   <div className="pt-4">
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Характеристики</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                      {selectedItem.all_params.map((p, pi) => (
+                      {selectedItem.all_params.filter((p) => p.name !== "GUID").map((p, pi) => (
                         <div key={pi} className="flex justify-between gap-4 py-1.5 border-b border-border/40 text-sm">
                           <span className="text-muted-foreground">{p.name}</span>
                           <span className="font-medium text-foreground text-right">{p.value}</span>
