@@ -6,7 +6,6 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-const SEND_TELEGRAM_URL = "https://functions.poehali.dev/95b872c9-2e30-4495-905b-400b33e28973";
 import {
   Accordion,
   AccordionItem,
@@ -14,6 +13,7 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 
+const SEND_TELEGRAM_URL = "https://functions.poehali.dev/95b872c9-2e30-4495-905b-400b33e28973";
 const LOGO_URL =
   "https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg";
 const ACCENT = "#e8712a";
@@ -552,16 +552,7 @@ export default function CalculatorMassager() {
     setResults(null);
   };
 
-  const handleLeadSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs: Record<string, string> = {};
-    if (!leadName.trim()) errs.name = "Укажите имя";
-    if (!leadPhone.trim()) errs.phone = "Укажите телефон";
-    if (!leadConsent) errs.consent = "Необходимо согласие";
-    setLeadErrors(errs);
-    if (Object.keys(errs).length > 0) return;
-    setLeadSent(true);
-  };
+
 
   const paybackDisplay = () => {
     if (!results) return "";
@@ -1167,7 +1158,7 @@ export default function CalculatorMassager() {
               <p className="text-sm text-gray-500 text-center mb-6 max-w-lg mx-auto">
                 Наш технолог проверит параметры, уточнит данные и подготовит персональное коммерческое предложение
               </p>
-              {leadSent ? (
+              {fosSent ? (
                 <div className="text-center py-8">
                   <div
                     className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -1175,92 +1166,22 @@ export default function CalculatorMassager() {
                   >
                     <Icon name="CheckCircle" size={32} className="text-[#e8712a]" />
                   </div>
-                  <p className="text-lg font-bold text-[#333]">Спасибо!</p>
+                  <p className="text-lg font-bold text-[#333]">Заявка отправлена!</p>
                   <p className="text-sm text-gray-500 mt-1">
                     Наш специалист свяжется с вами в течение рабочего дня.
                   </p>
                 </div>
               ) : (
-                <form
-                  onSubmit={handleLeadSubmit}
-                  className="max-w-lg mx-auto space-y-4"
-                >
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Имя *"
-                      value={leadName}
-                      onChange={(e) => setLeadName(e.target.value)}
-                      className={`w-full px-4 py-3 bg-white border rounded-lg text-sm text-[#333] focus:outline-none focus:ring-2 focus:ring-[#e8712a]/30 focus:border-[#e8712a] transition-all ${
-                        leadErrors.name
-                          ? "border-red-400 ring-2 ring-red-100"
-                          : "border-gray-200"
-                      }`}
-                    />
-                    {leadErrors.name && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {leadErrors.name}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <input
-                      type="tel"
-                      placeholder="Телефон *"
-                      value={leadPhone}
-                      onChange={(e) => setLeadPhone(e.target.value)}
-                      className={`w-full px-4 py-3 bg-white border rounded-lg text-sm text-[#333] focus:outline-none focus:ring-2 focus:ring-[#e8712a]/30 focus:border-[#e8712a] transition-all ${
-                        leadErrors.phone
-                          ? "border-red-400 ring-2 ring-red-100"
-                          : "border-gray-200"
-                      }`}
-                    />
-                    {leadErrors.phone && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {leadErrors.phone}
-                      </p>
-                    )}
-                  </div>
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    value={leadEmail}
-                    onChange={(e) => setLeadEmail(e.target.value)}
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-[#333] focus:outline-none focus:ring-2 focus:ring-[#e8712a]/30 focus:border-[#e8712a] transition-all"
-                  />
-                  <textarea
-                    placeholder="Расскажите о вашем производстве"
-                    value={leadComment}
-                    onChange={(e) => setLeadComment(e.target.value)}
-                    rows={3}
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm text-[#333] focus:outline-none focus:ring-2 focus:ring-[#e8712a]/30 focus:border-[#e8712a] transition-all resize-none"
-                  />
-                  <div>
-                    <label className="flex items-start gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={leadConsent}
-                        onChange={(e) => setLeadConsent(e.target.checked)}
-                        className="mt-1 accent-[#e8712a]"
-                      />
-                      <span className="text-xs text-gray-500">
-                        Согласен на обработку персональных данных
-                      </span>
-                    </label>
-                    {leadErrors.consent && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {leadErrors.consent}
-                      </p>
-                    )}
-                  </div>
+                <div className="text-center py-6">
+                  <p className="text-sm text-gray-500 mb-4">Оставьте контакты — технолог подготовит персональное КП</p>
                   <button
-                    type="submit"
-                    className="w-full py-3.5 rounded-xl text-white font-bold text-base shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
+                    onClick={() => setFosOpen(true)}
+                    className="px-8 py-3.5 rounded-xl text-white font-bold text-base shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
                     style={{ backgroundColor: ACCENT }}
                   >
                     Получить персональный расчёт
                   </button>
-                </form>
+                </div>
               )}
             </div>
 
