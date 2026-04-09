@@ -6,6 +6,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { useLeadForm } from "@/hooks/useLeadForm";
 import {
   Accordion,
   AccordionItem,
@@ -364,17 +365,35 @@ function SavingsRow({
   );
 }
 
+function isValidPhone(v: string): boolean {
+  const digits = v.replace(/\D/g, "");
+  if (/^[78]\d{10}$/.test(digits)) return true;
+  if (/^375\d{9}$/.test(digits)) return true;
+  return false;
+}
+
+function formatPhone(prev: string, next: string): string {
+  let raw = next.replace(/[^\d+]/g, "");
+  if (raw.startsWith("8")) raw = "7" + raw.slice(1);
+  if (/^[9]/.test(raw)) raw = "7" + raw;
+  raw = raw.replace(/\+/g, "");
+  const isBy = raw.startsWith("375");
+  const maxDigits = isBy ? 12 : 11;
+  raw = raw.slice(0, maxDigits);
+  if (!raw) return "";
+  return "+" + raw;
+}
+
 export default function CalculatorMassager() {
+  const { sendLead, sending } = useLeadForm();
   const [form, setForm] = useState<FormData>({ ...DEFAULTS });
   const [results, setResults] = useState<CalcResults | null>(null);
   const [showResults, setShowResults] = useState(false);
-  const [leadName, setLeadName] = useState("");
-  const [leadPhone, setLeadPhone] = useState("");
-  const [leadEmail, setLeadEmail] = useState("");
-  const [leadComment, setLeadComment] = useState("");
-  const [leadConsent, setLeadConsent] = useState(false);
-  const [leadSent, setLeadSent] = useState(false);
-  const [leadErrors, setLeadErrors] = useState<Record<string, string>>({});
+  const [fosOpen, setFosOpen] = useState(false);
+  const [fosName, setFosName] = useState("");
+  const [fosPhone, setFosPhone] = useState("");
+  const [fosPhoneTouched, setFosPhoneTouched] = useState(false);
+  const [fosSent, setFosSent] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -490,6 +509,27 @@ export default function CalculatorMassager() {
       netBenefit3y,
       netBenefit5y,
     });
+    if (!fosSent) {
+      setFosOpen(true);
+      return;
+    }
+    setShowResults(true);
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  };
+
+  const handleFosSubmit = async () => {
+    if (!fosName.trim() || !isValidPhone(fosPhone) || sending) return;
+    await sendLead({
+      name: fosName,
+      phone: fosPhone,
+      comment: `Калькулятор окупаемости мясомассажёра`,
+      formType: "modal",
+      topic: "calculator_massager",
+    });
+    setFosSent(true);
+    setFosOpen(false);
     setShowResults(true);
     setTimeout(() => {
       resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1322,6 +1362,64 @@ export default function CalculatorMassager() {
           </span>
         </div>
       </footer>
+
+      {fosOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setFosOpen(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-in fade-in zoom-in-95 duration-200">
+            <button onClick={() => setFosOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+              <Icon name="X" size={20} />
+            </button>
+
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-100 mb-4">
+                <Icon name="Calculator" size={28} className="text-orange-500" />
+              </div>
+              <h3 className="text-xl font-bold text-[#333] mb-2">
+                Оставьте контакты и получите расчёт окупаемости мясомассажера
+              </h3>
+              <p className="text-sm text-gray-500">Результат появится сразу после отправки</p>
+            </div>
+
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Ваше имя"
+                value={fosName}
+                onChange={(e) => setFosName(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-[#333] placeholder-gray-400 text-sm focus:outline-none focus:border-orange-400 transition-colors"
+              />
+              <div>
+                <input
+                  type="tel"
+                  placeholder="+7 (___) ___-__-__"
+                  value={fosPhone}
+                  onChange={(e) => setFosPhone(formatPhone(fosPhone, e.target.value))}
+                  onBlur={() => setFosPhoneTouched(true)}
+                  className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-[#333] placeholder-gray-400 text-sm focus:outline-none transition-colors ${fosPhoneTouched && !isValidPhone(fosPhone) ? "border-red-400 focus:border-red-500" : "border-gray-200 focus:border-orange-400"}`}
+                />
+                {fosPhoneTouched && !isValidPhone(fosPhone) && (
+                  <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>
+                )}
+              </div>
+              <button
+                onClick={handleFosSubmit}
+                disabled={!fosName.trim() || !isValidPhone(fosPhone) || sending}
+                className="w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-[0.98] disabled:opacity-40"
+                style={{ backgroundColor: ACCENT }}
+              >
+                {sending ? "Отправка..." : "Отправить"}
+              </button>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Отправляя форму, я соглашаюсь с{" "}
+                <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">политикой обработки персональных данных</a>
+                {" "}и даю{" "}
+                <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">согласие на обработку персональных данных</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
