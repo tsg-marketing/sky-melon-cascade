@@ -535,11 +535,24 @@ export default function CalculatorMassager() {
             <img src={LOGO_URL} alt="Техно-Сиб" className="h-8 sm:h-9 w-auto object-contain" />
           </a>
           <div className="h-8 w-px bg-gray-200 hidden sm:block" />
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h1 className="text-base sm:text-lg font-bold text-[#333] leading-tight truncate">
               Калькулятор окупаемости мясомассажёра
             </h1>
           </div>
+          <a
+            href="/"
+            className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 bg-[#2563eb] text-white rounded-lg font-semibold text-sm hover:bg-[#1d4ed8] transition-all shadow-sm"
+          >
+            <Icon name="ShoppingCart" size={16} />
+            Подобрать мясомассажёр
+          </a>
+          <a
+            href="/"
+            className="sm:hidden flex items-center justify-center w-10 h-10 bg-[#2563eb] text-white rounded-lg"
+          >
+            <Icon name="ShoppingCart" size={18} />
+          </a>
         </div>
       </header>
 
@@ -1284,8 +1297,7 @@ export default function CalculatorMassager() {
             <div className="text-center mt-8">
               <a
                 href="/"
-                className="inline-flex items-center gap-3 px-10 py-5 rounded-xl text-white font-bold text-xl shadow-lg hover:shadow-xl transition-all active:scale-[0.98]"
-                style={{ backgroundColor: ACCENT }}
+                className="inline-flex items-center gap-3 px-10 py-5 rounded-xl bg-[#2563eb] text-white font-bold text-xl shadow-lg shadow-blue-600/25 hover:bg-[#1d4ed8] hover:shadow-xl hover:shadow-blue-600/30 transition-all active:scale-[0.98]"
               >
                 <Icon name="ShoppingCart" size={22} />
                 Выбрать мясомассажёр

@@ -363,15 +363,22 @@ const Index = () => {
     );
   }, [catalogData, catalogSearch]);
 
+  const [equipMenuOpen, setEquipMenuOpen] = useState(false);
+
   const navLinks = [
-    { href: "/injector",       label: "Инъекторы" },
-    { href: "/slicers",        label: "Слайсеры" },
     { href: "#catalog",        label: "Каталог" },
     { href: "#advantages",     label: "Преимущества" },
     { href: "#selector",       label: "Подбор" },
     { href: "#technosib",      label: "О компании" },
     { href: "#faq",            label: "Вопросы" },
     { href: "#contacts",       label: "Контакты" },
+  ];
+
+  const equipmentLinks = [
+    { href: "#catalog",               label: "Мясомассажёры" },
+    { href: "/injector",              label: "Инъекторы" },
+    { href: "/slicers",               label: "Слайсеры" },
+    { href: "/calculator_massager",   label: "Калькулятор окупаемости" },
   ];
 
   return (
@@ -390,7 +397,33 @@ const Index = () => {
                 />
                 <span className="text-xs text-muted-foreground leading-tight mt-0.5 hidden sm:block">Оборудование для маринования и посола мяса</span>
               </div>
-              <nav className="hidden lg:flex gap-6 text-sm font-semibold">
+              <nav className="hidden lg:flex gap-6 text-sm font-semibold items-center">
+                <div
+                  className="relative"
+                  onMouseEnter={() => setEquipMenuOpen(true)}
+                  onMouseLeave={() => setEquipMenuOpen(false)}
+                >
+                  <button className="flex items-center gap-1 text-foreground hover:text-primary transition-colors whitespace-nowrap">
+                    Оборудование
+                    <Icon name="ChevronDown" size={14} className={`transition-transform ${equipMenuOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  {equipMenuOpen && (
+                    <div className="absolute top-full left-0 pt-2 z-50">
+                      <div className="bg-white border border-border rounded-xl shadow-lg py-2 min-w-[220px]">
+                        {equipmentLinks.map((l) => (
+                          <a
+                            key={l.href}
+                            href={l.href}
+                            className="block px-4 py-2.5 text-sm text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+                            onClick={() => setEquipMenuOpen(false)}
+                          >
+                            {l.label}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 {navLinks.map((l) => (
                   <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
                     {l.label}
@@ -442,6 +475,13 @@ const Index = () => {
         </div>
         {menuOpen && (
           <div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4">
+            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Оборудование</div>
+            {equipmentLinks.map((l) => (
+              <a key={l.href} href={l.href} className="text-sm text-foreground hover:text-primary transition-colors pl-3 border-l-2 border-primary/20" onClick={() => setMenuOpen(false)}>
+                {l.label}
+              </a>
+            ))}
+            <div className="h-px bg-border" />
             {navLinks.map((l) => (
               <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>
                 {l.label}
@@ -485,10 +525,10 @@ const Index = () => {
               </div>
               <a
                 href="/calculator_massager"
-                className="inline-flex items-center gap-3 mt-4 px-8 py-4 bg-green-600 text-white rounded-full font-bold text-lg hover:bg-green-700 transition-all shadow-lg shadow-green-600/25 hover:shadow-xl hover:shadow-green-600/30 active:scale-[0.98] group text-center"
+                className="inline-flex items-center gap-3 mt-4 px-8 py-4 bg-orange-500 text-white rounded-full font-bold text-lg hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/30 active:scale-[0.98] group text-center"
               >
                 <Icon name="Calculator" size={22} />
-                Посчитайте эффективность за 1 минуту
+                Посчитайте окупаемость мясомассажера за 1 минуту
                 <Icon name="ArrowRight" size={20} className="group-hover:translate-x-1 transition-transform" />
               </a>
             </div>
@@ -753,20 +793,20 @@ const Index = () => {
       </section>
 
       {/* ─── КНОПКА КАЛЬКУЛЯТОРА ПОД КАТАЛОГОМ ─── */}
-      <section className="py-12 px-6 bg-gradient-to-r from-green-600 to-green-700">
+      <section className="py-12 px-6 bg-gradient-to-r from-orange-500 to-orange-600">
         <div className="max-w-4xl mx-auto text-center">
           <h3 className="text-2xl sm:text-3xl font-display font-black text-white mb-3">
             Узнайте выгоду от нового оборудования
           </h3>
-          <p className="text-green-100 text-lg mb-6 max-w-xl mx-auto">
+          <p className="text-orange-100 text-lg mb-6 max-w-xl mx-auto">
             Калькулятор покажет экономию на сырье, браке и энергии за 1 минуту
           </p>
           <a
             href="/calculator_massager"
-            className="inline-flex items-center gap-3 px-10 py-5 bg-white text-green-700 rounded-full font-bold text-xl hover:bg-green-50 transition-all shadow-xl hover:shadow-2xl active:scale-[0.98] group"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-white text-orange-600 rounded-full font-bold text-xl hover:bg-orange-50 transition-all shadow-xl hover:shadow-2xl active:scale-[0.98] group"
           >
             <Icon name="Calculator" size={24} />
-            Открыть калькулятор эффективности
+            Посчитайте окупаемость мясомассажера за 1 минуту
             <Icon name="ArrowRight" size={22} className="group-hover:translate-x-1 transition-transform" />
           </a>
         </div>
@@ -1248,23 +1288,23 @@ const Index = () => {
       </section>
 
       {/* ─── БАННЕР КАЛЬКУЛЯТОРА ─── */}
-      <section className="py-16 px-6 bg-gradient-to-br from-primary/10 via-primary/5 to-background">
+      <section className="py-16 px-6 bg-gradient-to-br from-orange-50 via-orange-100/50 to-background">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/15 mb-6">
-            <Icon name="Calculator" size={32} className="text-primary" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-orange-500/15 mb-6">
+            <Icon name="Calculator" size={32} className="text-orange-500" />
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground mb-4">
-            Посчитайте эффективность нашего мясомассажера за 1 минуту
+            Посчитайте окупаемость мясомассажера за 1 минуту
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
             Узнайте, сколько вы сэкономите на сырье, браке и электроэнергии при переходе на вакуумный массажёр. Расчёт по реальным отраслевым данным.
           </p>
           <a
             href="/calculator_massager"
-            className="inline-flex items-center gap-3 px-10 py-5 bg-primary text-white rounded-full font-bold text-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-orange-500 text-white rounded-full font-bold text-xl hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/25 hover:shadow-xl hover:shadow-orange-500/30 active:scale-[0.98]"
           >
             <Icon name="Calculator" size={22} />
-            Открыть калькулятор
+            Посчитайте окупаемость мясомассажера за 1 минуту
             <Icon name="ArrowRight" size={20} />
           </a>
           <p className="text-sm text-muted-foreground mt-4">
