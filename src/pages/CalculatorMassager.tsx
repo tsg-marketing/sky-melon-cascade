@@ -491,10 +491,6 @@ export default function CalculatorMassager() {
   const calculate = () => {
     const r = computeResults(form);
     setResults(r);
-    if (!fosSent) {
-      setFosOpen(true);
-      return;
-    }
     setShowResults(true);
     setTimeout(() => {
       resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
