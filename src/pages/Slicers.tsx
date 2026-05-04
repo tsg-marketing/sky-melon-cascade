@@ -456,12 +456,12 @@ const Slicers = () => {
                   {selectedItem.brand && (<p className="text-xs font-bold text-primary uppercase tracking-wider mb-2">{selectedItem.brand}</p>)}
                   <h2 className="text-2xl sm:text-3xl font-display font-black text-foreground mb-4 leading-tight">{selectedItem.name}</h2>
                   {selectedItem.price_display && (<p className="text-2xl font-black text-primary mb-6">{selectedItem.price_display}</p>)}
-                  {selectedItem.description && (<p className="text-muted-foreground text-base leading-relaxed mb-6">{selectedItem.description}</p>)}
+                  {selectedItem.description && (<div className="prose prose-sm max-w-none text-muted-foreground text-base leading-relaxed mb-6 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-1 [&_p]:my-2 [&_strong]:font-semibold [&_strong]:text-foreground [&_a]:text-primary [&_a]:underline" dangerouslySetInnerHTML={{ __html: selectedItem.description }} />)}
                   {selectedItem.all_params.length > 0 && (
                     <div className="mb-6">
                       <h4 className="font-bold text-sm text-foreground mb-3 uppercase tracking-wider">Характеристики</h4>
                       <div className="space-y-2">
-                        {selectedItem.all_params.map((p, pi) => (<div key={pi} className="flex items-start gap-3 py-2 border-b border-border/50 last:border-0"><span className="text-sm text-muted-foreground min-w-[140px] flex-shrink-0">{p.name}</span><span className="text-sm font-medium text-foreground">{p.value}</span></div>))}
+                        {selectedItem.all_params.filter((p) => p.name !== "GUID").map((p, pi) => (<div key={pi} className="flex items-start gap-3 py-2 border-b border-border/50 last:border-0"><span className="text-sm text-muted-foreground min-w-[140px] flex-shrink-0">{p.name}</span><span className="text-sm font-medium text-foreground">{p.value}</span></div>))}
                       </div>
                     </div>
                   )}
