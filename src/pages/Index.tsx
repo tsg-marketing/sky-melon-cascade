@@ -758,16 +758,14 @@ const Index = () => {
                           <div className="flex flex-col gap-2 mt-2">
                             <button
                               onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); setInquiryConsent(false); }}
-                              style={{ backgroundColor: "#D98E5C" }}
-                              className="w-full py-4 text-white rounded-xl text-base font-bold hover:brightness-95 transition-all shadow-md"
+                              className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-base font-bold transition-all shadow-md"
                             >
                               Оставить заявку
                             </button>
                             <div className="flex gap-2">
                               <button
                                 onClick={() => { setSelectedItem(item); setSelectedSlide(0); }}
-                                style={{ borderColor: "#D98E5C", color: "#D98E5C" }}
-                                className="flex-1 py-3.5 border-2 rounded-xl text-base font-semibold hover:bg-orange-50 transition-all"
+                                className="flex-1 py-3.5 border-2 border-orange-500 text-orange-500 rounded-xl text-base font-semibold hover:bg-orange-50 transition-all"
                               >
                                 Подробнее
                               </button>
