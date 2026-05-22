@@ -5,15 +5,38 @@
 Товары без тега picture не включаются.
 """
 import urllib.request
+import urllib.error
 import xml.etree.ElementTree as ET
 import json
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 FEED_URL = "https://t-sib.ru/upload/catalog.xml"
 TARGET_CATEGORIES = {"229", "223", "230", "459"}
 
 _cache = None
 _cache_ts = 0
+_pic_status_cache: dict = {}
+
+
+def check_picture(url: str) -> bool:
+    """HEAD-запрос — True если ответ 2xx."""
+    if not url:
+        return False
+    if url in _pic_status_cache:
+        return _pic_status_cache[url]
+    ok = False
+    try:
+        req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            ok = 200 <= resp.status < 300
+    except Exception:
+        ok = False
+    _pic_status_cache[url] = ok
+    return ok
+
+
+
 
 
 def parse_offer(offer: ET.Element) -> dict:
@@ -92,6 +115,7 @@ def get_catalog():
 
     result = {"massagers": [], "injectors": [], "slicers": []}
 
+    parsed_offers = []
     for offer in (offers_el or []):
         cat_id = (offer.findtext("categoryId") or "").strip()
         if cat_id not in TARGET_CATEGORIES:
@@ -99,6 +123,24 @@ def get_catalog():
         parsed = parse_offer(offer)
         if not parsed:
             continue
+        parsed_offers.append((cat_id, parsed))
+
+    all_urls = []
+    seen = set()
+    for _, p in parsed_offers:
+        for u in p.get("pictures", []):
+            if u not in seen:
+                seen.add(u)
+                all_urls.append(u)
+    if all_urls:
+        with ThreadPoolExecutor(max_workers=50) as ex:
+            list(ex.map(check_picture, all_urls))
+
+    for cat_id, parsed in parsed_offers:
+        alive = [u for u in parsed.get("pictures", []) if _pic_status_cache.get(u)]
+        if not alive:
+            continue
+        parsed["pictures"] = alive
         if cat_id == "229":
             result["massagers"].append(parsed)
         elif cat_id == "223":

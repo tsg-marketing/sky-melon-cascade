@@ -1635,7 +1635,9 @@ const Index = () => {
       )}
 
       <QuizSideTrigger storageKey="quiz_auto_main">
-        <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, formType: 'quiz' })} />
+        {(close) => (
+          <QuizBlock onSent={(name, phone, quizAnswers) => { sendLead({ name, phone, quizAnswers, formType: 'quiz' }); close(); }} />
+        )}
       </QuizSideTrigger>
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
     </div>

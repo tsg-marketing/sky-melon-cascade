@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Icon from "@/components/ui/icon";
 
 interface QuizSideTriggerProps {
-  children: ReactNode;
+  children: ReactNode | ((close: () => void) => ReactNode);
   storageKey?: string;
   label?: string;
   autoOpenMs?: number;
@@ -16,6 +16,11 @@ export default function QuizSideTrigger({
   autoOpenMs = 30000,
 }: QuizSideTriggerProps) {
   const [open, setOpen] = useState(false);
+  const [renderKey, setRenderKey] = useState(0);
+  const close = () => {
+    setOpen(false);
+    setRenderKey((k) => k + 1);
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -43,18 +48,20 @@ export default function QuizSideTrigger({
         type="button"
         onClick={() => setOpen(true)}
         aria-label={label}
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-orange-500 hover:bg-orange-600 text-white shadow-2xl rounded-l-xl py-5 px-3 flex flex-col items-center gap-2 transition-all hover:pr-4"
-        style={{ writingMode: "vertical-rl" }}
+        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-orange-500 hover:bg-orange-600 text-white shadow-2xl rounded-l-xl py-5 px-2.5 transition-all hover:pr-3.5"
+        style={{ writingMode: "vertical-rl", transform: "translateY(-50%) rotate(180deg)" }}
       >
-        <Icon name="ClipboardList" size={20} className="rotate-90" />
-        <span className="font-bold text-sm tracking-wide" style={{ transform: "rotate(180deg)" }}>
+        <span className="inline-flex items-center gap-2 font-bold text-sm tracking-wide whitespace-nowrap">
+          <Icon name="ClipboardList" size={18} />
           {label}
         </span>
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
-          <div className="pt-2">{children}</div>
+          <div className="pt-2" key={renderKey}>
+            {typeof children === "function" ? children(close) : children}
+          </div>
         </DialogContent>
       </Dialog>
     </>

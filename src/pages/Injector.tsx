@@ -822,7 +822,9 @@ const Injector = () => {
       )}
 
       <QuizSideTrigger storageKey="quiz_auto_injector">
-        <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, topic: 'инъекторы для мяса', formType: 'quiz' })} />
+        {(close) => (
+          <QuizBlock onSent={(name, phone, quizAnswers) => { sendLead({ name, phone, quizAnswers, topic: 'инъекторы для мяса', formType: 'quiz' }); close(); }} />
+        )}
       </QuizSideTrigger>
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
     </div>

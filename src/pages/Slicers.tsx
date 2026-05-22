@@ -734,7 +734,9 @@ const Slicers = () => {
       )}
 
       <QuizSideTrigger storageKey="quiz_auto_slicers">
-        <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, topic: 'слайсеры', formType: 'quiz' })} />
+        {(close) => (
+          <QuizBlock onSent={(name, phone, quizAnswers) => { sendLead({ name, phone, quizAnswers, topic: 'слайсеры', formType: 'quiz' }); close(); }} />
+        )}
       </QuizSideTrigger>
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
     </div>
