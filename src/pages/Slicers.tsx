@@ -80,13 +80,21 @@ const CompareForm = ({ onSent }: { onSent: (name: string, phone: string) => void
   );
 };
 
-const CONSENT_TEXT = (
-  <p className="text-xs text-muted-foreground leading-relaxed">
-    Отправляя форму, я соглашаюсь с{" "}
-    <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">политикой обработки персональных данных</a>
-    {" "}и даю{" "}
-    <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">согласие на обработку персональных данных</a>.
-  </p>
+const ConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
+  <label className="flex items-start gap-2 cursor-pointer select-none">
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={(e) => onChange(e.target.checked)}
+      className="mt-0.5 w-4 h-4 flex-shrink-0 accent-orange-500 cursor-pointer"
+    />
+    <span className="text-xs text-muted-foreground leading-relaxed">
+      Отправляя форму, я соглашаюсь с{" "}
+      <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">политикой обработки персональных данных</a>
+      {" "}и даю{" "}
+      <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">согласие на обработку персональных данных</a>.
+    </span>
+  </label>
 );
 
 const QUIZ_QUESTIONS = [
@@ -102,11 +110,12 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswe
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneTouched, setPhoneTouched] = useState(false);
+  const [consent, setConsent] = useState(false);
   const isLast = step === QUIZ_QUESTIONS.length;
   const phoneValid = isValidPhone(phone);
   const choose = (opt: string) => { setAnswers([...answers, opt]); setStep(step + 1); };
   const handleSubmit = () => {
-    if (!name.trim() || !phoneValid) return;
+    if (!name.trim() || !phoneValid || !consent) return;
     const quizAnswers: Record<string, string> = {};
     QUIZ_QUESTIONS.forEach((q, i) => { quizAnswers[q.q] = answers[i] || ""; });
     onSent(name, phone, quizAnswers);
@@ -137,8 +146,8 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswe
               <input type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={e => setPhone(formatPhone(phone, e.target.value))} onBlur={() => setPhoneTouched(true)} className={phoneTouched && !phoneValid ? inputError : inputCls} />
               {phoneTouched && !phoneValid && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
             </div>
-            <button onClick={handleSubmit} disabled={!name.trim() || !phoneValid} className="w-full py-4 bg-primary text-white rounded-xl font-bold text-xl hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40">Отправить</button>
-            {CONSENT_TEXT}
+            <ConsentCheckbox checked={consent} onChange={setConsent} />
+            <button onClick={handleSubmit} disabled={!name.trim() || !phoneValid || !consent} style={{ backgroundColor: "#D98E5C" }} className="w-full py-4 text-white rounded-xl font-bold text-xl hover:brightness-95 transition-all shadow-sm disabled:opacity-40">Отправить</button>
           </div>
         </div>
       )}
@@ -178,6 +187,9 @@ const Slicers = () => {
   const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [videoOpen, setVideoOpen] = useState(false);
+  const [modalConsent, setModalConsent] = useState(false);
+  const [inquiryConsent, setInquiryConsent] = useState(false);
+  const [contactsConsent, setContactsConsent] = useState(false);
 
   useEffect(() => {
     document.title = "Слайсеры для нарезки мяса и овощей — купить промышленный слайсер | Техно-Сиб";
@@ -412,9 +424,9 @@ const Slicers = () => {
                             {item.extra_params.map((p, pi) => (<div key={pi} className="flex items-start gap-2 text-base"><Icon name="ChevronRight" size={16} className="text-primary flex-shrink-0 mt-0.5" /><span className="text-muted-foreground"><span className="font-medium text-foreground">{p.name}:</span> {p.value}</span></div>))}
                           </div>
                           <div className="flex flex-col gap-2 mt-2">
-                            <button onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }} className="w-full py-4 bg-orange-500 text-white rounded-xl text-base font-bold hover:bg-orange-600 transition-all shadow-md">Оставить заявку</button>
+                            <button onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); setInquiryConsent(false); }} style={{ backgroundColor: "#D98E5C" }} className="w-full py-4 text-white rounded-xl text-base font-bold hover:brightness-95 transition-all shadow-md">Оставить заявку</button>
                             <div className="flex gap-2">
-                              <button onClick={() => { setSelectedItem(item); setSelectedSlide(0); }} className="flex-1 py-3.5 border-2 border-primary/30 text-primary rounded-xl text-base font-semibold hover:border-primary hover:bg-primary/5 transition-all">Подробнее</button>
+                              <button onClick={() => { setSelectedItem(item); setSelectedSlide(0); }} style={{ borderColor: "#D98E5C", color: "#D98E5C" }} className="flex-1 py-3.5 border-2 rounded-xl text-base font-semibold hover:bg-orange-50 transition-all">Подробнее</button>
                               {(() => { const qty = getQuantity(item.id); return qty > 0 ? (<div className="flex items-center gap-1 border-2 border-primary rounded-xl px-2"><button onClick={() => removeItem(item.id)} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">−</button><span className="w-5 text-center font-bold text-primary text-sm">{qty}</span><button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">+</button></div>) : (<button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="py-3.5 px-4 border-2 border-primary/30 text-primary rounded-xl hover:border-primary hover:bg-primary/5 transition-all" title="В корзину"><Icon name="ShoppingCart" size={18} /></button>); })()}
                             </div>
                           </div>
@@ -489,8 +501,8 @@ const Slicers = () => {
                 <input type="tel" placeholder="+7 (___) ___-__-__" value={inquiryPhone} onChange={(e) => setInquiryPhone(formatPhone(inquiryPhone, e.target.value))} onBlur={() => setInquiryPhoneTouched(true)} className={inquiryPhoneTouched && !isValidPhone(inquiryPhone) ? inputError : inputCls} />
                 {inquiryPhoneTouched && !isValidPhone(inquiryPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
               </div>
-              <button onClick={() => { if (inquiryName.trim() && isValidPhone(inquiryPhone) && !sending) { sendLead({ name: inquiryName, phone: inquiryPhone, product: inquiryItem?.name, topic: 'слайсеры', formType: 'inquiry' }); setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false); } }} disabled={!inquiryName.trim() || !isValidPhone(inquiryPhone) || sending} className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
-              {CONSENT_TEXT}
+              <ConsentCheckbox checked={inquiryConsent} onChange={setInquiryConsent} />
+              <button onClick={() => { if (inquiryName.trim() && isValidPhone(inquiryPhone) && inquiryConsent && !sending) { sendLead({ name: inquiryName, phone: inquiryPhone, product: inquiryItem?.name, topic: 'слайсеры', formType: 'inquiry' }); setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false); setInquiryConsent(false); } }} disabled={!inquiryName.trim() || !isValidPhone(inquiryPhone) || !inquiryConsent || sending} style={{ backgroundColor: "#D98E5C" }} className="w-full py-4 text-white rounded-xl font-bold text-lg hover:brightness-95 transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
             </div>
           </div>
         </div>
@@ -647,8 +659,8 @@ const Slicers = () => {
             <div className="space-y-4">
               <input type="text" placeholder="Имя *" required value={modalName} onChange={e => setModalName(e.target.value)} className={inputCls} />
               <div><input type="tel" placeholder="+7 (___) ___-__-__" required value={modalPhone} onChange={e => setModalPhone(formatPhone(modalPhone, e.target.value))} onBlur={() => setModalPhoneTouched(true)} className={modalPhoneTouched && !isValidPhone(modalPhone) ? inputError : inputCls} />{modalPhoneTouched && !isValidPhone(modalPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}</div>
-              <button onClick={() => { if (modalName.trim() && isValidPhone(modalPhone) && !sending) { sendLead({ name: modalName, phone: modalPhone, product: modalProduct, topic: 'слайсеры', formType: 'modal' }); setModalOpen(false); setModalName(""); setModalPhone(""); setModalPhoneTouched(false); } }} disabled={!modalName.trim() || !isValidPhone(modalPhone) || sending} style={{ backgroundColor: "#D98E5C" }} className="w-full py-4 text-white rounded-xl font-bold text-lg hover:brightness-95 transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
-              {CONSENT_TEXT}
+              <ConsentCheckbox checked={modalConsent} onChange={setModalConsent} />
+              <button onClick={() => { if (modalName.trim() && isValidPhone(modalPhone) && modalConsent && !sending) { sendLead({ name: modalName, phone: modalPhone, product: modalProduct, topic: 'слайсеры', formType: 'modal' }); setModalOpen(false); setModalName(""); setModalPhone(""); setModalPhoneTouched(false); setModalConsent(false); } }} disabled={!modalName.trim() || !isValidPhone(modalPhone) || !modalConsent || sending} style={{ backgroundColor: "#D98E5C" }} className="w-full py-4 text-white rounded-xl font-bold text-lg hover:brightness-95 transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
             </div>
           </div>
         </div>

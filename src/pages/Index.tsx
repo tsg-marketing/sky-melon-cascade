@@ -181,13 +181,21 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswe
   );
 };
 
-const CONSENT_TEXT = (
-  <p className="text-xs text-muted-foreground leading-relaxed">
-    Отправляя форму, я соглашаюсь с{" "}
-    <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">политикой обработки персональных данных</a>
-    {" "}и даю{" "}
-    <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">согласие на обработку персональных данных</a>.
-  </p>
+const ConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
+  <label className="flex items-start gap-2 cursor-pointer select-none">
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={(e) => onChange(e.target.checked)}
+      className="mt-0.5 w-4 h-4 flex-shrink-0 accent-orange-500 cursor-pointer"
+    />
+    <span className="text-xs text-muted-foreground leading-relaxed">
+      Отправляя форму, я соглашаюсь с{" "}
+      <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">политикой обработки персональных данных</a>
+      {" "}и даю{" "}
+      <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">согласие на обработку персональных данных</a>.
+    </span>
+  </label>
 );
 
 const Index = () => {
@@ -224,6 +232,9 @@ const Index = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [modalConsent, setModalConsent] = useState(false);
+  const [inquiryConsent, setInquiryConsent] = useState(false);
+  const [contactsConsent, setContactsConsent] = useState(false);
 
   useEffect(() => {
     document.title = "Вакуумные массажеры для мяса — купить промышленный массажер | Техно-Сиб";
@@ -746,15 +757,17 @@ const Index = () => {
 
                           <div className="flex flex-col gap-2 mt-2">
                             <button
-                              onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }}
-                              className="w-full py-4 bg-orange-500 text-white rounded-xl text-base font-bold hover:bg-orange-600 transition-all shadow-md"
+                              onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); setInquiryConsent(false); }}
+                              style={{ backgroundColor: "#D98E5C" }}
+                              className="w-full py-4 text-white rounded-xl text-base font-bold hover:brightness-95 transition-all shadow-md"
                             >
                               Оставить заявку
                             </button>
                             <div className="flex gap-2">
                               <button
                                 onClick={() => { setSelectedItem(item); setSelectedSlide(0); }}
-                                className="flex-1 py-3.5 border-2 border-primary/30 text-primary rounded-xl text-base font-semibold hover:border-primary hover:bg-primary/5 transition-all"
+                                style={{ borderColor: "#D98E5C", color: "#D98E5C" }}
+                                className="flex-1 py-3.5 border-2 rounded-xl text-base font-semibold hover:bg-orange-50 transition-all"
                               >
                                 Подробнее
                               </button>
@@ -1017,19 +1030,20 @@ const Index = () => {
                     />
                     {inquiryPhoneTouched && !isValidPhone(inquiryPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
                   </div>
+                  <ConsentCheckbox checked={inquiryConsent} onChange={setInquiryConsent} />
                   <button
                     onClick={() => {
-                      if (inquiryName.trim() && isValidPhone(inquiryPhone) && !sending) {
+                      if (inquiryName.trim() && isValidPhone(inquiryPhone) && inquiryConsent && !sending) {
                         sendLead({ name: inquiryName, phone: inquiryPhone, product: inquiryItem?.name, formType: 'inquiry' });
-                        setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false);
+                        setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false); setInquiryConsent(false);
                       }
                     }}
-                    disabled={!inquiryName.trim() || !isValidPhone(inquiryPhone) || sending}
-                    className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-md disabled:opacity-40"
+                    disabled={!inquiryName.trim() || !isValidPhone(inquiryPhone) || !inquiryConsent || sending}
+                    style={{ backgroundColor: "#D98E5C" }}
+                    className="w-full py-4 text-white rounded-xl font-bold text-lg hover:brightness-95 transition-all shadow-md disabled:opacity-40"
                   >
                     {sending ? "Отправляем..." : "Отправить"}
                   </button>
-                  {CONSENT_TEXT}
                 </div>
           </div>
         </div>
@@ -1487,19 +1501,20 @@ const Index = () => {
                     {contactsPhoneTouched && !isValidPhone(contactsPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
                   </div>
                   <textarea placeholder="Комментарий (продукт, объём, задача)" rows={4} value={contactsComment} onChange={e => setContactsComment(e.target.value)} className={inputCls + " resize-none"} />
+                  <ConsentCheckbox checked={contactsConsent} onChange={setContactsConsent} />
                   <button
                     onClick={() => {
-                      if (contactsName.trim() && isValidPhone(contactsPhone) && !sending) {
+                      if (contactsName.trim() && isValidPhone(contactsPhone) && contactsConsent && !sending) {
                         sendLead({ name: contactsName, phone: contactsPhone, comment: contactsComment, formType: 'contacts' });
-                        setContactsName(""); setContactsPhone(""); setContactsComment(""); setContactsPhoneTouched(false);
+                        setContactsName(""); setContactsPhone(""); setContactsComment(""); setContactsPhoneTouched(false); setContactsConsent(false);
                       }
                     }}
-                    disabled={!contactsName.trim() || !isValidPhone(contactsPhone) || sending}
-                    className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
+                    disabled={!contactsName.trim() || !isValidPhone(contactsPhone) || !contactsConsent || sending}
+                    style={{ backgroundColor: "#D98E5C" }}
+                    className="w-full py-4 text-white rounded-xl font-bold text-base hover:brightness-95 transition-all shadow-sm disabled:opacity-40"
                   >
                     {sending ? "Отправляем..." : "Отправить"}
                   </button>
-                  {CONSENT_TEXT}
                 </div>
               </div>
             </div>
@@ -1530,20 +1545,20 @@ const Index = () => {
                 <input type="tel" placeholder="+7 (___) ___-__-__" required value={modalPhone} onChange={e => setModalPhone(formatPhone(modalPhone, e.target.value))} onBlur={() => setModalPhoneTouched(true)} className={modalPhoneTouched && !isValidPhone(modalPhone) ? inputError : inputCls} />
                 {modalPhoneTouched && !isValidPhone(modalPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
               </div>
+              <ConsentCheckbox checked={modalConsent} onChange={setModalConsent} />
               <button
                 onClick={() => {
-                  if (modalName.trim() && isValidPhone(modalPhone) && !sending) {
+                  if (modalName.trim() && isValidPhone(modalPhone) && modalConsent && !sending) {
                     sendLead({ name: modalName, phone: modalPhone, product: modalProduct, formType: 'modal' });
-                    setModalOpen(false); setModalName(""); setModalPhone(""); setModalPhoneTouched(false);
+                    setModalOpen(false); setModalName(""); setModalPhone(""); setModalPhoneTouched(false); setModalConsent(false);
                   }
                 }}
-                disabled={!modalName.trim() || !isValidPhone(modalPhone) || sending}
+                disabled={!modalName.trim() || !isValidPhone(modalPhone) || !modalConsent || sending}
                 style={{ backgroundColor: "#D98E5C" }}
                 className="w-full py-4 text-white rounded-xl font-bold text-base hover:brightness-95 transition-all shadow-sm disabled:opacity-40"
               >
                 {sending ? "Отправляем..." : "Отправить"}
               </button>
-              {CONSENT_TEXT}
             </div>
           </div>
         </div>
