@@ -1037,8 +1037,7 @@ const Index = () => {
                       }
                     }}
                     disabled={!isValidPhone(inquiryPhone) || !inquiryConsent || sending}
-                    style={{ backgroundColor: "#D98E5C" }}
-                    className="w-full py-4 text-white rounded-xl font-bold text-lg hover:brightness-95 transition-all shadow-md disabled:opacity-40"
+                    className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-lg transition-all shadow-md disabled:opacity-40"
                   >
                     {sending ? "Отправляем..." : "Отправить"}
                   </button>
