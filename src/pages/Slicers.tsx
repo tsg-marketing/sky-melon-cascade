@@ -502,7 +502,7 @@ const Slicers = () => {
                 {inquiryPhoneTouched && !isValidPhone(inquiryPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
               </div>
               <ConsentCheckbox checked={inquiryConsent} onChange={setInquiryConsent} />
-              <button onClick={() => { if (inquiryName.trim() && isValidPhone(inquiryPhone) && inquiryConsent && !sending) { sendLead({ name: inquiryName, phone: inquiryPhone, product: inquiryItem?.name, topic: 'слайсеры', formType: 'inquiry' }); setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false); setInquiryConsent(false); } }} disabled={!inquiryName.trim() || !isValidPhone(inquiryPhone) || !inquiryConsent || sending} style={{ backgroundColor: "#D98E5C" }} className="w-full py-4 text-white rounded-xl font-bold text-lg hover:brightness-95 transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
+              <button onClick={() => { if (isValidPhone(inquiryPhone) && inquiryConsent && !sending) { sendLead({ name: inquiryName || "—", phone: inquiryPhone, product: inquiryItem?.name, topic: 'слайсеры', formType: 'inquiry' }); setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false); setInquiryConsent(false); } }} disabled={!isValidPhone(inquiryPhone) || !inquiryConsent || sending} style={{ backgroundColor: "#D98E5C" }} className="w-full py-4 text-white rounded-xl font-bold text-lg hover:brightness-95 transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
             </div>
           </div>
         </div>
