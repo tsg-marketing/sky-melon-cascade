@@ -673,6 +673,8 @@ const Index = () => {
                           <img
                             src={item.pictures[slide]}
                             alt={item.name}
+                            referrerPolicy="no-referrer"
+                            loading="lazy"
                             className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500"
                             onClick={() => { setLightboxPhotos(item.pictures); setLightboxIndex(slide); setLightboxOpen(true); }}
                             style={{ cursor: "pointer" }}
@@ -885,6 +887,7 @@ const Index = () => {
                     <img
                       src={selectedItem.pictures[selectedSlide]}
                       alt={selectedItem.name}
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-contain p-3 cursor-zoom-in"
                       onClick={() => { setLightboxPhotos(selectedItem.pictures); setLightboxIndex(selectedSlide); setLightboxOpen(true); }}
                     />
@@ -913,7 +916,7 @@ const Index = () => {
                           onClick={() => setSelectedSlide(pi)}
                           className={`flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${pi === selectedSlide ? "border-primary shadow-md" : "border-transparent opacity-60 hover:opacity-100"}`}
                         >
-                          <img src={pic} alt="" className="w-full h-full object-contain bg-white p-1" />
+                          <img src={pic} alt="" referrerPolicy="no-referrer" className="w-full h-full object-contain bg-white p-1" />
                         </button>
                       ))}
                     </div>
