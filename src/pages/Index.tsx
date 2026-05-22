@@ -1538,7 +1538,8 @@ const Index = () => {
                   }
                 }}
                 disabled={!modalName.trim() || !isValidPhone(modalPhone) || sending}
-                className="w-full py-4 bg-primary text-white rounded-xl font-bold text-base hover:bg-primary/90 transition-all shadow-sm disabled:opacity-40"
+                style={{ backgroundColor: "#D98E5C" }}
+                className="w-full py-4 text-white rounded-xl font-bold text-base hover:brightness-95 transition-all shadow-sm disabled:opacity-40"
               >
                 {sending ? "Отправляем..." : "Отправить"}
               </button>
