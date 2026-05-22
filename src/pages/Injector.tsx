@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import ThankYouModal from "@/components/ThankYouModal";
+import QuizSideTrigger from "@/components/QuizSideTrigger";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
 
@@ -444,7 +445,7 @@ const Injector = () => {
                             {item.extra_params.map((p, pi) => (<div key={pi} className="flex items-start gap-2 text-base"><Icon name="ChevronRight" size={16} className="text-primary flex-shrink-0 mt-0.5" /><span className="text-muted-foreground"><span className="font-medium text-foreground">{p.name}:</span> {p.value}</span></div>))}
                           </div>
                           <div className="flex flex-col gap-2 mt-2">
-                            <button onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }} className="w-full py-4 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md">Оставить заявку</button>
+                            <button onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }} className="w-full py-4 bg-orange-500 text-white rounded-xl text-base font-bold hover:bg-orange-600 transition-all shadow-md">Оставить заявку</button>
                             <div className="flex gap-2">
                               <button onClick={() => { setSelectedItem(item); setSelectedSlide(0); }} className="flex-1 py-3.5 border-2 border-primary/30 text-primary rounded-xl text-base font-semibold hover:border-primary hover:bg-primary/5 transition-all">Подробнее</button>
                               {(() => { const qty = getQuantity(item.id); return qty > 0 ? (<div className="flex items-center gap-1 border-2 border-primary rounded-xl px-2"><button onClick={() => removeItem(item.id)} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">−</button><span className="w-5 text-center font-bold text-primary text-sm">{qty}</span><button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">+</button></div>) : (<button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="py-3.5 px-4 border-2 border-primary/30 text-primary rounded-xl hover:border-primary hover:bg-primary/5 transition-all" title="В корзину"><Icon name="ShoppingCart" size={18} /></button>); })()}
@@ -820,6 +821,9 @@ const Injector = () => {
         </div>
       )}
 
+      <QuizSideTrigger storageKey="quiz_auto_injector">
+        <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, topic: 'инъекторы для мяса', formType: 'quiz' })} />
+      </QuizSideTrigger>
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
     </div>
   );

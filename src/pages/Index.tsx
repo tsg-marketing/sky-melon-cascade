@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import ThankYouModal from "@/components/ThankYouModal";
+import QuizSideTrigger from "@/components/QuizSideTrigger";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
 
@@ -744,7 +745,7 @@ const Index = () => {
                           <div className="flex flex-col gap-2 mt-2">
                             <button
                               onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); }}
-                              className="w-full py-4 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md"
+                              className="w-full py-4 bg-orange-500 text-white rounded-xl text-base font-bold hover:bg-orange-600 transition-all shadow-md"
                             >
                               Оставить заявку
                             </button>
@@ -1633,6 +1634,9 @@ const Index = () => {
         </div>
       )}
 
+      <QuizSideTrigger storageKey="quiz_auto_main">
+        <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, formType: 'quiz' })} />
+      </QuizSideTrigger>
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
     </div>
   );

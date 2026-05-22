@@ -25,11 +25,12 @@ def parse_offer(offer: ET.Element) -> dict:
     if not pictures:
         return None
 
+    hidden_param_names = {"guid", "видео (ссылка)", "видео(ссылка)", "видео ссылка"}
     params = {}
     for p in offer.findall("param"):
         name = (p.get("name") or "").strip()
         val = (p.text or "").strip()
-        if name and val:
+        if name and val and name.lower() not in hidden_param_names:
             params[name] = val
 
     brand = None
