@@ -389,6 +389,7 @@ const Index = () => {
   const equipmentLinks = [
     { href: "/injector",              label: "Инъекторы" },
     { href: "/slicers",               label: "Слайсеры" },
+    { href: "/ldogenerator",          label: "Льдогенераторы" },
   ];
 
   return (
@@ -1591,6 +1592,7 @@ const Index = () => {
                 <a href="#catalog" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Каталог массажеров</a>
                 <a href="/injector" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Инъекторы</a>
                 <a href="/slicers" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Слайсеры</a>
+                <a href="/ldogenerator" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Льдогенераторы</a>
               </div>
             </div>
             <div>

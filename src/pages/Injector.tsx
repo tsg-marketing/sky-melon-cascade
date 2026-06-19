@@ -317,6 +317,7 @@ const Injector = () => {
   const navLinks = [
     { href: "/",             label: "Массажеры" },
     { href: "/slicers",      label: "Слайсеры" },
+    { href: "/ldogenerator", label: "Льдогенераторы" },
     { href: "#catalog",      label: "Каталог" },
     { href: "#advantages",   label: "Преимущества" },
     { href: "#selector",     label: "Подбор" },
@@ -772,6 +773,7 @@ const Injector = () => {
                 <a href="/" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Вакуумные массажеры</a>
                 <a href="#catalog" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Каталог инъекторов</a>
                 <a href="/slicers" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Слайсеры</a>
+                <a href="/ldogenerator" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Льдогенераторы</a>
               </div>
             </div>
             <div>

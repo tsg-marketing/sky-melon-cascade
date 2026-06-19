@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Injector from "./pages/Injector";
 import Slicers from "./pages/Slicers";
+import LDOGenerator from "./pages/LDOGenerator";
 import Cart from "./pages/Cart";
 import CalculatorMassager from "./pages/CalculatorMassager";
 import NotFound from "./pages/NotFound";
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/injector" element={<Injector />} />
           <Route path="/slicers" element={<Slicers />} />
+          <Route path="/ldogenerator" element={<LDOGenerator />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/calculator_massager" element={<CalculatorMassager />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

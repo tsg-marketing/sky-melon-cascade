@@ -54,7 +54,7 @@ const CompareForm = ({ onSent }: { onSent: (name: string, phone: string) => void
   const phoneValid = isValidPhone(phone);
   return (
     <div className="p-8 bg-white border-2 border-primary/20 rounded-3xl shadow-sm">
-      <h3 className="font-display font-bold text-2xl mb-1 text-foreground text-center">Хотите подобрать оборудование?</h3>
+      <h3 className="font-display font-bold text-2xl mb-1 text-foreground text-center">Хотите подобрать льдогенератор?</h3>
       <p className="text-muted-foreground text-base mb-6 text-center">Оставьте контакты — технолог свяжется в течение 2 часов</p>
       <div className="space-y-4">
         <input type="text" placeholder="Ваше имя" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
@@ -98,10 +98,10 @@ const ConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (v
 );
 
 const QUIZ_QUESTIONS = [
-  { q: "Что вы планируете нарезать чаще всего?", options: ["Мясо / ветчина / бекон", "Колбасы / деликатесы", "Сыр", "Рыба", "Овощи / другая продукция"] },
-  { q: "Какая у вас требуемая производительность?", options: ["До 50 кг/день", "50–200 кг/день", "200–500 кг/день", "Более 500 кг/день / непрерывная работа"] },
-  { q: "Какой формат и точность нарезки вам нужны?", options: ["0–3 мм (очень тонко)", "0–10 мм (универсально)", "0–20+ мм (толще / порции)", "Важна максимальная стабильность толщины"] },
-  { q: "Какие требования к оборудованию важны?", options: ["Полуавтомат", "Автомат / интеграция в линию", "Настольный / компактный", "Напольный / высокая производительность", "Простая мойка и санитария (HACCP)"] },
+  { q: "Какой тип льда вам нужен?", options: ["Чешуйчатый лёд", "Гранулированный лёд", "Пока не определились"] },
+  { q: "Какая производительность нужна в сутки?", options: ["До 300 кг", "300–1000 кг", "1000–3000 кг", "Более 3000 кг"] },
+  { q: "Для какой отрасли подбираете оборудование?", options: ["Мясопереработка", "Рыба и морепродукты", "Хлебопечение", "Торговля / HoReCa", "Другое"] },
+  { q: "Какое исполнение предпочтительнее?", options: ["Моноблок", "Библок (агрегат выносится за цех)", "Нужна консультация"] },
 ];
 
 const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswers: Record<string, string>) => void }) => {
@@ -139,7 +139,7 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswe
       ) : (
         <div className="p-8 bg-white border-2 border-primary/20 rounded-3xl shadow-sm">
           <h3 className="font-display font-bold text-3xl mb-2 text-foreground text-center">Осталось совсем немного!</h3>
-          <p className="text-muted-foreground text-base mb-8 text-center">Оставьте контакты — технолог подберёт слайсер и пришлёт КП</p>
+          <p className="text-muted-foreground text-base mb-8 text-center">Оставьте контакты — технолог подберёт льдогенератор и пришлёт КП</p>
           <div className="space-y-4">
             <input type="text" placeholder="Ваше имя" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
             <div>
@@ -147,7 +147,7 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswe
               {phoneTouched && !phoneValid && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
             </div>
             <ConsentCheckbox checked={consent} onChange={setConsent} />
-            <button onClick={handleSubmit} disabled={!name.trim() || !phoneValid || !consent} style={{ backgroundColor: "#D98E5C" }} className="w-full py-4 text-white rounded-xl font-bold text-xl hover:brightness-95 transition-all shadow-sm disabled:opacity-40">Отправить</button>
+            <button onClick={handleSubmit} disabled={!name.trim() || !phoneValid || !consent} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-xl transition-all shadow-sm disabled:opacity-40">Отправить</button>
           </div>
         </div>
       )}
@@ -155,7 +155,7 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswe
   );
 };
 
-const Slicers = () => {
+const LDOGenerator = () => {
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
   const { addItem, removeItem, getQuantity, totalCount } = useCart();
   const navigate = useNavigate();
@@ -170,7 +170,7 @@ const Slicers = () => {
   const [contactsComment, setContactsComment] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [catalogExpanded, setCatalogExpanded] = useState(false);
-  const [catalogData, setCatalogData] = useState<{ massagers: CatalogItem[]; injectors: CatalogItem[]; slicers: CatalogItem[] } | null>(null);
+  const [catalogData, setCatalogData] = useState<{ massagers: CatalogItem[]; injectors: CatalogItem[]; slicers: CatalogItem[]; icemakers: CatalogItem[] } | null>(null);
   const [catalogLoading, setCatalogLoading] = useState(true);
   const [catalogSearch, setCatalogSearch] = useState("");
   const [selectedItem, setSelectedItem] = useState<CatalogItem | null>(null);
@@ -186,93 +186,37 @@ const Slicers = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
-  const [videoOpen, setVideoOpen] = useState(false);
   const [modalConsent, setModalConsent] = useState(false);
   const [inquiryConsent, setInquiryConsent] = useState(false);
   const [contactsConsent, setContactsConsent] = useState(false);
 
   useEffect(() => {
-    document.title = "Слайсеры для нарезки мяса и овощей — купить промышленный слайсер | Техно-Сиб";
+    document.title = "Промышленные льдогенераторы — чешуйчатый и гранулированный лёд | Техно-Сиб";
     const setMeta = (name: string, content: string, property?: boolean) => {
       const attr = property ? "property" : "name";
       let el = document.querySelector(`meta[${attr}="${name}"]`);
       if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.setAttribute("content", content);
     };
-    setMeta("description", "Промышленные слайсеры для точной нарезки мяса, рыбы и овощей. Толщина от 1 мм, до 260 резов/мин. Подбор, поставка и сервис по всей России. Техно-Сиб — 25 лет на рынке.");
-    setMeta("keywords", "слайсер для мяса, промышленный слайсер, слайсер для нарезки, оборудование для нарезки мяса, купить слайсер");
-    setMeta("og:title", "Слайсеры для нарезки мяса и овощей — промышленное оборудование | Техно-Сиб", true);
-    setMeta("og:description", "Промышленные слайсеры для точной нарезки мяса, рыбы и овощей. Подбор модели под ваш продукт, поставка и сервис по всей России.", true);
-    setMeta("og:url", "https://meatmassagers.ru/slicers", true);
+    setMeta("description", "Промышленные льдогенераторы от 90 до 10 000 кг льда в сутки. Чешуйчатый и гранулированный лёд для мясопереработки, рыбной отрасли, хлебопечения и торговли. Подбор, поставка и сервис по всей России.");
+    setMeta("keywords", "льдогенератор, промышленный льдогенератор, чешуйчатый лёд, генератор льда, купить льдогенератор");
+    setMeta("og:title", "Промышленные льдогенераторы — чешуйчатый и гранулированный лёд | Техно-Сиб", true);
+    setMeta("og:description", "Промышленные льдогенераторы от 90 до 10 000 кг льда в сутки для пищевого производства. Подбор модели под вашу производительность.", true);
+    setMeta("og:url", "https://meatmassagers.ru/ldogenerator", true);
     setMeta("og:type", "website", true);
     const link = document.querySelector("link[rel='canonical']") || document.createElement("link");
     link.setAttribute("rel", "canonical");
-    link.setAttribute("href", "https://meatmassagers.ru/slicers");
+    link.setAttribute("href", "https://meatmassagers.ru/ldogenerator");
     if (!link.parentNode) document.head.appendChild(link);
-
-    const schema = {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "WebPage",
-          "@id": "https://meatmassagers.ru/slicers",
-          "url": "https://meatmassagers.ru/slicers",
-          "name": "Слайсеры для нарезки мяса и овощей — купить промышленный слайсер",
-          "description": "Промышленные слайсеры для точной нарезки мяса, рыбы и овощей. Толщина от 1 мм, до 260 резов/мин.",
-          "isPartOf": { "@id": "https://meatmassagers.ru/#website" }
-        },
-        {
-          "@type": "WebSite",
-          "@id": "https://meatmassagers.ru/#website",
-          "url": "https://meatmassagers.ru",
-          "name": "Техно-Сиб — оборудование для маринования и посола мяса",
-          "publisher": { "@id": "https://meatmassagers.ru/#org" }
-        },
-        {
-          "@type": "Organization",
-          "@id": "https://meatmassagers.ru/#org",
-          "name": "Техно-Сиб",
-          "url": "https://meatmassagers.ru",
-          "telephone": "+7-800-505-91-24",
-          "email": "massagers@t-sib.ru",
-          "address": { "@type": "PostalAddress", "addressCountry": "RU", "addressLocality": "Новосибирск" },
-          "foundingDate": "2001",
-          "description": "Поставщик профессионального пищевого оборудования с 2001 года. Вакуумные массажеры, инъекторы и слайсеры для мяса."
-        },
-        {
-          "@type": "BreadcrumbList",
-          "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://meatmassagers.ru/" },
-            { "@type": "ListItem", "position": 2, "name": "Слайсеры для нарезки", "item": "https://meatmassagers.ru/slicers" }
-          ]
-        },
-        {
-          "@type": "FAQPage",
-          "mainEntity": [
-            { "@type": "Question", "name": "Какую минимальную толщину нарезки обеспечивает слайсер?", "acceptedAnswer": { "@type": "Answer", "text": "Наши слайсеры обеспечивают нарезку от 1 мм с погрешностью менее 1%. Точная настройка толщины позволяет получить одинаковые ломтики для любого продукта." }},
-            { "@type": "Question", "name": "Какие продукты можно нарезать?", "acceptedAnswer": { "@type": "Answer", "text": "Слайсеры работают с мясом (свежим и замороженным), птицей, рыбой, сыром, овощами и деликатесами. Модели подбираются под конкретный продукт и задачу." }},
-            { "@type": "Question", "name": "Как часто нужно менять ножи?", "acceptedAnswer": { "@type": "Answer", "text": "Ресурс ножей зависит от интенсивности работы и типа продукта. В среднем заточка требуется каждые 2–4 недели. Замена ножей — простая процедура без специальных инструментов." }},
-            { "@type": "Question", "name": "Какая производительность слайсеров?", "acceptedAnswer": { "@type": "Answer", "text": "До 260 резов в минуту в зависимости от модели. Точная производительность зависит от типа продукта и толщины нарезки." }},
-            { "@type": "Question", "name": "Как устроена санитарная обработка?", "acceptedAnswer": { "@type": "Answer", "text": "Корпус из нержавеющей стали, быстросъёмные детали. Полная мойка занимает 15–30 минут стандартными дезинфектантами." }}
-          ]
-        }
-      ]
-    };
-    let scriptEl = document.getElementById("schema-slicers");
-    if (!scriptEl) { scriptEl = document.createElement("script"); scriptEl.id = "schema-slicers"; scriptEl.setAttribute("type", "application/ld+json"); document.head.appendChild(scriptEl); }
-    scriptEl.textContent = JSON.stringify(schema);
-
     return () => {
       document.title = "Массажеры и инъекторы от Техносиб";
       const canonical = document.querySelector("link[rel='canonical']");
       if (canonical) canonical.remove();
-      const schemaEl = document.getElementById("schema-slicers");
-      if (schemaEl) schemaEl.remove();
     };
   }, []);
 
   useEffect(() => {
-    const ids = ["hero","benefits","catalog","compare","service","selector","about","faq","contacts"];
+    const ids = ["hero","benefits","catalog","industries","compare","service","selector","faq","technosib","contacts"];
     setVisibleSections((prev) => ({ ...prev, hero: true }));
     const observers: Record<string, IntersectionObserver> = {};
     ids.forEach((id) => {
@@ -293,29 +237,30 @@ const Slicers = () => {
       const hash = window.location.hash;
       if (hash.startsWith("#product-")) {
         const productId = hash.slice("#product-".length);
-        const found = (d.slicers || []).find((it: CatalogItem) => it.id === productId);
-        if (found) { setCatalogExpanded(true); setTimeout(() => { setSelectedItem(found); setSelectedSlide(0); const el = document.getElementById("product-" + productId); if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 100); }
+        const found = (d.icemakers || []).find((it: CatalogItem) => it.id === productId);
+        if (found) { setCatalogExpanded(true); setSelectedItem(found); setSelectedSlide(0); }
       }
-    }).finally(() => setCatalogLoading(false));
+      setCatalogLoading(false);
+    }).catch(() => setCatalogLoading(false));
   }, []);
 
   const filteredItems = useCallback(() => {
     if (!catalogData) return [];
-    const items = catalogData.slicers;
+    const items = catalogData.icemakers || [];
     if (!catalogSearch.trim()) return items;
     const q = catalogSearch.toLowerCase();
     return items.filter((it) => it.name.toLowerCase().includes(q) || (it.brand || "").toLowerCase().includes(q));
   }, [catalogData, catalogSearch]);
 
   const navLinks = [
-    { href: "/",             label: "Массажеры" },
-    { href: "/injector",     label: "Инъекторы" },
-    { href: "/ldogenerator", label: "Льдогенераторы" },
-    { href: "#catalog",      label: "Каталог" },
-    { href: "#benefits",     label: "Преимущества" },
-    { href: "#technosib",    label: "О компании" },
-    { href: "#faq",          label: "Вопросы" },
-    { href: "#contacts",     label: "Контакты" },
+    { href: "/",                label: "Массажеры" },
+    { href: "/injector",        label: "Инъекторы" },
+    { href: "/slicers",         label: "Слайсеры" },
+    { href: "#catalog",         label: "Каталог" },
+    { href: "#benefits",        label: "Преимущества" },
+    { href: "#industries",      label: "Отрасли" },
+    { href: "#faq",             label: "Вопросы" },
+    { href: "#contacts",        label: "Контакты" },
   ];
 
   return (
@@ -328,7 +273,7 @@ const Slicers = () => {
               <span className="text-xs text-muted-foreground leading-tight mt-0.5 hidden sm:block">Оборудование для маринования и посола мяса</span>
             </div>
             <nav className="hidden lg:flex gap-6 text-sm font-semibold">
-              {navLinks.map((l) => (<a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">{l.label}</a>))}
+              {navLinks.map((l) => (<a key={l.label} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">{l.label}</a>))}
             </nav>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-shrink-0">
@@ -341,7 +286,7 @@ const Slicers = () => {
             <button className="lg:hidden p-2 text-muted-foreground flex-shrink-0" onClick={() => setMenuOpen(!menuOpen)}><Icon name={menuOpen ? "X" : "Menu"} size={22} /></button>
           </div>
         </div>
-        {menuOpen && (<div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4"><span className="text-xs text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>{navLinks.map((l) => (<a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>{l.label}</a>))}</div>)}
+        {menuOpen && (<div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4"><span className="text-xs text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>{navLinks.map((l) => (<a key={l.label} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>{l.label}</a>))}</div>)}
       </header>
 
       <section id="hero" className="relative pt-24 sm:pt-28 pb-14 sm:pb-20 px-4 sm:px-6 bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
@@ -350,15 +295,25 @@ const Slicers = () => {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div className={`transition-all duration-1000 ${vis("hero") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               <span className="inline-block text-xs font-semibold tracking-widest text-primary uppercase border border-primary/30 rounded-full px-4 py-1.5 mb-4 bg-primary/5">Поставка и внедрение</span>
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-display font-black leading-[1.05] tracking-tight mb-4 text-foreground">Слайсеры для точной нарезки{" "}<span className="text-primary">мяса и овощей</span></h1>
-              <p className="text-xl sm:text-2xl font-semibold text-foreground leading-relaxed mb-6 max-w-xl">От ведущих производителей мясного оборудования</p>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-black leading-[1.07] tracking-tight mb-4 text-foreground">Промышленные льдогенераторы{" "}<span className="text-primary">от 90 до 10 000 кг</span> льда в сутки</h1>
+              <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed mb-7 max-w-xl">Чешуйчатый и гранулированный лёд для мясопереработки, рыбной отрасли, хлебопечения и торговли. Подберём модель под вашу производительность — от компактной до промышленной линии.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 max-w-xl">
+                {[
+                  { emoji: "❄️", text: "Производительность 90–10 000 кг/сутки — модель под любой объём" },
+                  { emoji: "⚙️", text: "Надёжные агрегаты на годы" },
+                  { emoji: "🏭", text: "Нержавеющая сталь AISI 304 — для пищевого производства" },
+                  { emoji: "🛡️", text: "Гарантия до 2 лет + поставка по всей России и ТС" },
+                ].map((t, i) => (
+                  <div key={i} className="flex items-start gap-2.5 text-sm font-medium text-foreground"><span className="text-lg leading-none flex-shrink-0">{t.emoji}</span><span>{t.text}</span></div>
+                ))}
+              </div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button onClick={() => setModalOpen(true)} className="px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 text-center">Рассчитать решение</button>
-                <a href="#catalog" className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all text-center">Смотреть оборудование</a>
+                <a href="#selector" className="px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 text-center">Подобрать льдогенератор</a>
+                <button onClick={() => { setModalProduct(""); setModalOpen(true); }} className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all text-center">Получить КП за 15 минут</button>
               </div>
             </div>
             <div className={`hidden lg:block transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
-              <img src="https://cdn.poehali.dev/files/88c2481b-fd8b-4f5f-9015-582ce1edcb78.jpg" alt="Слайсер Daribo" className="w-full h-auto object-contain lg:scale-110" />
+              <img src="https://cdn.poehali.dev/projects/63874bed-e293-4b07-975b-a3b344891b91/files/362214e7-927a-4e58-a79c-737cc98a25b7.jpg" alt="Промышленный льдогенератор" className="w-full h-auto object-contain rounded-3xl shadow-xl" />
             </div>
           </div>
         </div>
@@ -366,15 +321,15 @@ const Slicers = () => {
 
       <section id="benefits" className="py-12 px-6 bg-gradient-to-br from-primary/5 via-white to-primary/10">
         <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-14 transition-all duration-1000 ${vis("benefits") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground">Преимущества наших слайсеров</h2></div>
+          <div className={`text-center mb-14 transition-all duration-1000 ${vis("benefits") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground">Почему выбирают наши льдогенераторы</h2></div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {[
-              { icon: "Ruler", title: "Толщина от 1 мм", desc: "Погрешность менее 1% — точная нарезка каждого ломтика" },
-              { icon: "Zap", title: "До 260 резов/мин", desc: "Высокая скорость нарезки для максимальной производительности" },
-              { icon: "Scale", title: "Порционирование", desc: "Интеллектуальное порционирование по весу и толщине — минимум отходов" },
-              { icon: "Shield", title: "Нержавеющая сталь", desc: "Гигиеничность и влагозащита — соответствие стандартам пищевой безопасности" },
-              { icon: "Wrench", title: "Удобство эксплуатации", desc: "Простая санитарная обработка и быстрая замена ножей" },
-              { icon: "Settings", title: "Программирование", desc: "Сохранение до 99 рецептур нарезки для повторяемого результата" },
+              { icon: "Snowflake", title: "Лёд, который не тупит ножи куттеров", desc: "Толщина чешуек 0,6–0,9 мм и температура −6…−9 °C — лёд мгновенно смешивается с фаршем, не перегружая оборудование." },
+              { icon: "Fish", title: "Хранение рыбы до 28 суток", desc: "Чешуйчатый лёд бережно обволакивает продукт без острых краёв — сохраняет товарный вид рыбы и морепродуктов на витрине и в транспортировке." },
+              { icon: "Gauge", title: "Премиальные компрессорные агрегаты", desc: "Ресурс и стабильность работы — оборудование рассчитано на непрерывную эксплуатацию." },
+              { icon: "Cpu", title: "Полная автоматизация", desc: "Микропроцессорное управление с самодиагностикой, таймер программирования на 2 недели, автоподдержание уровня воды." },
+              { icon: "Boxes", title: "Моноблок или библок — на выбор", desc: "Библочное исполнение позволяет вынести агрегат за пределы цеха — экономия площади и температурный режим в рабочей зоне." },
+              { icon: "Shield", title: "Пищевая нержавеющая сталь AISI 304", desc: "Соответствие техрегламентам ТС, гигиеничность, долговечность корпуса." },
             ].map((feat, i) => (
               <div key={i} className={`p-7 bg-white border border-border rounded-2xl hover:border-primary/40 hover:shadow-lg transition-all flex flex-col gap-4 ${vis("benefits") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 90}ms`, transitionDuration: "700ms" }}>
                 <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center"><Icon name={feat.icon} fallback="Star" size={28} className="text-primary" /></div>
@@ -387,8 +342,9 @@ const Slicers = () => {
 
       <section id="catalog" className="py-12 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-14 transition-all duration-1000 ${vis("catalog") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Каталог слайсеров</h2>
+          <div className={`text-center mb-10 transition-all duration-1000 ${vis("catalog") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Каталог льдогенераторов</h2>
+            <p className="text-lg text-muted-foreground mt-4">Модели в наличии и под заказ — от компактных до промышленных линий</p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">
             <div className="relative w-full sm:w-80">
@@ -503,25 +459,38 @@ const Slicers = () => {
                 {inquiryPhoneTouched && !isValidPhone(inquiryPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
               </div>
               <ConsentCheckbox checked={inquiryConsent} onChange={setInquiryConsent} />
-              <button onClick={() => { if (isValidPhone(inquiryPhone) && inquiryConsent && !sending) { sendLead({ name: inquiryName || "—", phone: inquiryPhone, product: inquiryItem?.name, topic: 'слайсеры', formType: 'inquiry' }); setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false); setInquiryConsent(false); } }} disabled={!isValidPhone(inquiryPhone) || !inquiryConsent || sending} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-lg transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
+              <button onClick={() => { if (isValidPhone(inquiryPhone) && inquiryConsent && !sending) { sendLead({ name: inquiryName || "—", phone: inquiryPhone, product: inquiryItem?.name, topic: 'льдогенераторы', formType: 'inquiry' }); setInquiryItem(null); setInquiryName(""); setInquiryPhone(""); setInquiryPhoneTouched(false); setInquiryConsent(false); } }} disabled={!isValidPhone(inquiryPhone) || !inquiryConsent || sending} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-lg transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
             </div>
           </div>
         </div>
       )}
 
-      <section className="py-12 px-6 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10"><span className="text-xs font-semibold tracking-widest text-primary uppercase">Смотрите в деле</span><h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground">Посмотрите как работает наше оборудование</h2></div>
-          <div className="rounded-3xl overflow-hidden shadow-xl border border-border aspect-video">
-            <iframe src="https://rutube.ru/play/embed/8da885b0d83746946a92da33e0538c41/" className="w-full h-full" allowFullScreen allow="autoplay; fullscreen" title="Оборудование для нарезки" />
+      <section id="industries" className="py-12 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className={`text-center mb-14 transition-all duration-1000 ${vis("industries") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground">Для каких задач нужен льдогенератор</h2></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { emoji: "🥩", title: "Мясопереработка", problem: "Фарш перегревается при куттеровании", solution: "лёд −6 °C держит температуру, не тупит ножи" },
+              { emoji: "🐟", title: "Рыба и морепродукты", problem: "Быстрая порча, потеря вида", solution: "охлаждение от вылова до прилавка, хранение до 28 суток" },
+              { emoji: "🥖", title: "Хлебопечение", problem: "Тесто перегревается при замесе", solution: "ледяная вода / лёд для контроля температуры теста" },
+              { emoji: "🛒", title: "Торговля, HoReCa", problem: "Невзрачная витрина", solution: "красивая выкладка рыбы и деликатесов на льду, салат-бары" },
+              { emoji: "🥦", title: "Сельское хозяйство", problem: "Перегрев урожая", solution: "предварительное охлаждение овощей и фруктов" },
+              { emoji: "🏗️", title: "Строительство, фарма", problem: "Нагрев процессов", solution: "охлаждение бетона, технологических процессов, ледяная вода" },
+            ].map((item, i) => (
+              <div key={i} className={`p-7 bg-background border border-border rounded-2xl hover:border-primary/40 hover:shadow-lg transition-all flex flex-col gap-3 ${vis("industries") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 80}ms`, transitionDuration: "700ms" }}>
+                <div className="flex items-center gap-3"><span className="text-3xl leading-none">{item.emoji}</span><h3 className="font-bold text-xl text-foreground">{item.title}</h3></div>
+                <div className="flex items-start gap-2 text-sm"><Icon name="AlertCircle" size={18} className="text-red-400 flex-shrink-0 mt-0.5" /><span className="text-muted-foreground">{item.problem}</span></div>
+                <div className="flex items-start gap-2 text-sm"><Icon name="CheckCircle" size={18} className="text-primary flex-shrink-0 mt-0.5" /><span className="text-foreground font-medium">{item.solution}</span></div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       <section id="compare" className="py-12 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ${vis("compare") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Хотите подобрать оборудование?</h2></div>
-          <div className="max-w-md mx-auto"><CompareForm onSent={(name, phone) => sendLead({ name, phone, topic: 'слайсеры', formType: 'compare' })} /></div>
+          <div className={`text-center mb-16 transition-all duration-1000 ${vis("compare") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Хотите подобрать льдогенератор?</h2></div>
+          <div className="max-w-md mx-auto"><CompareForm onSent={(name, phone) => sendLead({ name, phone, topic: 'льдогенераторы', formType: 'compare' })} /></div>
         </div>
       </section>
 
@@ -546,29 +515,9 @@ const Slicers = () => {
           <div className={`text-center mb-16 transition-all duration-1000 ${vis("selector") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
             <span className="text-xs font-semibold tracking-widest text-primary uppercase">Подбор оборудования</span>
             <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Ответьте на 4 вопроса — получите решение</h2>
-            <p className="text-lg text-muted-foreground mt-4">Технолог подберёт слайсер и пришлёт КП в течение 2 часов</p>
+            <p className="text-lg text-muted-foreground mt-4">Технолог подберёт льдогенератор и пришлёт КП в течение 2 часов</p>
           </div>
-          <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, topic: 'слайсеры', formType: 'quiz' })} />
-        </div>
-      </section>
-
-      <section id="about" className="py-12 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className={`transition-all duration-1000 ${vis("about") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-              <span className="text-xs font-semibold tracking-widest text-primary uppercase">О компании</span>
-              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 mb-6 text-foreground">О компании Daribo (Дарибо)</h2>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-5">Мы предлагаем оборудование компании <strong className="text-foreground">Daribo (Дарибо)</strong>. «Shanghai DARIBO Food Machinery Co., Ltd» — крупный производитель оборудования для пищевой промышленности, базирующийся в Шанхае.</p>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-5">Специализация Daribo (Дарибо) включает вакуумные массажеры (серия GRY, например DRB-GRY750L), автоматические инъекторы рассола, слайсеры, порционирующие машины, волчки для замороженного мяса, блокорезки, вакуумные фаршемесы, котлетные машины и полные производственные линии под ключ. Поставляет продукцию в США, Мексику, Францию, Индонезию, Таиланд, Филиппины и другие страны.</p>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-8">Специализация Daribo (Дарибо) включает <strong className="text-foreground">вакуумные массажеры</strong> (серия GRY, например DRB-GRY750L), <strong className="text-foreground">инъекторы рассола</strong>, мясорезки, котлетные машины и полные производственные линии под ключ.</p>
-              <div className="grid grid-cols-2 gap-3">
-                {[{ icon: "Building2", text: "Производитель: Шанхай" },{ icon: "Globe", text: "Поставки в 20+ стран" },{ icon: "Factory", text: "Полные линии под ключ" },{ icon: "Settings", text: "Подбор режимов и сервис" }].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 p-4 bg-primary/5 border border-primary/10 rounded-xl"><Icon name={item.icon} fallback="Star" size={18} className="text-primary flex-shrink-0" /><span className="text-sm font-medium text-foreground">{item.text}</span></div>
-                ))}
-              </div>
-            </div>
-            <div className={`transition-all duration-1000 delay-300 ${vis("about") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}><img src="https://cdn.poehali.dev/files/dbffb4e8-22d1-4072-9a78-6ecbbe2efa4f.jpg" alt="Завод Daribo, Шанхай" className="w-full rounded-3xl shadow-xl object-cover" /></div>
-          </div>
+          <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, topic: 'льдогенераторы', formType: 'quiz' })} />
         </div>
       </section>
 
@@ -577,11 +526,11 @@ const Slicers = () => {
           <div className={`text-center mb-16 transition-all duration-1000 ${vis("faq") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><span className="text-xs font-semibold tracking-widest text-primary uppercase">FAQ</span><h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Частые вопросы</h2></div>
           <div className="space-y-3 mb-12">
             {[
-              { q: "Какую минимальную толщину нарезки обеспечивает слайсер?", a: "Наши слайсеры обеспечивают нарезку от 1 мм с погрешностью менее 1%. Точная настройка толщины позволяет получить одинаковые ломтики для любого продукта." },
-              { q: "Какие продукты можно нарезать?", a: "Слайсеры работают с мясом (свежим и замороженным), птицей, рыбой, сыром, овощами и деликатесами. Модели подбираются под конкретный продукт и задачу." },
-              { q: "Как часто нужно менять ножи?", a: "Ресурс ножей зависит от интенсивности работы и типа продукта. В среднем заточка требуется каждые 2–4 недели. Замена ножей — простая процедура без специальных инструментов." },
-              { q: "Какая производительность слайсеров?", a: "До 260 резов в минуту в зависимости от модели. Точная производительность зависит от типа продукта и толщины нарезки." },
-              { q: "Как устроена санитарная обработка?", a: "Корпус из нержавеющей стали, быстросъёмные детали. Полная мойка занимает 15–30 минут стандартными дезинфектантами." },
+              { q: "Какую производительность выбрать?", a: "Производительность подбирается под суточную потребность производства — от 90 до 10 000 кг льда в сутки. Технолог рассчитает нужный объём по вашей задаче и подскажет оптимальную модель." },
+              { q: "Чем чешуйчатый лёд отличается от гранулированного?", a: "Чешуйчатый лёд — тонкие чешуйки 0,6–0,9 мм с температурой −6…−9 °C, идеален для мясопереработки и охлаждения рыбы. Гранулированный лёд плотнее, дольше тает и подходит для витрин и HoReCa." },
+              { q: "Что такое моноблок и библок?", a: "Моноблок — компактное исполнение, где компрессор и генератор в одном корпусе. Библок позволяет вынести компрессорный агрегат за пределы цеха — экономит площадь и снижает тепловую нагрузку в рабочей зоне." },
+              { q: "Из какого материала корпус?", a: "Корпус изготовлен из пищевой нержавеющей стали AISI 304 — соответствует техрегламентам Таможенного союза, гигиеничен и долговечен." },
+              { q: "Какая гарантия и доставка?", a: "Гарантия до 2 лет. Поставка по всей России и странам Таможенного союза, монтаж и пусконаладка под ключ." },
             ].map((faq, i) => (
               <div key={i} className={`bg-white border border-border rounded-2xl overflow-hidden transition-all duration-700 ${vis("faq") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${i * 60}ms` }}>
                 <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-primary/3 transition-colors"><span className="font-semibold text-base text-foreground pr-4">{faq.q}</span><Icon name={openFaq === i ? "ChevronUp" : "ChevronDown"} size={20} className="text-primary flex-shrink-0" /></button>
@@ -604,8 +553,7 @@ const Slicers = () => {
           <div className="bg-white rounded-2xl shadow-lg p-7 sm:p-10">
             <p className="text-lg text-muted-foreground leading-relaxed mb-5">Компания <strong className="text-foreground">«Техно-Сиб»</strong> — надёжный поставщик и партнёр в сфере профессионального пищевого и фасовочно-упаковочного оборудования. Мы работаем с 2001 года и уже 25 лет помогаем предприятиям эффективно оснащать производства, предоставляем сервисное обслуживание, а также реализуем упаковочные и расходные материалы.</p>
             <div className="border-l-4 border-primary bg-primary/5 rounded-r-xl px-5 py-4 mb-5"><p className="font-medium text-foreground">Мы сотрудничаем с ведущими заводами-производителями Европы, России и Китая, подбирая решения под задачи и бюджет клиента.</p></div>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-5">Собственные офисы продаж, склады, сервисная служба и отлаженная логистика в Москве и Новосибирске позволяют нам оперативно выполнять поставки и поддерживать оборудование на территории России и стран СНГ.</p>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8">Экспертиза наших специалистов помогает решать задачи любого уровня сложности — от подбора единичной позиции до комплексного оснащения. <strong className="text-foreground">«Техно-Сиб»</strong> всегда предложит оптимальное решение для вашего бизнеса и обеспечит надёжную поддержку на всех этапах работы.</p>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-8">Собственные офисы продаж, склады, сервисная служба и отлаженная логистика в Москве и Новосибирске позволяют нам оперативно выполнять поставки и поддерживать оборудование на территории России и стран СНГ.</p>
             <div className="border-t border-border/50 pt-7 grid sm:grid-cols-2 gap-5">
               {[{ title: "Комплексные решения", desc: "От подбора оборудования до сервисного обслуживания" },{ title: "Быстрая доставка", desc: "Собственная логистика по всей России и СНГ" },{ title: "Сервисная поддержка", desc: "Гарантийное и постгарантийное обслуживание" },{ title: "Экспертная консультация", desc: "Помощь в выборе оптимального решения" }].map((f, i) => (
                 <div key={i} className="flex items-start gap-3"><Icon name="CheckCircle" size={22} className="text-primary flex-shrink-0 mt-0.5" /><div><p className="font-semibold text-foreground">{f.title}</p><p className="text-sm text-muted-foreground">{f.desc}</p></div></div>
@@ -622,8 +570,8 @@ const Slicers = () => {
             <div className={`transition-all duration-1000 ${vis("contacts") ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}>
               <div className="flex justify-center mb-10">
                 <div className="p-8 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-3xl shadow-xl w-full max-w-sm">
-                  <div className="flex justify-center mb-6"><div className="w-28 h-28 bg-primary/10 rounded-2xl flex items-center justify-center"><Icon name="Factory" size={56} className="text-primary" /></div></div>
-                  <p className="text-center text-sm font-medium text-muted-foreground mb-6">Оборудование в чистом пищевом цехе</p>
+                  <div className="flex justify-center mb-6"><div className="w-28 h-28 bg-primary/10 rounded-2xl flex items-center justify-center"><Icon name="Snowflake" size={56} className="text-primary" /></div></div>
+                  <p className="text-center text-sm font-medium text-muted-foreground mb-6">Льдогенераторы для пищевого производства</p>
                   <div className="space-y-4">
                     {[{ icon: "Phone", label: "Телефон", value: "8 800 505-91-24", href: "tel:88005059124", goal: "click_phone" },{ icon: "Mail", label: "Почта", value: "massagers@t-sib.ru", href: "mailto:massagers@t-sib.ru", goal: "click_email" }].map((c, i) => (
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -640,9 +588,9 @@ const Slicers = () => {
                 <div className="space-y-4">
                   <input type="text" placeholder="Имя *" required value={contactsName} onChange={e => setContactsName(e.target.value)} className={inputCls} />
                   <div><input type="tel" placeholder="+7 (___) ___-__-__" required value={contactsPhone} onChange={e => setContactsPhone(formatPhone(contactsPhone, e.target.value))} onBlur={() => setContactsPhoneTouched(true)} className={contactsPhoneTouched && !isValidPhone(contactsPhone) ? inputError : inputCls} />{contactsPhoneTouched && !isValidPhone(contactsPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}</div>
-                  <textarea placeholder="Комментарий (продукт, объём, задача)" rows={4} value={contactsComment} onChange={e => setContactsComment(e.target.value)} className={inputCls + " resize-none"} />
+                  <textarea placeholder="Комментарий (тип льда, объём, задача)" rows={4} value={contactsComment} onChange={e => setContactsComment(e.target.value)} className={inputCls + " resize-none"} />
                   <ConsentCheckbox checked={contactsConsent} onChange={setContactsConsent} />
-                  <button onClick={() => { if (contactsName.trim() && isValidPhone(contactsPhone) && contactsConsent && !sending) { sendLead({ name: contactsName, phone: contactsPhone, comment: contactsComment, topic: 'слайсеры', formType: 'contacts' }); setContactsName(""); setContactsPhone(""); setContactsComment(""); setContactsPhoneTouched(false); setContactsConsent(false); } }} disabled={!contactsName.trim() || !isValidPhone(contactsPhone) || !contactsConsent || sending} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-base transition-all shadow-sm disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
+                  <button onClick={() => { if (contactsName.trim() && isValidPhone(contactsPhone) && contactsConsent && !sending) { sendLead({ name: contactsName, phone: contactsPhone, comment: contactsComment, topic: 'льдогенераторы', formType: 'contacts' }); setContactsName(""); setContactsPhone(""); setContactsComment(""); setContactsPhoneTouched(false); setContactsConsent(false); } }} disabled={!contactsName.trim() || !isValidPhone(contactsPhone) || !contactsConsent || sending} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-base transition-all shadow-sm disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
                 </div>
               </div>
             </div>
@@ -654,14 +602,14 @@ const Slicers = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setModalOpen(false)}>
           <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <div><h3 className="font-display font-bold text-2xl text-foreground">{modalProduct === "consult" ? "Получить консультацию технолога" : modalProduct ? "Запросить КП" : "Получить предложение"}</h3>{modalProduct && modalProduct !== "consult" && (<p className="text-sm text-primary mt-1">{modalProduct}</p>)}</div>
+              <div><h3 className="font-display font-bold text-2xl text-foreground">{modalProduct === "consult" ? "Получить консультацию технолога" : modalProduct ? "Запросить КП" : "Получить КП за 15 минут"}</h3>{modalProduct && modalProduct !== "consult" && (<p className="text-sm text-primary mt-1">{modalProduct}</p>)}</div>
               <button onClick={() => setModalOpen(false)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-background hover:bg-primary/10 transition-colors"><Icon name="X" size={20} className="text-muted-foreground" /></button>
             </div>
             <div className="space-y-4">
               <input type="text" placeholder="Имя *" required value={modalName} onChange={e => setModalName(e.target.value)} className={inputCls} />
               <div><input type="tel" placeholder="+7 (___) ___-__-__" required value={modalPhone} onChange={e => setModalPhone(formatPhone(modalPhone, e.target.value))} onBlur={() => setModalPhoneTouched(true)} className={modalPhoneTouched && !isValidPhone(modalPhone) ? inputError : inputCls} />{modalPhoneTouched && !isValidPhone(modalPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}</div>
               <ConsentCheckbox checked={modalConsent} onChange={setModalConsent} />
-              <button onClick={() => { if (modalName.trim() && isValidPhone(modalPhone) && modalConsent && !sending) { sendLead({ name: modalName, phone: modalPhone, product: modalProduct, topic: 'слайсеры', formType: 'modal' }); setModalOpen(false); setModalName(""); setModalPhone(""); setModalPhoneTouched(false); setModalConsent(false); } }} disabled={!modalName.trim() || !isValidPhone(modalPhone) || !modalConsent || sending} style={{ backgroundColor: "#D98E5C" }} className="w-full py-4 text-white rounded-xl font-bold text-lg hover:brightness-95 transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
+              <button onClick={() => { if (modalName.trim() && isValidPhone(modalPhone) && modalConsent && !sending) { sendLead({ name: modalName, phone: modalPhone, product: modalProduct, topic: 'льдогенераторы', formType: 'modal' }); setModalOpen(false); setModalName(""); setModalPhone(""); setModalPhoneTouched(false); setModalConsent(false); } }} disabled={!modalName.trim() || !isValidPhone(modalPhone) || !modalConsent || sending} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-lg transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
             </div>
           </div>
         </div>
@@ -685,20 +633,20 @@ const Slicers = () => {
               <div className="space-y-2">
                 <a href="/" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Вакуумные массажеры</a>
                 <a href="/injector" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Инъекторы</a>
-                <a href="/ldogenerator" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Льдогенераторы</a>
-                <a href="#catalog" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Каталог слайсеров</a>
+                <a href="/slicers" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Слайсеры</a>
+                <a href="#catalog" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Каталог льдогенераторов</a>
               </div>
             </div>
             <div>
               <p className="font-semibold text-sm text-foreground mb-3">Компания</p>
               <div className="space-y-2">
-                {["#benefits", "#compare", "#service", "#technosib", "#faq"].map((href, i) => (<a key={i} href={href} className="block text-sm text-muted-foreground hover:text-primary transition-colors">{["Преимущества", "Подбор оборудования", "От подбора до запуска", "О компании Техно-Сиб", "Вопросы"][i]}</a>))}
+                {["#benefits", "#industries", "#service", "#technosib", "#faq"].map((href, i) => (<a key={i} href={href} className="block text-sm text-muted-foreground hover:text-primary transition-colors">{["Преимущества", "Отрасли", "От подбора до запуска", "О компании Техно-Сиб", "Вопросы"][i]}</a>))}
               </div>
             </div>
             <div>
               <p className="font-semibold text-sm text-foreground mb-3">Подбор</p>
               <div className="space-y-2">
-                {[["#compare", "Подобрать оборудование"], ["#contacts", "Контакты"], ["#contacts", "Запросить КП"]].map(([href, label], i) => (<a key={i} href={href} className="block text-sm text-muted-foreground hover:text-primary transition-colors">{label}</a>))}
+                {[["#selector", "Подобрать льдогенератор"], ["#contacts", "Контакты"], ["#contacts", "Запросить КП"]].map(([href, label], i) => (<a key={i} href={href} className="block text-sm text-muted-foreground hover:text-primary transition-colors">{label}</a>))}
               </div>
               <div className="mt-6"><a href="#contacts" className="inline-block px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-full hover:bg-primary/90 transition-all shadow-sm">Рассчитать решение</a></div>
             </div>
@@ -709,17 +657,6 @@ const Slicers = () => {
           </div>
         </div>
       </footer>
-
-      {videoOpen && (
-        <div className="fixed inset-0 z-[150] bg-black/95 flex items-center justify-center p-4" onClick={() => setVideoOpen(false)}>
-          <button onClick={() => setVideoOpen(false)} className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
-            <Icon name="X" size={24} className="text-white" />
-          </button>
-          <div className="w-full max-w-5xl aspect-video" onClick={(e) => e.stopPropagation()}>
-            <iframe src="https://rutube.ru/play/embed/8da885b0d83746946a92da33e0538c41/" className="w-full h-full rounded-2xl" allowFullScreen allow="autoplay; fullscreen" title="Оборудование для нарезки" />
-          </div>
-        </div>
-      )}
 
       {lightboxOpen && lightboxPhotos.length > 0 && (
         <div className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center" onClick={() => setLightboxOpen(false)}>
@@ -747,9 +684,9 @@ const Slicers = () => {
         </div>
       )}
 
-      <QuizSideTrigger storageKey="quiz_auto_slicers">
+      <QuizSideTrigger storageKey="quiz_auto_ldogenerator">
         {(close) => (
-          <QuizBlock onSent={(name, phone, quizAnswers) => { sendLead({ name, phone, quizAnswers, topic: 'слайсеры', formType: 'quiz' }); close(); }} />
+          <QuizBlock onSent={(name, phone, quizAnswers) => { sendLead({ name, phone, quizAnswers, topic: 'льдогенераторы', formType: 'quiz' }); close(); }} />
         )}
       </QuizSideTrigger>
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
@@ -757,4 +694,4 @@ const Slicers = () => {
   );
 };
 
-export default Slicers;
+export default LDOGenerator;
