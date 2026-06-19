@@ -6,7 +6,7 @@ import QuizSideTrigger from "@/components/QuizSideTrigger";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
 
-const CATALOG_URL = "https://functions.poehali.dev/7093349e-12b4-4025-a465-82ce3b87b0b2";
+const CATALOG_URL = "https://functions.poehali.dev/6070fa9b-5de5-408c-984f-0ae244eb68ef";
 
 interface CatalogItem {
   id: string;
