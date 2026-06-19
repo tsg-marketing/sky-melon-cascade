@@ -256,6 +256,28 @@ const LDOGenerator = () => {
     return items.filter((it) => it.name.toLowerCase().includes(q) || (it.brand || "").toLowerCase().includes(q));
   }, [catalogData, catalogSearch]);
 
+  const openModelModal = (model: string) => {
+    const items = catalogData?.icemakers || [];
+    const q = model.toLowerCase().replace(/\s+/g, "");
+    const found = items.find((it) => {
+      const hay = (it.name + " " + (it.brand || "")).toLowerCase().replace(/\s+/g, "");
+      return hay.includes(q);
+    });
+    if (found) {
+      setSelectedItem(found);
+      setSelectedSlide(0);
+      history.replaceState(null, "", `#product-${found.id}`);
+    } else {
+      setCatalogSearch(model);
+      document.getElementById("catalog")?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const closeProductModal = () => {
+    setSelectedItem(null);
+    history.replaceState(null, "", window.location.pathname);
+  };
+
   const navLinks = [
     { href: "#catalog",         label: "Каталог" },
     { href: "#segmentation",    label: "Линейка" },
@@ -394,16 +416,16 @@ const LDOGenerator = () => {
                           {item.brand && item.brand.toLowerCase() !== "hualian" && (<div className="absolute top-3 left-3 bg-white/95 text-primary text-xs font-bold px-3 py-1 rounded-full shadow-sm border border-primary/20 uppercase tracking-wide">{item.brand}</div>)}
                         </div>
                         <div className="p-5 flex flex-col flex-1">
-                          <h3 className="font-bold text-2xl text-foreground mb-2 leading-snug cursor-pointer hover:text-primary transition-colors" onClick={() => { setSelectedItem(item); setSelectedSlide(0); }}>{item.name}</h3>
+                          <h3 className="font-bold text-2xl text-foreground mb-2 leading-snug cursor-pointer hover:text-primary transition-colors" onClick={() => { setSelectedItem(item); setSelectedSlide(0); history.replaceState(null, "", `#product-${item.id}`); }}>{item.name}</h3>
                           {item.price_display && (<p className="text-xl font-black text-primary mb-3">{item.price_display}</p>)}
                           <div className="space-y-1.5 mb-4 flex-1">
                             {item.productivity && (<div className="flex items-start gap-2 text-base"><Icon name="Zap" size={16} className="text-primary flex-shrink-0 mt-0.5" /><span className="text-muted-foreground"><span className="font-medium text-foreground">{item.productivity.name}:</span> {item.productivity.value}</span></div>)}
-                            {item.extra_params.map((p, pi) => (<div key={pi} className="flex items-start gap-2 text-base"><Icon name="ChevronRight" size={16} className="text-primary flex-shrink-0 mt-0.5" /><span className="text-muted-foreground"><span className="font-medium text-foreground">{p.name}:</span> {p.value}</span></div>))}
+                            {item.all_params.filter((p) => p.name !== "GUID" && p.name.toLowerCase() !== "бренд" && (!item.productivity || p.name !== item.productivity.name)).map((p, pi) => (<div key={pi} className="flex items-start gap-2 text-base"><Icon name="ChevronRight" size={16} className="text-primary flex-shrink-0 mt-0.5" /><span className="text-muted-foreground"><span className="font-medium text-foreground">{p.name}:</span> {p.value}</span></div>))}
                           </div>
                           <div className="flex flex-col gap-2 mt-2">
                             <button onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); setInquiryConsent(false); }} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-base font-bold transition-all shadow-md">Оставить заявку</button>
                             <div className="flex gap-2">
-                              <button onClick={() => { setSelectedItem(item); setSelectedSlide(0); }} className="flex-1 py-3.5 border-2 border-orange-500 text-orange-500 rounded-xl text-base font-semibold hover:bg-orange-50 transition-all">Подробнее</button>
+                              <button onClick={() => { setSelectedItem(item); setSelectedSlide(0); history.replaceState(null, "", `#product-${item.id}`); }} className="flex-1 py-3.5 border-2 border-orange-500 text-orange-500 rounded-xl text-base font-semibold hover:bg-orange-50 transition-all">Подробнее</button>
                               {(() => { const qty = getQuantity(item.id); return qty > 0 ? (<div className="flex items-center gap-1 border-2 border-primary rounded-xl px-2"><button onClick={() => removeItem(item.id)} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">−</button><span className="w-5 text-center font-bold text-primary text-sm">{qty}</span><button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">+</button></div>) : (<button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="py-3.5 px-4 border-2 border-primary/30 text-primary rounded-xl hover:border-primary hover:bg-primary/5 transition-all" title="В корзину"><Icon name="ShoppingCart" size={18} /></button>); })()}
                             </div>
                           </div>
@@ -421,10 +443,10 @@ const LDOGenerator = () => {
       </section>
 
       {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={() => setSelectedItem(null)}>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={closeProductModal}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div className="relative bg-white w-full sm:rounded-3xl shadow-2xl sm:max-w-4xl rounded-t-3xl overflow-hidden" style={{ maxHeight: "95dvh" }} onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setSelectedItem(null)} className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/90 hover:bg-white border border-border rounded-full flex items-center justify-center shadow-sm transition-all"><Icon name="X" size={18} className="text-foreground" /></button>
+            <button onClick={closeProductModal} className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/90 hover:bg-white border border-border rounded-full flex items-center justify-center shadow-sm transition-all"><Icon name="X" size={18} className="text-foreground" /></button>
             <div className="sm:hidden flex justify-center pt-3 pb-1"><div className="w-10 h-1 bg-border rounded-full" /></div>
             <div className="overflow-y-auto" style={{ maxHeight: "95dvh" }}>
               <div className="flex flex-col sm:flex-row gap-0">
@@ -456,7 +478,7 @@ const LDOGenerator = () => {
                     </div>
                   )}
                   <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                    <button onClick={() => { setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); setSelectedItem(null); }} className="flex-1 py-4 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md">Оставить заявку</button>
+                    <button onClick={() => { setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); closeProductModal(); }} className="flex-1 py-4 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md">Оставить заявку</button>
                     {(() => { const qty = getQuantity(selectedItem.id); return qty > 0 ? (<div className="flex items-center gap-2 border-2 border-primary rounded-xl px-4"><button onClick={() => removeItem(selectedItem.id)} className="w-10 h-10 flex items-center justify-center text-primary font-bold text-xl hover:bg-primary/10 rounded-lg transition-colors">−</button><span className="w-6 text-center font-bold text-primary">{qty}</span><button onClick={() => addItem({ id: selectedItem.id, name: selectedItem.name, price: selectedItem.price, price_display: selectedItem.price_display, picture: selectedItem.pictures[0] })} className="w-10 h-10 flex items-center justify-center text-primary font-bold text-xl hover:bg-primary/10 rounded-lg transition-colors">+</button></div>) : (<button onClick={() => addItem({ id: selectedItem.id, name: selectedItem.name, price: selectedItem.price, price_display: selectedItem.price_display, picture: selectedItem.pictures[0] })} className="flex-1 py-4 border-2 border-primary/30 text-primary rounded-xl text-base font-semibold hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2"><Icon name="ShoppingCart" size={18} />В корзину</button>); })()}
                   </div>
                 </div>
@@ -510,8 +532,7 @@ const LDOGenerator = () => {
       <section id="segmentation" className="py-12 px-6 bg-gradient-to-br from-primary/5 via-white to-primary/10">
         <div className="max-w-7xl mx-auto">
           <div className={`text-center mb-12 transition-all duration-1000 ${vis("segmentation") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <span className="text-xs font-semibold tracking-widest text-primary uppercase">Линейка моделей</span>
-            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground">Как разобраться в линейке</h2>
+            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground">Как разобраться в линейке</h2>
             <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">Выберите свой объём производства — подсветим подходящие серии и модели</p>
           </div>
 
@@ -536,13 +557,12 @@ const LDOGenerator = () => {
                       <p className={`text-sm font-bold uppercase tracking-wide ${segLevel === i ? "text-primary" : "text-muted-foreground"}`}>{l.title}</p>
                       <p className="text-2xl font-display font-black text-foreground leading-tight">{l.range}</p>
                       <div className="flex flex-wrap gap-1.5 my-1">
-                        {l.models.map((m, mi) => (<span key={mi} className={`text-xs font-bold px-2.5 py-1 rounded-full ${segLevel === i ? "bg-primary text-white" : "bg-primary/10 text-primary"}`}>{m}</span>))}
+                        {l.models.map((m, mi) => (<button key={mi} onClick={(e) => { e.stopPropagation(); openModelModal(m); }} className={`text-xs font-bold px-2.5 py-1 rounded-full transition-all hover:brightness-95 cursor-pointer ${segLevel === i ? "bg-primary text-white" : "bg-primary/10 text-primary hover:bg-primary/20"}`}>{m}</button>))}
                       </div>
                       <p className="text-sm text-muted-foreground">{l.use}</p>
                     </div>
                   ))}
                 </div>
-                <div className="text-center mt-8"><a href="#catalog" className={btnPrimary + " inline-flex items-center gap-2"}>Смотреть модели<Icon name="ArrowRight" size={18} /></a></div>
               </div>
             );
           })()}
