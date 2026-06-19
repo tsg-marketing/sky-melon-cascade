@@ -98,10 +98,10 @@ const ConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (v
 );
 
 const QUIZ_QUESTIONS = [
-  { q: "Какой тип льда вам нужен?", options: ["Чешуйчатый лёд", "Гранулированный лёд", "Пока не определились"] },
-  { q: "Какая производительность нужна в сутки?", options: ["До 300 кг", "300–1000 кг", "1000–3000 кг", "Более 3000 кг"] },
-  { q: "Для какой отрасли подбираете оборудование?", options: ["Мясопереработка", "Рыба и морепродукты", "Хлебопечение", "Торговля / HoReCa", "Другое"] },
-  { q: "Какое исполнение предпочтительнее?", options: ["Моноблок", "Библок (агрегат выносится за цех)", "Нужна консультация"] },
+  { q: "Для какой отрасли нужен лёд?", options: ["Мясопереработка / куттерование", "Рыба и морепродукты", "Хлебопечение", "Торговля, HoReCa, витрины", "Сельское хозяйство / другое"] },
+  { q: "Какой объём льда нужен в сутки?", options: ["До 300 кг", "300–1000 кг", "1000–3000 кг", "Свыше 3000 кг", "Не знаю — нужна консультация"] },
+  { q: "Какой тип льда предпочтителен?", options: ["Чешуйчатый (для куттеров, рыбы, витрин)", "Гранулированный/кусковой (для охлаждения, теплообмена)", "Не знаю, подскажите"] },
+  { q: "Исполнение и условия размещения?", options: ["Моноблок (всё в одном корпусе)", "Библок (агрегат выносится из цеха)", "Нужна рекомендация"] },
 ];
 
 const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswers: Record<string, string>) => void }) => {
@@ -138,8 +138,8 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, quizAnswe
         </div>
       ) : (
         <div className="p-8 bg-white border-2 border-primary/20 rounded-3xl shadow-sm">
-          <h3 className="font-display font-bold text-3xl mb-2 text-foreground text-center">Осталось совсем немного!</h3>
-          <p className="text-muted-foreground text-base mb-8 text-center">Оставьте контакты — технолог подберёт льдогенератор и пришлёт КП</p>
+          <h3 className="font-display font-bold text-3xl mb-2 text-foreground text-center">Куда отправить подборку моделей с ценами?</h3>
+          <p className="text-muted-foreground text-base mb-8 text-center">Пришлём 2–3 подходящие модели с ценами — технолог свяжется в течение 2 часов</p>
           <div className="space-y-4">
             <input type="text" placeholder="Ваше имя" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
             <div>
@@ -189,6 +189,9 @@ const LDOGenerator = () => {
   const [modalConsent, setModalConsent] = useState(false);
   const [inquiryConsent, setInquiryConsent] = useState(false);
   const [contactsConsent, setContactsConsent] = useState(false);
+  const [contactsEmail, setContactsEmail] = useState("");
+  const [iceTab, setIceTab] = useState<"flake" | "granular">("flake");
+  const [segLevel, setSegLevel] = useState(0);
 
   useEffect(() => {
     document.title = "Промышленные льдогенераторы — чешуйчатый и гранулированный лёд | Техно-Сиб";
@@ -216,7 +219,7 @@ const LDOGenerator = () => {
   }, []);
 
   useEffect(() => {
-    const ids = ["hero","benefits","catalog","industries","compare","service","selector","faq","technosib","contacts"];
+    const ids = ["hero","benefits","catalog","industries","segmentation","compare","service","selector","faq","technosib","getkp","contacts"];
     setVisibleSections((prev) => ({ ...prev, hero: true }));
     const observers: Record<string, IntersectionObserver> = {};
     ids.forEach((id) => {
@@ -257,10 +260,10 @@ const LDOGenerator = () => {
     { href: "/injector",        label: "Инъекторы" },
     { href: "/slicers",         label: "Слайсеры" },
     { href: "#catalog",         label: "Каталог" },
-    { href: "#benefits",        label: "Преимущества" },
-    { href: "#industries",      label: "Отрасли" },
+    { href: "#segmentation",    label: "Линейка" },
+    { href: "#selector",        label: "Подбор" },
     { href: "#faq",             label: "Вопросы" },
-    { href: "#contacts",        label: "Контакты" },
+    { href: "#contacts",        label: "КП" },
   ];
 
   return (
@@ -487,6 +490,88 @@ const LDOGenerator = () => {
         </div>
       </section>
 
+      <section id="segmentation" className="py-12 px-6 bg-gradient-to-br from-primary/5 via-white to-primary/10">
+        <div className="max-w-7xl mx-auto">
+          <div className={`text-center mb-12 transition-all duration-1000 ${vis("segmentation") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+            <span className="text-xs font-semibold tracking-widest text-primary uppercase">Линейка моделей</span>
+            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground">Как разобраться в линейке</h2>
+            <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">Выберите свой объём производства — подсветим подходящие серии и модели</p>
+          </div>
+
+          {(() => {
+            const levels = [
+              { title: "Малый объём", range: "90 кг/сут", models: ["Л12"], use: "Кафе, малые цеха, рыбные отделы" },
+              { title: "Средний", range: "300–720 кг/сут", models: ["Л101", "Л103"], use: "Средние производства" },
+              { title: "Крупный", range: "1200–3000 кг/сут", models: ["Л105", "Л110", "WLK 2000"], use: "Крупные производства" },
+              { title: "Промышленный", range: "5000–10 000 кг/сут", models: ["ZIEGRA", "Линии Bitzer"], use: "Заводы, комбинаты" },
+            ];
+            return (
+              <div className="mb-16">
+                <div className="relative mb-8">
+                  <input type="range" min={0} max={3} step={1} value={segLevel} onChange={(e) => setSegLevel(Number(e.target.value))} className="w-full h-2 rounded-full appearance-none cursor-pointer accent-primary bg-primary/15" />
+                  <div className="flex justify-between mt-3 text-xs font-semibold text-muted-foreground">
+                    {levels.map((l, i) => (<button key={i} onClick={() => setSegLevel(i)} className={`flex-1 text-center transition-colors ${segLevel === i ? "text-primary" : "hover:text-primary"}`}>{l.title}</button>))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {levels.map((l, i) => (
+                    <div key={i} onClick={() => setSegLevel(i)} className={`p-6 rounded-2xl border-2 cursor-pointer transition-all flex flex-col gap-2 ${segLevel === i ? "border-primary bg-white shadow-xl scale-[1.03]" : "border-border bg-white/60 hover:border-primary/40"}`}>
+                      <p className={`text-sm font-bold uppercase tracking-wide ${segLevel === i ? "text-primary" : "text-muted-foreground"}`}>{l.title}</p>
+                      <p className="text-2xl font-display font-black text-foreground leading-tight">{l.range}</p>
+                      <div className="flex flex-wrap gap-1.5 my-1">
+                        {l.models.map((m, mi) => (<span key={mi} className={`text-xs font-bold px-2.5 py-1 rounded-full ${segLevel === i ? "bg-primary text-white" : "bg-primary/10 text-primary"}`}>{m}</span>))}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{l.use}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-center mt-8"><a href="#catalog" className={btnPrimary + " inline-flex items-center gap-2"}>Смотреть модели<Icon name="ArrowRight" size={18} /></a></div>
+              </div>
+            );
+          })()}
+
+          <div className="max-w-4xl mx-auto">
+            <div className="flex justify-center gap-2 mb-8">
+              <button onClick={() => setIceTab("flake")} className={`px-6 py-3 rounded-full font-semibold text-sm transition-all ${iceTab === "flake" ? "bg-primary text-white shadow-md" : "bg-white border border-border text-foreground hover:border-primary"}`}>❄️ Чешуйчатый лёд</button>
+              <button onClick={() => setIceTab("granular")} className={`px-6 py-3 rounded-full font-semibold text-sm transition-all ${iceTab === "granular" ? "bg-primary text-white shadow-md" : "bg-white border border-border text-foreground hover:border-primary"}`}>🧊 Гранулированный лёд</button>
+            </div>
+            {iceTab === "flake" ? (
+              <div className="bg-white rounded-3xl shadow-lg p-7 sm:p-10">
+                <h3 className="text-2xl font-display font-black text-foreground mb-2">Чешуйчатый лёд — серии «Л» и «WLK»</h3>
+                <p className="text-muted-foreground mb-6">Для куттеров, охлаждения рыбы и витрин. Тонкие чешуйки 0,6–0,9 мм, температура −6…−9 °C.</p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {[
+                    { tag: "Серия «Л»", desc: "Российские чешуйчатые льдогенераторы (Технохолод ГЛЕН): Л12 — 90 кг/сут, Л101 — 300, Л103 — 720, Л105 — 1200, Л110 — 3000 кг/сут." },
+                    { tag: "Серия «WLK»", desc: "Чешуйчатый лёд для пищепрома: 2000 кг/сут, безопасное напряжение 24 В, компактные габариты." },
+                  ].map((s, i) => (
+                    <div key={i} className="p-5 bg-background border border-border rounded-2xl">
+                      <span className="inline-block text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full mb-2">{s.tag}</span>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl shadow-lg p-7 sm:p-10">
+                <h3 className="text-2xl font-display font-black text-foreground mb-2">Гранулированный лёд — серия «ZIEGRA» и промышленные линии</h3>
+                <p className="text-muted-foreground mb-6">Для теплообмена и охлаждения процессов. Премиальная немецкая технология, лёд −0,5 °C, толщина 5–10 мм.</p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {[
+                    { tag: "Серия «ZIEGRA»", desc: "Гранулированный (кусковой) лёд, линейка 30–10 000 кг/сут, лёд −0,5 °C, толщина 5–10 мм, патентованная система." },
+                    { tag: "Линии Bitzer", desc: "Промышленные линии на базе Bitzer — до 5000–6000 кг/сут для крупных мясо- и рыбопроизводств." },
+                  ].map((s, i) => (
+                    <div key={i} className="p-5 bg-background border border-border rounded-2xl">
+                      <span className="inline-block text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full mb-2">{s.tag}</span>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       <section id="compare" className="py-12 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 ${vis("compare") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Хотите подобрать льдогенератор?</h2></div>
@@ -514,8 +599,8 @@ const LDOGenerator = () => {
         <div className="max-w-4xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 ${vis("selector") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
             <span className="text-xs font-semibold tracking-widest text-primary uppercase">Подбор оборудования</span>
-            <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Ответьте на 4 вопроса — получите решение</h2>
-            <p className="text-lg text-muted-foreground mt-4">Технолог подберёт льдогенератор и пришлёт КП в течение 2 часов</p>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Подберите льдогенератор за 1 минуту</h2>
+            <p className="text-lg text-muted-foreground mt-4">Ответьте на 4 вопроса — пришлём 2–3 подходящие модели с ценами</p>
           </div>
           <QuizBlock onSent={(name, phone, quizAnswers) => sendLead({ name, phone, quizAnswers, topic: 'льдогенераторы', formType: 'quiz' })} />
         </div>
@@ -526,11 +611,14 @@ const LDOGenerator = () => {
           <div className={`text-center mb-16 transition-all duration-1000 ${vis("faq") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><span className="text-xs font-semibold tracking-widest text-primary uppercase">FAQ</span><h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Частые вопросы</h2></div>
           <div className="space-y-3 mb-12">
             {[
-              { q: "Какую производительность выбрать?", a: "Производительность подбирается под суточную потребность производства — от 90 до 10 000 кг льда в сутки. Технолог рассчитает нужный объём по вашей задаче и подскажет оптимальную модель." },
-              { q: "Чем чешуйчатый лёд отличается от гранулированного?", a: "Чешуйчатый лёд — тонкие чешуйки 0,6–0,9 мм с температурой −6…−9 °C, идеален для мясопереработки и охлаждения рыбы. Гранулированный лёд плотнее, дольше тает и подходит для витрин и HoReCa." },
-              { q: "Что такое моноблок и библок?", a: "Моноблок — компактное исполнение, где компрессор и генератор в одном корпусе. Библок позволяет вынести компрессорный агрегат за пределы цеха — экономит площадь и снижает тепловую нагрузку в рабочей зоне." },
-              { q: "Из какого материала корпус?", a: "Корпус изготовлен из пищевой нержавеющей стали AISI 304 — соответствует техрегламентам Таможенного союза, гигиеничен и долговечен." },
-              { q: "Какая гарантия и доставка?", a: "Гарантия до 2 лет. Поставка по всей России и странам Таможенного союза, монтаж и пусконаладка под ключ." },
+              { q: "В чём разница между чешуйчатым и гранулированным льдом?", a: "Чешуйчатый (0,6–0,9 мм, −6…−9 °C) идеален для куттеров и охлаждения рыбы — мягкий, не режет продукт, не тупит ножи. Гранулированный (5–10 мм, −0,5 °C) даёт максимальную холодопроизводительность для теплообмена и охлаждения процессов." },
+              { q: "Чем отличается моноблок от библока?", a: "В моноблоке агрегат и испаритель в одном корпусе. В библоке компрессорно-конденсаторный агрегат выносится отдельно (даже за пределы цеха) — это экономит площадь и поддерживает температуру в рабочей зоне." },
+              { q: "Какая производительность мне нужна?", a: "Зависит от объёмов производства и отрасли. Пройдите квиз или оставьте заявку — рассчитаем под вашу задачу." },
+              { q: "Какие сроки поставки?", a: "Часть моделей — в наличии на складе в Новосибирске. Промышленные линии под заказ — 6–7 недель." },
+              { q: "Какая гарантия?", a: "До 2 лет, на компрессорные агрегаты — в рамках гарантии заводов Bitzer / L'UNITE HERMETIQUE." },
+              { q: "Доставляете в регионы?", a: "Да, по всей России и странам Таможенного союза транспортными компаниями." },
+              { q: "Какой хладагент используется?", a: "Безопасные фреоны R507, R404A, R407 — не разрушают озоновый слой, соответствуют техрегламентам ТС." },
+              { q: "Сложно ли обслуживать?", a: "Микропроцессорное управление с самодиагностикой, автоподдержание уровня воды, программируемый таймер — оборудование максимально автоматизировано." },
             ].map((faq, i) => (
               <div key={i} className={`bg-white border border-border rounded-2xl overflow-hidden transition-all duration-700 ${vis("faq") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${i * 60}ms` }}>
                 <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-primary/3 transition-colors"><span className="font-semibold text-base text-foreground pr-4">{faq.q}</span><Icon name={openFaq === i ? "ChevronUp" : "ChevronDown"} size={20} className="text-primary flex-shrink-0" /></button>
@@ -563,34 +651,51 @@ const LDOGenerator = () => {
         </div>
       </section>
 
-      <section id="contacts" className="py-12 px-6 bg-white">
+      <section id="getkp" className="py-12 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-16 transition-all duration-1000 ${vis("contacts") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}><h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Обсудим вашу задачу</h2></div>
+          <div className={`text-center mb-12 transition-all duration-1000 ${vis("getkp") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground leading-tight">Получите коммерческое предложение за 15 минут</h2>
+            <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">Подберём льдогенератор под вашу производительность, рассчитаем стоимость и сроки. Бесплатная консультация инженера.</p>
+          </div>
           <div className="grid lg:grid-cols-2 gap-14 items-start">
-            <div className={`transition-all duration-1000 ${vis("contacts") ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}>
-              <div className="flex justify-center mb-10">
-                <div className="p-8 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-3xl shadow-xl w-full max-w-sm">
-                  <div className="flex justify-center mb-6"><div className="w-28 h-28 bg-primary/10 rounded-2xl flex items-center justify-center"><Icon name="Snowflake" size={56} className="text-primary" /></div></div>
-                  <p className="text-center text-sm font-medium text-muted-foreground mb-6">Льдогенераторы для пищевого производства</p>
-                  <div className="space-y-4">
-                    {[{ icon: "Phone", label: "Телефон", value: "8 800 505-91-24", href: "tel:88005059124", goal: "click_phone" },{ icon: "Mail", label: "Почта", value: "massagers@t-sib.ru", href: "mailto:massagers@t-sib.ru", goal: "click_email" }].map((c, i) => (
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      <a key={i} href={c.href} onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', c.goal); } catch (_e) { /* noop */ } }} className="flex items-center gap-4 p-4 bg-white border border-primary/10 rounded-xl hover:border-primary/30 transition-colors"><div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0"><Icon name={c.icon} fallback="Star" size={18} className="text-primary" /></div><div><p className="text-xs text-muted-foreground">{c.label}</p><p className="font-bold text-base text-foreground">{c.value}</p></div></a>
-                    ))}
-                  </div>
+            <div className={`transition-all duration-1000 ${vis("getkp") ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}>
+              <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-3xl shadow-xl p-8 mb-6">
+                <h3 className="font-display font-bold text-xl mb-5 text-foreground">Что вы получите:</h3>
+                <div className="space-y-4">
+                  {[
+                    "2–3 подходящие модели с ценами",
+                    "Расчёт производительности под вашу задачу",
+                    "Условия поставки и гарантии",
+                  ].map((t, i) => (
+                    <div key={i} className="flex items-start gap-3"><Icon name="CheckCircle" size={22} className="text-primary flex-shrink-0 mt-0.5" /><span className="text-base font-medium text-foreground">{t}</span></div>
+                  ))}
+                </div>
+              </div>
+              <div className="p-7 bg-background border border-primary/15 rounded-3xl shadow-sm">
+                <p className="font-bold text-base text-foreground mb-1">Перезвоним за 15 минут</p>
+                <p className="text-sm text-muted-foreground mb-5">Звоните или пишите в мессенджеры — ответим оперативно</p>
+                <div className="space-y-3">
+                  {[
+                    { icon: "Phone", label: "Телефон", value: "8 800 505-78-31", href: "tel:88005057831", goal: "click_phone" },
+                    { icon: "Mail", label: "Почта", value: "massagers@t-sib.ru", href: "mailto:massagers@t-sib.ru", goal: "click_email" },
+                  ].map((c, i) => (
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    <a key={i} href={c.href} onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', c.goal); } catch (_e) { /* noop */ } }} className="flex items-center gap-4 p-4 bg-white border border-primary/10 rounded-xl hover:border-primary/30 transition-colors"><div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0"><Icon name={c.icon} fallback="Star" size={18} className="text-primary" /></div><div><p className="text-xs text-muted-foreground">{c.label}</p><p className="font-bold text-base text-foreground">{c.value}</p></div></a>
+                  ))}
                 </div>
               </div>
             </div>
-            <div className={`transition-all duration-1000 delay-300 ${vis("contacts") ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}>
+            <div id="contacts" className={`transition-all duration-1000 delay-300 ${vis("getkp") ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}>
               <div className="p-8 bg-background border-2 border-primary/15 rounded-3xl shadow-sm">
-                <h3 className="font-display font-bold text-2xl mb-2 text-foreground">Отправить вопрос</h3>
+                <h3 className="font-display font-bold text-2xl mb-2 text-foreground">Куда отправить КП?</h3>
                 <p className="text-muted-foreground mb-6 text-sm">Технолог ответит в течение 2 часов</p>
                 <div className="space-y-4">
                   <input type="text" placeholder="Имя *" required value={contactsName} onChange={e => setContactsName(e.target.value)} className={inputCls} />
                   <div><input type="tel" placeholder="+7 (___) ___-__-__" required value={contactsPhone} onChange={e => setContactsPhone(formatPhone(contactsPhone, e.target.value))} onBlur={() => setContactsPhoneTouched(true)} className={contactsPhoneTouched && !isValidPhone(contactsPhone) ? inputError : inputCls} />{contactsPhoneTouched && !isValidPhone(contactsPhone) && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}</div>
-                  <textarea placeholder="Комментарий (тип льда, объём, задача)" rows={4} value={contactsComment} onChange={e => setContactsComment(e.target.value)} className={inputCls + " resize-none"} />
+                  <input type="email" placeholder="E-mail" value={contactsEmail} onChange={e => setContactsEmail(e.target.value)} className={inputCls} />
+                  <textarea placeholder="Комментарий (необязательно): тип льда, объём, задача" rows={3} value={contactsComment} onChange={e => setContactsComment(e.target.value)} className={inputCls + " resize-none"} />
                   <ConsentCheckbox checked={contactsConsent} onChange={setContactsConsent} />
-                  <button onClick={() => { if (contactsName.trim() && isValidPhone(contactsPhone) && contactsConsent && !sending) { sendLead({ name: contactsName, phone: contactsPhone, comment: contactsComment, topic: 'льдогенераторы', formType: 'contacts' }); setContactsName(""); setContactsPhone(""); setContactsComment(""); setContactsPhoneTouched(false); setContactsConsent(false); } }} disabled={!contactsName.trim() || !isValidPhone(contactsPhone) || !contactsConsent || sending} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-base transition-all shadow-sm disabled:opacity-40">{sending ? "Отправляем..." : "Отправить"}</button>
+                  <button onClick={() => { if (contactsName.trim() && isValidPhone(contactsPhone) && contactsConsent && !sending) { sendLead({ name: contactsName, phone: contactsPhone, comment: [contactsEmail ? `E-mail: ${contactsEmail}` : "", contactsComment].filter(Boolean).join(". "), topic: 'льдогенераторы', formType: 'contacts' }); setContactsName(""); setContactsPhone(""); setContactsEmail(""); setContactsComment(""); setContactsPhoneTouched(false); setContactsConsent(false); } }} disabled={!contactsName.trim() || !isValidPhone(contactsPhone) || !contactsConsent || sending} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-base transition-all shadow-sm disabled:opacity-40">{sending ? "Отправляем..." : "Получить КП"}</button>
                 </div>
               </div>
             </div>
@@ -623,7 +728,7 @@ const LDOGenerator = () => {
               <p className="text-xs text-muted-foreground mb-4">Оборудование для маринования и посола мяса</p>
               <div className="space-y-2">
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                <a href="tel:88005059124" onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', 'click_phone'); } catch (_e) { /* noop */ } }} className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors"><Icon name="Phone" size={14} className="text-primary" />8 800 505-91-24</a>
+                <a href="tel:88005057831" onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', 'click_phone'); } catch (_e) { /* noop */ } }} className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors"><Icon name="Phone" size={14} className="text-primary" />8 800 505-78-31</a>
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <a href="mailto:massagers@t-sib.ru" onClick={() => { try { (window as any).ym?.(107258870, 'reachGoal', 'click_email'); } catch (_e) { /* noop */ } }} className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors"><Icon name="Mail" size={14} className="text-primary" />massagers@t-sib.ru</a>
               </div>
@@ -640,7 +745,7 @@ const LDOGenerator = () => {
             <div>
               <p className="font-semibold text-sm text-foreground mb-3">Компания</p>
               <div className="space-y-2">
-                {["#benefits", "#industries", "#service", "#technosib", "#faq"].map((href, i) => (<a key={i} href={href} className="block text-sm text-muted-foreground hover:text-primary transition-colors">{["Преимущества", "Отрасли", "От подбора до запуска", "О компании Техно-Сиб", "Вопросы"][i]}</a>))}
+                {["#benefits", "#segmentation", "#industries", "#technosib", "#faq"].map((href, i) => (<a key={i} href={href} className="block text-sm text-muted-foreground hover:text-primary transition-colors">{["Преимущества", "Линейка моделей", "Отрасли", "О компании Техно-Сиб", "Вопросы"][i]}</a>))}
               </div>
             </div>
             <div>
