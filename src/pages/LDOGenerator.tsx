@@ -337,16 +337,16 @@ const LDOGenerator = () => {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div className={`transition-all duration-1000 ${vis("hero") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               <span className="inline-block text-xs font-semibold tracking-widest text-primary uppercase border border-primary/30 rounded-full px-4 py-1.5 mb-4 bg-primary/5">Поставка и внедрение</span>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-black leading-[1.07] tracking-tight mb-4 text-foreground">Промышленные льдогенераторы{" "}<span className="text-primary">от 90 до 10 000 кг</span> льда в сутки</h1>
-              <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed mb-7 max-w-xl">Чешуйчатый и гранулированный лёд для мясопереработки, рыбной отрасли, хлебопечения и торговли. Подберём модель под вашу производительность — от компактной до промышленной линии.</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 max-w-xl">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-black leading-[1.07] tracking-tight mb-4 text-foreground">Промышленные льдогенераторы{" "}<span className="text-primary">до 10 000 кг</span> льда в сутки</h1>
+              <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed mb-7 max-w-xl">Чешуйчатый и гранулированный лёд от компактной модели до промышленной линии.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 max-w-xl">
                 {[
-                  { emoji: "❄️", text: "Производительность 90–10 000 кг/сутки — модель под любой объём" },
-                  { emoji: "⚙️", text: "Надёжные агрегаты на годы" },
-                  { emoji: "🏭", text: "Нержавеющая сталь AISI 304 — для пищевого производства" },
-                  { emoji: "🛡️", text: "Гарантия до 2 лет + поставка по всей России и ТС" },
+                  { emoji: "❄️", text: "Производительность 90–10 000 кг/сутки" },
+                  { emoji: "🔪", text: "Не тупит ножи" },
+                  { emoji: "🏭", text: "Нержавеющая сталь" },
+                  { emoji: "🛡️", text: "Гарантия до 2-х лет" },
                 ].map((t, i) => (
-                  <div key={i} className="flex items-start gap-2.5 text-sm font-medium text-foreground"><span className="text-lg leading-none flex-shrink-0">{t.emoji}</span><span>{t.text}</span></div>
+                  <div key={i} className="flex items-center gap-3 text-lg sm:text-xl font-bold text-foreground"><span className="text-2xl leading-none flex-shrink-0">{t.emoji}</span><span>{t.text}</span></div>
                 ))}
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
