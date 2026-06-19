@@ -189,6 +189,7 @@ const LDOGenerator = () => {
   const [modalConsent, setModalConsent] = useState(false);
   const [inquiryConsent, setInquiryConsent] = useState(false);
   const [contactsConsent, setContactsConsent] = useState(false);
+  const [equipMenuOpen, setEquipMenuOpen] = useState(false);
   const [contactsEmail, setContactsEmail] = useState("");
   const [iceTab, setIceTab] = useState<"flake" | "granular">("flake");
   const [segLevel, setSegLevel] = useState(0);
@@ -256,14 +257,17 @@ const LDOGenerator = () => {
   }, [catalogData, catalogSearch]);
 
   const navLinks = [
-    { href: "/",                label: "Массажеры" },
-    { href: "/injector",        label: "Инъекторы" },
-    { href: "/slicers",         label: "Слайсеры" },
     { href: "#catalog",         label: "Каталог" },
     { href: "#segmentation",    label: "Линейка" },
     { href: "#selector",        label: "Подбор" },
     { href: "#faq",             label: "Вопросы" },
     { href: "#contacts",        label: "КП" },
+  ];
+
+  const equipmentLinks = [
+    { href: "/",                label: "Мясомассажеры" },
+    { href: "/injector",        label: "Инъекторы" },
+    { href: "/slicers",         label: "Слайсеры" },
   ];
 
   return (
@@ -275,7 +279,20 @@ const LDOGenerator = () => {
               <a href="/"><img src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg" alt="Техносиб" className="h-8 sm:h-9 w-auto object-contain" /></a>
               <span className="text-xs text-muted-foreground leading-tight mt-0.5 hidden sm:block">Оборудование для маринования и посола мяса</span>
             </div>
-            <nav className="hidden lg:flex gap-6 text-sm font-semibold">
+            <nav className="hidden lg:flex gap-6 text-sm font-semibold items-center">
+              <div className="relative" onMouseEnter={() => setEquipMenuOpen(true)} onMouseLeave={() => setEquipMenuOpen(false)}>
+                <button className="flex items-center gap-1 text-foreground hover:text-primary transition-colors whitespace-nowrap">
+                  Оборудование
+                  <Icon name="ChevronDown" size={14} className={`transition-transform ${equipMenuOpen ? "rotate-180" : ""}`} />
+                </button>
+                {equipMenuOpen && (
+                  <div className="absolute top-full left-0 pt-2 z-50">
+                    <div className="bg-white border border-border rounded-xl shadow-lg py-2 min-w-[220px]">
+                      {equipmentLinks.map((l) => (<a key={l.href} href={l.href} className="block px-4 py-2.5 text-sm text-foreground hover:text-primary hover:bg-primary/5 transition-colors" onClick={() => setEquipMenuOpen(false)}>{l.label}</a>))}
+                    </div>
+                  </div>
+                )}
+              </div>
               {navLinks.map((l) => (<a key={l.label} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">{l.label}</a>))}
             </nav>
           </div>
@@ -289,7 +306,7 @@ const LDOGenerator = () => {
             <button className="lg:hidden p-2 text-muted-foreground flex-shrink-0" onClick={() => setMenuOpen(!menuOpen)}><Icon name={menuOpen ? "X" : "Menu"} size={22} /></button>
           </div>
         </div>
-        {menuOpen && (<div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4"><span className="text-xs text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>{navLinks.map((l) => (<a key={l.label} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>{l.label}</a>))}</div>)}
+        {menuOpen && (<div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4"><div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Оборудование</div>{equipmentLinks.map((l) => (<a key={l.href} href={l.href} className="text-sm text-foreground hover:text-primary transition-colors pl-3 border-l-2 border-primary/20" onClick={() => setMenuOpen(false)}>{l.label}</a>))}<div className="h-px bg-border" />{navLinks.map((l) => (<a key={l.label} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>{l.label}</a>))}</div>)}
       </header>
 
       <section id="hero" className="relative pt-24 sm:pt-28 pb-14 sm:pb-20 px-4 sm:px-6 bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
