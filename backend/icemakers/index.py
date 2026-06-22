@@ -15,6 +15,18 @@ ICEMAKER_CATEGORY = "228"
 SCHEMA = "t_p69811181_sky_melon_cascade"
 
 
+def rutube_embed(url: str):
+    """Преобразует ссылку Rutube в embed-URL без превью (autoplay)."""
+    import re
+    if not url:
+        return None
+    url = url.strip()
+    m = re.search(r"rutube\.ru/(?:video|play/embed)/([0-9a-f]+)", url)
+    if m:
+        return f"https://rutube.ru/play/embed/{m.group(1)}"
+    return url
+
+
 def parse_offer(offer: ET.Element):
     def text(tag):
         el = offer.find(tag)
@@ -24,11 +36,15 @@ def parse_offer(offer: ET.Element):
     if not pictures:
         return None
 
-    hidden_param_names = {"guid", "видео (ссылка)", "видео(ссылка)", "видео ссылка"}
+    video_param_names = {"видео (ссылка)", "видео(ссылка)", "видео ссылка"}
+    hidden_param_names = {"guid"} | video_param_names
     params = {}
+    video = None
     for p in offer.findall("param"):
         name = (p.get("name") or "").strip()
         val = (p.text or "").strip()
+        if name and val and name.lower() in video_param_names:
+            video = rutube_embed(val)
         if name and val and name.lower() not in hidden_param_names:
             params[name] = val
 
@@ -73,6 +89,7 @@ def parse_offer(offer: ET.Element):
         "extra_params": extra_params,
         "all_params": [{"name": k, "value": v} for k, v in params.items()],
         "category_id": text("categoryId"),
+        "video": video,
     }
 
 

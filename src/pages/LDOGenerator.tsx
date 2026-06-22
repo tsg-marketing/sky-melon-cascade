@@ -21,6 +21,7 @@ interface CatalogItem {
   extra_params: { name: string; value: string }[];
   all_params: { name: string; value: string }[];
   category_id: string;
+  video: string | null;
 }
 
 const inputCls = "w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary transition-colors";
@@ -186,6 +187,7 @@ const LDOGenerator = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [modalConsent, setModalConsent] = useState(false);
   const [inquiryConsent, setInquiryConsent] = useState(false);
   const [contactsConsent, setContactsConsent] = useState(false);
@@ -220,7 +222,7 @@ const LDOGenerator = () => {
   }, []);
 
   useEffect(() => {
-    const ids = ["hero","benefits","catalog","industries","segmentation","compare","service","selector","faq","technosib","getkp","contacts"];
+    const ids = ["hero","benefits","catalog","videos","industries","segmentation","compare","service","selector","faq","technosib","getkp","contacts"];
     setVisibleSections((prev) => ({ ...prev, hero: true }));
     const observers: Record<string, IntersectionObserver> = {};
     ids.forEach((id) => {
@@ -423,7 +425,8 @@ const LDOGenerator = () => {
                             {item.all_params.filter((p) => p.name !== "GUID" && p.name.toLowerCase() !== "бренд" && (!item.productivity || p.name !== item.productivity.name)).map((p, pi) => (<div key={pi} className="flex items-start gap-2 text-base"><Icon name="ChevronRight" size={16} className="text-primary flex-shrink-0 mt-0.5" /><span className="text-muted-foreground"><span className="font-medium text-foreground">{p.name}:</span> {p.value}</span></div>))}
                           </div>
                           <div className="flex flex-col gap-2 mt-2">
-                            <button onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); setInquiryConsent(false); }} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-base font-bold transition-all shadow-md">Оставить заявку</button>
+                            <button onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); setInquiryConsent(false); }} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-base font-bold transition-all shadow-md">Получить консультацию</button>
+                            {item.video && (<button onClick={() => setVideoUrl(item.video)} className="w-full py-3.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl text-base font-semibold transition-all flex items-center justify-center gap-2"><Icon name="Play" size={18} />Смотреть видео</button>)}
                             <div className="flex gap-2">
                               <button onClick={() => { setSelectedItem(item); setSelectedSlide(0); history.replaceState(null, "", `#product-${item.id}`); }} className="flex-1 py-3.5 border-2 border-orange-500 text-orange-500 rounded-xl text-base font-semibold hover:bg-orange-50 transition-all">Подробнее</button>
                               {(() => { const qty = getQuantity(item.id); return qty > 0 ? (<div className="flex items-center gap-1 border-2 border-primary rounded-xl px-2"><button onClick={() => removeItem(item.id)} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">−</button><span className="w-5 text-center font-bold text-primary text-sm">{qty}</span><button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">+</button></div>) : (<button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="py-3.5 px-4 border-2 border-primary/30 text-primary rounded-xl hover:border-primary hover:bg-primary/5 transition-all" title="В корзину"><Icon name="ShoppingCart" size={18} /></button>); })()}
@@ -441,6 +444,38 @@ const LDOGenerator = () => {
           )}
         </div>
       </section>
+
+      {catalogData && (catalogData.icemakers || []).some((it) => it.video) && (
+        <section id="videos" className="py-12 px-6 bg-gradient-to-br from-primary/5 via-white to-primary/10">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-10">
+              <h2 className="text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight">Видео о нашем оборудовании</h2>
+              <p className="text-lg text-muted-foreground mt-4">Смотрите льдогенераторы в работе</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {(catalogData.icemakers || []).filter((it) => it.video).map((it) => (
+                <div key={it.id} className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all">
+                  <div className="relative w-full bg-black" style={{ aspectRatio: "16/9" }}>
+                    <iframe src={it.video!} title={it.name} allow="autoplay; fullscreen" allowFullScreen className="absolute inset-0 w-full h-full" frameBorder="0" />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-lg text-foreground leading-snug cursor-pointer hover:text-primary transition-colors" onClick={() => { setSelectedItem(it); setSelectedSlide(0); history.replaceState(null, "", `#product-${it.id}`); }}>{it.name}</h3>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {videoUrl && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setVideoUrl(null)}>
+          <button onClick={() => setVideoUrl(null)} className="absolute top-5 right-5 w-11 h-11 bg-white/15 hover:bg-white/25 rounded-full flex items-center justify-center transition-all"><Icon name="X" size={22} className="text-white" /></button>
+          <div className="relative w-full max-w-4xl" style={{ aspectRatio: "16/9" }} onClick={(e) => e.stopPropagation()}>
+            <iframe src={videoUrl.includes("?") ? `${videoUrl}&autoplay=1` : `${videoUrl}?autoplay=1`} title="Видео" allow="autoplay; fullscreen" allowFullScreen className="w-full h-full rounded-2xl" frameBorder="0" />
+          </div>
+        </div>
+      )}
 
       {selectedItem && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={closeProductModal}>
@@ -477,8 +512,9 @@ const LDOGenerator = () => {
                       </div>
                     </div>
                   )}
-                  <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                    <button onClick={() => { setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); closeProductModal(); }} className="flex-1 py-4 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md">Оставить заявку</button>
+                  {selectedItem.video && (<button onClick={() => setVideoUrl(selectedItem.video)} className="w-full mb-3 py-3.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl text-base font-semibold transition-all flex items-center justify-center gap-2"><Icon name="Play" size={18} />Смотреть видео</button>)}
+                  <div className="flex flex-col sm:flex-row gap-3 mt-3">
+                    <button onClick={() => { setInquiryItem(selectedItem); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); closeProductModal(); }} className="flex-1 py-4 bg-primary text-white rounded-xl text-base font-bold hover:bg-primary/90 transition-all shadow-md">Получить консультацию</button>
                     {(() => { const qty = getQuantity(selectedItem.id); return qty > 0 ? (<div className="flex items-center gap-2 border-2 border-primary rounded-xl px-4"><button onClick={() => removeItem(selectedItem.id)} className="w-10 h-10 flex items-center justify-center text-primary font-bold text-xl hover:bg-primary/10 rounded-lg transition-colors">−</button><span className="w-6 text-center font-bold text-primary">{qty}</span><button onClick={() => addItem({ id: selectedItem.id, name: selectedItem.name, price: selectedItem.price, price_display: selectedItem.price_display, picture: selectedItem.pictures[0] })} className="w-10 h-10 flex items-center justify-center text-primary font-bold text-xl hover:bg-primary/10 rounded-lg transition-colors">+</button></div>) : (<button onClick={() => addItem({ id: selectedItem.id, name: selectedItem.name, price: selectedItem.price, price_display: selectedItem.price_display, picture: selectedItem.pictures[0] })} className="flex-1 py-4 border-2 border-primary/30 text-primary rounded-xl text-base font-semibold hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2"><Icon name="ShoppingCart" size={18} />В корзину</button>); })()}
                   </div>
                 </div>
@@ -492,7 +528,7 @@ const LDOGenerator = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setInquiryItem(null)}>
           <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-8" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setInquiryItem(null)} className="absolute top-4 right-4 w-10 h-10 bg-background hover:bg-primary/10 rounded-xl flex items-center justify-center transition-colors"><Icon name="X" size={18} className="text-muted-foreground" /></button>
-            <h3 className="text-2xl font-display font-black text-foreground mb-1">Оставить заявку</h3>
+            <h3 className="text-2xl font-display font-black text-foreground mb-1">Получить консультацию</h3>
             <p className="text-sm text-muted-foreground mb-6 leading-relaxed"><span className="font-medium text-foreground">{inquiryItem.name}</span></p>
             <div className="space-y-3">
               <input type="text" placeholder="Ваше имя" value={inquiryName} onChange={(e) => setInquiryName(e.target.value)} className={inputCls} />
