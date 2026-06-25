@@ -8,14 +8,20 @@ import xml.etree.ElementTree as ET
 import time
 
 FEED_URL = "https://t-sib.ru/upload/catalog.xml"
-TARGET_CATEGORIES = {"229", "223", "230", "459"}
+TARGET_CATEGORIES = {"229", "223", "230", "459", "228"}
 SITE_URL = "https://meatmassagers.ru"
+
+# Несколько исходных категорий слайсеров (230, 459) объединяем в одну (230),
+# чтобы в фиде не было дублирующихся категорий с одинаковым именем.
+CATEGORY_REMAP = {
+    "459": "230",
+}
 
 CATEGORY_NAMES = {
     "229": "Массажёры мяса",
     "223": "Инъекторы",
     "230": "Слайсеры",
-    "459": "Слайсеры",
+    "228": "Льдогенераторы",
 }
 
 _cache = None
@@ -68,6 +74,7 @@ def build_yml(xml_data: bytes) -> str:
         cat_id = (offer.findtext("categoryId") or "").strip()
         if cat_id not in TARGET_CATEGORIES:
             continue
+        cat_id = CATEGORY_REMAP.get(cat_id, cat_id)
 
         offer_id = offer.get("id", "")
         pictures = [p.text.strip() for p in offer.findall("picture") if p.text and p.text.strip()]
@@ -88,8 +95,10 @@ def build_yml(xml_data: bytes) -> str:
 
         if cat_id == "223":
             item_url = f"{SITE_URL}/injector/#product-{offer_id}"
-        elif cat_id in ("230", "459"):
+        elif cat_id == "230":
             item_url = f"{SITE_URL}/slicers/#product-{offer_id}"
+        elif cat_id == "228":
+            item_url = f"{SITE_URL}/ldogenerator/#product-{offer_id}"
         else:
             item_url = f"{SITE_URL}/#product-{offer_id}"
 
