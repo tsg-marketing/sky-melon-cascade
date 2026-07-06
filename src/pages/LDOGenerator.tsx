@@ -5,6 +5,7 @@ import ThankYouModal from "@/components/ThankYouModal";
 import QuizSideTrigger from "@/components/QuizSideTrigger";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
+import { productPath } from "@/lib/catalog";
 
 const CATALOG_URL = "https://functions.poehali.dev/6070fa9b-5de5-408c-984f-0ae244eb68ef";
 
@@ -418,7 +419,7 @@ const LDOGenerator = () => {
                           {item.brand && item.brand.toLowerCase() !== "hualian" && (<div className="absolute top-3 left-3 bg-white/95 text-primary text-xs font-bold px-3 py-1 rounded-full shadow-sm border border-primary/20 uppercase tracking-wide">{item.brand}</div>)}
                         </div>
                         <div className="p-5 flex flex-col flex-1">
-                          <h3 className="font-bold text-2xl text-foreground mb-2 leading-snug cursor-pointer hover:text-primary transition-colors" onClick={() => { setSelectedItem(item); setSelectedSlide(0); history.replaceState(null, "", `#product-${item.id}`); }}>{item.name}</h3>
+                          <h3 className="font-bold text-2xl text-foreground mb-2 leading-snug cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(productPath("ldogenerator", item))}>{item.name}</h3>
                           {item.price_display && (<p className="text-xl font-black text-primary mb-3">{item.price_display}</p>)}
                           <div className="space-y-1.5 mb-4 flex-1">
                             {item.productivity && (<div className="flex items-start gap-2 text-base"><Icon name="Zap" size={16} className="text-primary flex-shrink-0 mt-0.5" /><span className="text-muted-foreground"><span className="font-medium text-foreground">{item.productivity.name}:</span> {item.productivity.value}</span></div>)}
@@ -428,7 +429,7 @@ const LDOGenerator = () => {
                             <button onClick={() => { setInquiryItem(item); setInquiryName(""); setInquiryPhone(""); setInquirySent(false); setInquiryConsent(false); }} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-base font-bold transition-all shadow-md">Получить консультацию</button>
                             {item.video && (<button onClick={() => setVideoUrl(item.video)} className="w-full py-3.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl text-base font-semibold transition-all flex items-center justify-center gap-2"><Icon name="Play" size={18} />Смотреть видео</button>)}
                             <div className="flex gap-2">
-                              <button onClick={() => { setSelectedItem(item); setSelectedSlide(0); history.replaceState(null, "", `#product-${item.id}`); }} className="flex-1 py-3.5 border-2 border-orange-500 text-orange-500 rounded-xl text-base font-semibold hover:bg-orange-50 transition-all">Подробнее</button>
+                              <button onClick={() => navigate(productPath("ldogenerator", item))} className="flex-1 py-3.5 border-2 border-orange-500 text-orange-500 rounded-xl text-base font-semibold hover:bg-orange-50 transition-all">Подробнее</button>
                               {(() => { const qty = getQuantity(item.id); return qty > 0 ? (<div className="flex items-center gap-1 border-2 border-primary rounded-xl px-2"><button onClick={() => removeItem(item.id)} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">−</button><span className="w-5 text-center font-bold text-primary text-sm">{qty}</span><button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="w-8 h-8 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">+</button></div>) : (<button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="py-3.5 px-4 border-2 border-primary/30 text-primary rounded-xl hover:border-primary hover:bg-primary/5 transition-all" title="В корзину"><Icon name="ShoppingCart" size={18} /></button>); })()}
                             </div>
                           </div>

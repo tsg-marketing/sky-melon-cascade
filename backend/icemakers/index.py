@@ -14,6 +14,33 @@ FEED_URL = "https://t-sib.ru/upload/catalog.xml"
 ICEMAKER_CATEGORY = "228"
 SCHEMA = "t_p69811181_sky_melon_cascade"
 
+_TRANSLIT = {
+    "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "e",
+    "ж": "zh", "з": "z", "и": "i", "й": "y", "к": "k", "л": "l", "м": "m",
+    "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",
+    "ф": "f", "х": "h", "ц": "ts", "ч": "ch", "ш": "sh", "щ": "sch",
+    "ъ": "", "ы": "y", "ь": "", "э": "e", "ю": "yu", "я": "ya",
+}
+
+
+def slugify(name: str, offer_id: str) -> str:
+    """Транслитерирует название в URL-слаг и добавляет короткий id для уникальности."""
+    s = (name or "").lower().strip()
+    out = []
+    for ch in s:
+        if ch in _TRANSLIT:
+            out.append(_TRANSLIT[ch])
+        elif ch.isalnum() and ord(ch) < 128:
+            out.append(ch)
+        else:
+            out.append("-")
+    slug = "".join(out)
+    while "--" in slug:
+        slug = slug.replace("--", "-")
+    slug = slug.strip("-")[:60].strip("-")
+    short_id = (offer_id or "").replace("-", "")[-6:] or "0"
+    return f"{slug}-{short_id}" if slug else short_id
+
 
 def rutube_embed(url: str):
     """Преобразует ссылку Rutube в embed-URL без превью (autoplay)."""
@@ -78,6 +105,7 @@ def parse_offer(offer: ET.Element):
 
     return {
         "id": offer.get("id"),
+        "slug": slugify(text("name") or "", offer.get("id") or ""),
         "name": text("name"),
         "price": price,
         "price_display": f"{int(price):,}".replace(",", " ") + " ₽" if price else None,

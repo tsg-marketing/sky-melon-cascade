@@ -5,6 +5,7 @@ import ThankYouModal from "@/components/ThankYouModal";
 import QuizSideTrigger from "@/components/QuizSideTrigger";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
+import { productPath } from "@/lib/catalog";
 
 const CATALOG_URL = "https://functions.poehali.dev/7093349e-12b4-4025-a465-82ce3b87b0b2";
 
@@ -727,7 +728,7 @@ const Index = () => {
                         <div className="p-5 flex flex-col flex-1">
                           <h3
                             className="font-bold text-2xl text-foreground mb-2 leading-snug cursor-pointer hover:text-primary transition-colors"
-                            onClick={() => { setSelectedItem(item); setSelectedSlide(0); }}
+                            onClick={() => navigate(productPath("massagers", item))}
                           >
                             {item.name}
                           </h3>
@@ -765,7 +766,7 @@ const Index = () => {
                             </button>
                             <div className="flex gap-2">
                               <button
-                                onClick={() => { setSelectedItem(item); setSelectedSlide(0); }}
+                                onClick={() => navigate(productPath("massagers", item))}
                                 className="flex-1 py-3.5 border-2 border-orange-500 text-orange-500 rounded-xl text-base font-semibold hover:bg-orange-50 transition-all"
                               >
                                 Подробнее

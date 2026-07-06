@@ -15,6 +15,33 @@ TARGET_CATEGORIES = {"229", "223", "230", "459", "228"}
 _cache = None
 _cache_ts = 0
 
+_TRANSLIT = {
+    "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "e",
+    "ж": "zh", "з": "z", "и": "i", "й": "y", "к": "k", "л": "l", "м": "m",
+    "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",
+    "ф": "f", "х": "h", "ц": "ts", "ч": "ch", "ш": "sh", "щ": "sch",
+    "ъ": "", "ы": "y", "ь": "", "э": "e", "ю": "yu", "я": "ya",
+}
+
+
+def slugify(name: str, offer_id: str) -> str:
+    """Транслитерирует название в URL-слаг и добавляет короткий id для уникальности."""
+    s = (name or "").lower().strip()
+    out = []
+    for ch in s:
+        if ch in _TRANSLIT:
+            out.append(_TRANSLIT[ch])
+        elif ch.isalnum() and ord(ch) < 128:
+            out.append(ch)
+        else:
+            out.append("-")
+    slug = "".join(out)
+    while "--" in slug:
+        slug = slug.replace("--", "-")
+    slug = slug.strip("-")[:60].strip("-")
+    short_id = (offer_id or "").replace("-", "")[-6:] or "0"
+    return f"{slug}-{short_id}" if slug else short_id
+
 
 def parse_offer(offer: ET.Element) -> dict:
     def text(tag):
@@ -63,6 +90,7 @@ def parse_offer(offer: ET.Element) -> dict:
 
     return {
         "id": offer.get("id"),
+        "slug": slugify(text("name") or "", offer.get("id") or ""),
         "name": text("name"),
         "price": price,
         "price_display": f"{int(price):,}".replace(",", " ") + " ₽" if price else None,
