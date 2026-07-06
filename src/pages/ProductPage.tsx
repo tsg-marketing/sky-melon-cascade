@@ -167,7 +167,7 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
           <nav className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground mb-6">
             <a href="/" className="hover:text-primary transition-colors">Главная</a>
             <Icon name="ChevronRight" size={14} />
-            <a href={category.path} className="hover:text-primary transition-colors">{category.title}</a>
+            <a href={category.categoryLink} className="hover:text-primary transition-colors">{category.title}</a>
             {item && (<><Icon name="ChevronRight" size={14} /><span className="text-foreground truncate max-w-[200px] sm:max-w-none">{item.name}</span></>)}
           </nav>
 
@@ -180,7 +180,7 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
               <Icon name="PackageX" size={56} className="mx-auto mb-5 text-muted-foreground opacity-30" />
               <h1 className="text-2xl font-display font-black text-foreground mb-3">Товар не найден</h1>
               <p className="text-muted-foreground mb-6">Возможно, он снят с производства или ссылка устарела.</p>
-              <a href={category.path} className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary/90 transition-all">
+              <a href={category.categoryLink} className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary/90 transition-all">
                 <Icon name="ArrowLeft" size={18} />Все {category.title.toLowerCase()}
               </a>
             </div>
@@ -188,16 +188,23 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
 
           {!loading && item && (
             <>
-              <div className="grid lg:grid-cols-[minmax(0,1fr)_400px] gap-8 lg:gap-10 items-start">
+              {item.brand && item.brand.toLowerCase() !== "hualian" && (
+                <p className="text-sm font-bold text-primary uppercase tracking-wider mb-1">{item.brand}</p>
+              )}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black text-foreground leading-tight mb-8">{item.name}</h1>
+
+              <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 items-start">
                 {/* Фото */}
-                <div className="bg-white border border-border rounded-3xl p-5 sm:p-8 shadow-sm">
-                  <div className="relative bg-gray-50 rounded-2xl overflow-hidden" style={{ aspectRatio: "4/3" }}>
+                <div className="bg-white border border-border rounded-3xl p-5 sm:p-6 shadow-sm">
+                  <div className="relative bg-gray-50 rounded-2xl overflow-hidden" style={{ aspectRatio: "1/1" }}>
+                    {item.price && (
+                      <div className="absolute top-4 right-4 z-10 bg-orange-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-md">−5%</div>
+                    )}
                     <img src={item.pictures[slide]} alt={item.name} referrerPolicy="no-referrer" className="w-full h-full object-contain p-4 cursor-zoom-in" onClick={() => { setLightboxIndex(slide); setLightboxOpen(true); }} />
                     {item.pictures.length > 1 && (<>
                       <button onClick={() => setSlide((s) => (s - 1 + item.pictures.length) % item.pictures.length)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 hover:bg-white rounded-full shadow flex items-center justify-center"><Icon name="ChevronLeft" size={18} className="text-foreground" /></button>
                       <button onClick={() => setSlide((s) => (s + 1) % item.pictures.length)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 hover:bg-white rounded-full shadow flex items-center justify-center"><Icon name="ChevronRight" size={18} className="text-foreground" /></button>
                     </>)}
-                    {item.brand && item.brand.toLowerCase() !== "hualian" && (<div className="absolute top-4 left-4 bg-white/95 text-primary text-xs font-bold px-3 py-1 rounded-full shadow-sm border border-primary/20 uppercase tracking-wide">{item.brand}</div>)}
                   </div>
                   {item.pictures.length > 1 && (
                     <div className="flex gap-2 overflow-x-auto pt-4">
@@ -206,61 +213,80 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
                   )}
                 </div>
 
-                {/* Правая колонка: инфо + характеристики + цена + ФОС */}
-                <div className="space-y-5">
-                  <div>
-                    <h1 className="text-2xl sm:text-3xl font-display font-black text-foreground leading-tight mb-3">{item.name}</h1>
-                    {item.price_display ? (
-                      <p className="text-3xl font-black text-primary">{item.price_display}</p>
-                    ) : (
-                      <p className="text-lg font-semibold text-muted-foreground">Цена по запросу</p>
-                    )}
-                  </div>
-
-                  {item.all_params.filter((p) => p.name !== "GUID").length > 0 && (
-                    <div className="bg-white border border-border rounded-2xl p-5 shadow-sm">
-                      <h2 className="font-bold text-sm text-foreground mb-3 uppercase tracking-wider">Характеристики</h2>
+                {/* Характеристики */}
+                <div>
+                  {item.all_params.filter((p) => p.name !== "GUID").length > 0 ? (
+                    <div>
+                      <h2 className="text-2xl font-display font-black text-foreground mb-4">Характеристики</h2>
                       <div className="space-y-0.5">
                         {item.all_params.filter((p) => p.name !== "GUID").map((p, pi) => (
-                          <div key={pi} className="flex items-start gap-3 py-2 border-b border-border/50 last:border-0">
-                            <span className="text-sm text-muted-foreground flex-1">{p.name}</span>
-                            <span className="text-sm font-semibold text-foreground text-right">{p.value}</span>
+                          <div key={pi} className="flex items-start gap-3 py-3.5 border-b border-border/60 last:border-0">
+                            <span className="text-base text-muted-foreground flex-1">{p.name}</span>
+                            <span className="text-base font-bold text-foreground text-right">{p.value}</span>
                           </div>
                         ))}
                       </div>
                     </div>
+                  ) : (
+                    <div className="text-muted-foreground">Характеристики уточняйте у менеджера.</div>
+                  )}
+                </div>
+
+                {/* Цена + ФОС */}
+                <div className="space-y-5 lg:sticky lg:top-24">
+                  {item.price ? (
+                    <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
+                      <div className="flex items-end gap-3 flex-wrap">
+                        <span className="text-4xl font-display font-black text-foreground">{item.price_display}</span>
+                        <span className="text-lg text-muted-foreground line-through mb-1">{Math.round(item.price / 0.95).toLocaleString("ru-RU")} ₽</span>
+                      </div>
+                      <p className="text-base font-bold text-orange-600 mt-1">Экономия по акции: {Math.round(item.price / 0.95 - item.price).toLocaleString("ru-RU")} ₽</p>
+                      <div className="flex items-center gap-2 mt-4 text-sm text-muted-foreground">
+                        <Icon name="BadgePercent" size={18} className="text-orange-500 flex-shrink-0" />
+                        <span>Акция: скидка 5% от розничной цены</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
+                      <span className="text-2xl font-display font-black text-foreground">Цена по запросу</span>
+                      <p className="text-sm text-muted-foreground mt-1">Оставьте заявку — пришлём актуальную цену</p>
+                    </div>
                   )}
 
-                  <div className="bg-gradient-to-br from-primary/5 to-primary/10 border-2 border-primary/20 rounded-2xl p-5 sm:p-6 shadow-sm">
-                    <h2 className="font-display font-bold text-xl text-foreground mb-1">Оставить заявку</h2>
-                    <p className="text-sm text-muted-foreground mb-4">Технолог свяжется в течение 2 часов и рассчитает стоимость</p>
-                    <div className="space-y-3">
-                      <input type="text" placeholder="Ваше имя" value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
+                  <div className="bg-slate-800 rounded-2xl p-6 shadow-lg">
+                    <h2 className="font-display font-bold text-xl text-white mb-1">Получить предложение со скидкой</h2>
+                    <p className="text-sm text-slate-300 mb-5">Оставьте контакты — пришлём КП с актуальной ценой</p>
+                    <div className="space-y-4">
                       <div>
-                        <input type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={(e) => setPhone(formatPhone(phone, e.target.value))} onBlur={() => setPhoneTouched(true)} className={phoneTouched && !phoneValid ? inputError : inputCls} />
-                        {phoneTouched && !phoneValid && <p className="text-xs text-red-500 mt-1">Введите номер России, Казахстана или Беларуси</p>}
+                        <label className="block text-sm font-medium text-slate-200 mb-1.5">Ваше имя</label>
+                        <input type="text" placeholder="Иван" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-3 bg-white border border-transparent rounded-lg text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-orange-400" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-200 mb-1.5">Телефон</label>
+                        <input type="tel" placeholder="+7" value={phone} onChange={(e) => setPhone(formatPhone(phone, e.target.value))} onBlur={() => setPhoneTouched(true)} className={`w-full px-4 py-3 bg-white rounded-lg text-foreground placeholder-muted-foreground text-sm focus:outline-none border ${phoneTouched && !phoneValid ? "border-red-400" : "border-transparent focus:border-orange-400"}`} />
+                        {phoneTouched && !phoneValid && <p className="text-xs text-red-300 mt-1">Введите номер России, Казахстана или Беларуси</p>}
                       </div>
                       <label className="flex items-start gap-2 cursor-pointer select-none">
                         <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 w-4 h-4 flex-shrink-0 accent-orange-500 cursor-pointer" />
-                        <span className="text-xs text-muted-foreground leading-relaxed">
+                        <span className="text-xs text-slate-300 leading-relaxed">
                           Отправляя форму, я соглашаюсь с{" "}
-                          <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">политикой обработки персональных данных</a>
+                          <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-300 hover:underline">политикой</a>
                           {" "}и даю{" "}
-                          <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">согласие</a>.
+                          <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-300 hover:underline">согласие</a>.
                         </span>
                       </label>
-                      <button onClick={submit} disabled={!name.trim() || !phoneValid || !consent || sending} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-base transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Получить консультацию"}</button>
+                      <button onClick={submit} disabled={!name.trim() || !phoneValid || !consent || sending} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-bold text-base transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : (item.price ? "Получить КП со скидкой 5%" : "Получить КП")}</button>
                     </div>
-                    <div className="flex gap-3 mt-3">
-                      {item.video && (<button onClick={() => setVideoOpen(true)} className="flex-1 py-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2"><Icon name="Play" size={16} />Видео</button>)}
+                    <div className="flex gap-3 mt-4">
+                      {item.video && (<button onClick={() => setVideoOpen(true)} className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2"><Icon name="Play" size={16} />Видео</button>)}
                       {qty > 0 ? (
-                        <div className="flex items-center gap-1 border-2 border-primary rounded-xl px-2">
-                          <button onClick={() => removeItem(item.id)} className="w-9 h-9 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">−</button>
-                          <span className="w-6 text-center font-bold text-primary">{qty}</span>
-                          <button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="w-9 h-9 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">+</button>
+                        <div className="flex items-center gap-1 border-2 border-orange-400 rounded-lg px-2">
+                          <button onClick={() => removeItem(item.id)} className="w-9 h-9 flex items-center justify-center text-orange-300 font-bold text-lg hover:bg-white/10 rounded-lg transition-colors">−</button>
+                          <span className="w-6 text-center font-bold text-white">{qty}</span>
+                          <button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="w-9 h-9 flex items-center justify-center text-orange-300 font-bold text-lg hover:bg-white/10 rounded-lg transition-colors">+</button>
                         </div>
                       ) : (
-                        <button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="flex-1 py-3 border-2 border-primary/30 text-primary rounded-xl text-sm font-semibold hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2"><Icon name="ShoppingCart" size={16} />В корзину</button>
+                        <button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="flex-1 py-3 border-2 border-white/25 text-white rounded-lg text-sm font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2"><Icon name="ShoppingCart" size={16} />В корзину</button>
                       )}
                     </div>
                   </div>
@@ -296,7 +322,7 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
               )}
 
               <div className="mt-10 text-center">
-                <a href={category.path} className="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary/30 text-primary rounded-full font-semibold hover:border-primary hover:bg-primary/5 transition-all">
+                <a href={category.categoryLink} className="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary/30 text-primary rounded-full font-semibold hover:border-primary hover:bg-primary/5 transition-all">
                   <Icon name="ArrowLeft" size={18} />Все {category.title.toLowerCase()}
                 </a>
               </div>

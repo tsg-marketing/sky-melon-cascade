@@ -28,6 +28,7 @@ export const CATALOG_URL =
 export interface CategoryMeta {
   slug: string;
   path: string;
+  categoryLink: string;
   dataKey: keyof CatalogData;
   title: string;
   singular: string;
@@ -38,6 +39,7 @@ export const CATEGORIES: Record<string, CategoryMeta> = {
   massagers: {
     slug: "massagers",
     path: "/massagers",
+    categoryLink: "/",
     dataKey: "massagers",
     title: "Массажёры мяса",
     singular: "массажёр",
@@ -46,6 +48,7 @@ export const CATEGORIES: Record<string, CategoryMeta> = {
   injector: {
     slug: "injector",
     path: "/injector",
+    categoryLink: "/injector",
     dataKey: "injectors",
     title: "Инъекторы",
     singular: "инъектор",
@@ -54,6 +57,7 @@ export const CATEGORIES: Record<string, CategoryMeta> = {
   slicers: {
     slug: "slicers",
     path: "/slicers",
+    categoryLink: "/slicers",
     dataKey: "slicers",
     title: "Слайсеры",
     singular: "слайсер",
@@ -62,6 +66,7 @@ export const CATEGORIES: Record<string, CategoryMeta> = {
   ldogenerator: {
     slug: "ldogenerator",
     path: "/ldogenerator",
+    categoryLink: "/ldogenerator",
     dataKey: "icemakers",
     title: "Льдогенераторы",
     singular: "льдогенератор",
