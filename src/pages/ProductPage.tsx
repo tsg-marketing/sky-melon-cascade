@@ -5,18 +5,13 @@ import ThankYouModal from "@/components/ThankYouModal";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
 import {
-  CATALOG_URL,
   CATEGORIES,
   CatalogData,
   CatalogItem,
+  fetchCatalog,
   itemSlug,
   productPath,
 } from "@/lib/catalog";
-
-const inputCls =
-  "w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary transition-colors";
-const inputError =
-  "w-full px-4 py-3 bg-background border border-red-400 rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-red-500 transition-colors";
 
 function isValidPhone(v: string): boolean {
   const digits = v.replace(/\D/g, "");
@@ -55,11 +50,12 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
   const [consent, setConsent] = useState(false);
 
   useEffect(() => {
+    let alive = true;
     setLoading(true);
-    fetch(CATALOG_URL)
-      .then((r) => r.json())
-      .then((d) => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+    fetchCatalog()
+      .then((d) => { if (alive) { setData(d); setLoading(false); } })
+      .catch(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
   }, []);
 
   const items: CatalogItem[] = useMemo(
@@ -130,8 +126,8 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
 
   const phoneValid = isValidPhone(phone);
   const submit = () => {
-    if (!name.trim() || !phoneValid || !consent || sending || !item) return;
-    sendLead({ name, phone, product: item.name, topic: category.topic, formType: "inquiry" });
+    if (!phoneValid || !consent || sending || !item) return;
+    sendLead({ name: name || "—", phone, product: item.name, topic: category.topic, formType: "inquiry" });
     setName(""); setPhone(""); setPhoneTouched(false); setConsent(false);
   };
 
@@ -197,9 +193,6 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
                 {/* Фото */}
                 <div className="bg-white border border-border rounded-3xl p-5 sm:p-6 shadow-sm">
                   <div className="relative bg-gray-50 rounded-2xl overflow-hidden" style={{ aspectRatio: "1/1" }}>
-                    {item.price && (
-                      <div className="absolute top-4 right-4 z-10 bg-orange-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-md">−5%</div>
-                    )}
                     <img src={item.pictures[slide]} alt={item.name} referrerPolicy="no-referrer" className="w-full h-full object-contain p-4 cursor-zoom-in" onClick={() => { setLightboxIndex(slide); setLightboxOpen(true); }} />
                     {item.pictures.length > 1 && (<>
                       <button onClick={() => setSlide((s) => (s - 1 + item.pictures.length) % item.pictures.length)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 hover:bg-white rounded-full shadow flex items-center justify-center"><Icon name="ChevronLeft" size={18} className="text-foreground" /></button>
@@ -234,59 +227,47 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
 
                 {/* Цена + ФОС */}
                 <div className="space-y-5 lg:sticky lg:top-24">
-                  {item.price ? (
-                    <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
-                      <div className="flex items-end gap-3 flex-wrap">
-                        <span className="text-4xl font-display font-black text-foreground">{item.price_display}</span>
-                        <span className="text-lg text-muted-foreground line-through mb-1">{Math.round(item.price / 0.95).toLocaleString("ru-RU")} ₽</span>
-                      </div>
-                      <p className="text-base font-bold text-orange-600 mt-1">Экономия по акции: {Math.round(item.price / 0.95 - item.price).toLocaleString("ru-RU")} ₽</p>
-                      <div className="flex items-center gap-2 mt-4 text-sm text-muted-foreground">
-                        <Icon name="BadgePercent" size={18} className="text-orange-500 flex-shrink-0" />
-                        <span>Акция: скидка 5% от розничной цены</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
-                      <span className="text-2xl font-display font-black text-foreground">Цена по запросу</span>
-                      <p className="text-sm text-muted-foreground mt-1">Оставьте заявку — пришлём актуальную цену</p>
-                    </div>
-                  )}
+                  <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+                    {item.price_display ? (
+                      <span className="text-4xl font-display font-black text-primary">{item.price_display}</span>
+                    ) : (
+                      <>
+                        <span className="text-2xl font-display font-black text-foreground">Цена по запросу</span>
+                        <p className="text-sm text-muted-foreground mt-1">Оставьте заявку — пришлём актуальную цену</p>
+                      </>
+                    )}
+                  </div>
 
-                  <div className="bg-slate-800 rounded-2xl p-6 shadow-lg">
-                    <h2 className="font-display font-bold text-xl text-white mb-1">Получить предложение со скидкой</h2>
-                    <p className="text-sm text-slate-300 mb-5">Оставьте контакты — пришлём КП с актуальной ценой</p>
-                    <div className="space-y-4">
+                  <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 shadow-xl shadow-orange-500/25">
+                    <h2 className="font-display font-black text-2xl text-white mb-1">Получить предложение</h2>
+                    <p className="text-sm text-orange-50 mb-5">Оставьте контакты — технолог свяжется в течение 2 часов и рассчитает стоимость</p>
+                    <div className="space-y-3">
+                      <input type="text" placeholder="Ваше имя" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-3.5 bg-white border-2 border-transparent rounded-xl text-foreground placeholder-muted-foreground text-base focus:outline-none focus:border-slate-800/40 transition-colors" />
                       <div>
-                        <label className="block text-sm font-medium text-slate-200 mb-1.5">Ваше имя</label>
-                        <input type="text" placeholder="Иван" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-4 py-3 bg-white border border-transparent rounded-lg text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-orange-400" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-200 mb-1.5">Телефон</label>
-                        <input type="tel" placeholder="+7" value={phone} onChange={(e) => setPhone(formatPhone(phone, e.target.value))} onBlur={() => setPhoneTouched(true)} className={`w-full px-4 py-3 bg-white rounded-lg text-foreground placeholder-muted-foreground text-sm focus:outline-none border ${phoneTouched && !phoneValid ? "border-red-400" : "border-transparent focus:border-orange-400"}`} />
-                        {phoneTouched && !phoneValid && <p className="text-xs text-red-300 mt-1">Введите номер России, Казахстана или Беларуси</p>}
+                        <input type="tel" placeholder="+7 (___) ___-__-__" value={phone} onChange={(e) => setPhone(formatPhone(phone, e.target.value))} onBlur={() => setPhoneTouched(true)} className={`w-full px-4 py-3.5 bg-white rounded-xl text-foreground placeholder-muted-foreground text-base focus:outline-none border-2 transition-colors ${phoneTouched && !phoneValid ? "border-red-500" : "border-transparent focus:border-slate-800/40"}`} />
+                        {phoneTouched && !phoneValid && <p className="text-xs text-white font-medium mt-1">Введите номер России, Казахстана или Беларуси</p>}
                       </div>
                       <label className="flex items-start gap-2 cursor-pointer select-none">
-                        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 w-4 h-4 flex-shrink-0 accent-orange-500 cursor-pointer" />
-                        <span className="text-xs text-slate-300 leading-relaxed">
+                        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 w-4 h-4 flex-shrink-0 accent-slate-800 cursor-pointer" />
+                        <span className="text-xs text-orange-50 leading-relaxed">
                           Отправляя форму, я соглашаюсь с{" "}
-                          <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-300 hover:underline">политикой</a>
+                          <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-white font-medium hover:underline">политикой обработки персональных данных</a>
                           {" "}и даю{" "}
-                          <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-orange-300 hover:underline">согласие</a>.
+                          <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="text-white font-medium hover:underline">согласие на обработку персональных данных</a>.
                         </span>
                       </label>
-                      <button onClick={submit} disabled={!name.trim() || !phoneValid || !consent || sending} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-bold text-base transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : (item.price ? "Получить КП со скидкой 5%" : "Получить КП")}</button>
+                      <button onClick={submit} disabled={!phoneValid || !consent || sending} className="w-full py-4 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-base transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Получить консультацию"}</button>
                     </div>
                     <div className="flex gap-3 mt-4">
-                      {item.video && (<button onClick={() => setVideoOpen(true)} className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2"><Icon name="Play" size={16} />Видео</button>)}
+                      {item.video && (<button onClick={() => setVideoOpen(true)} className="flex-1 py-3 bg-white/20 hover:bg-white/30 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2"><Icon name="Play" size={16} />Видео</button>)}
                       {qty > 0 ? (
-                        <div className="flex items-center gap-1 border-2 border-orange-400 rounded-lg px-2">
-                          <button onClick={() => removeItem(item.id)} className="w-9 h-9 flex items-center justify-center text-orange-300 font-bold text-lg hover:bg-white/10 rounded-lg transition-colors">−</button>
+                        <div className="flex items-center gap-1 border-2 border-white/60 rounded-xl px-2">
+                          <button onClick={() => removeItem(item.id)} className="w-9 h-9 flex items-center justify-center text-white font-bold text-lg hover:bg-white/15 rounded-lg transition-colors">−</button>
                           <span className="w-6 text-center font-bold text-white">{qty}</span>
-                          <button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="w-9 h-9 flex items-center justify-center text-orange-300 font-bold text-lg hover:bg-white/10 rounded-lg transition-colors">+</button>
+                          <button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="w-9 h-9 flex items-center justify-center text-white font-bold text-lg hover:bg-white/15 rounded-lg transition-colors">+</button>
                         </div>
                       ) : (
-                        <button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="flex-1 py-3 border-2 border-white/25 text-white rounded-lg text-sm font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2"><Icon name="ShoppingCart" size={16} />В корзину</button>
+                        <button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="flex-1 py-3 border-2 border-white/50 text-white rounded-xl text-sm font-semibold hover:bg-white/15 transition-all flex items-center justify-center gap-2"><Icon name="ShoppingCart" size={16} />В корзину</button>
                       )}
                     </div>
                   </div>

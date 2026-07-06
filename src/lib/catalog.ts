@@ -102,3 +102,44 @@ export function productPath(categorySlug: string, item: CatalogItem): string {
   const cat = CATEGORIES[categorySlug];
   return `${cat.path}/${itemSlug(item)}`;
 }
+
+const CACHE_KEY = "mm_catalog_cache";
+const CACHE_TTL = 10 * 60 * 1000; // 10 минут
+let catalogPromise: Promise<CatalogData> | null = null;
+
+function readSessionCache(): CatalogData | null {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { ts: number; data: CatalogData };
+    if (Date.now() - parsed.ts > CACHE_TTL) return null;
+    return parsed.data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Загружает каталог с кэшированием: повторные вызовы (переходы между товарами)
+ * отдают данные мгновенно из памяти/sessionStorage, без сетевого запроса.
+ */
+export function fetchCatalog(): Promise<CatalogData> {
+  const cached = readSessionCache();
+  if (cached) return Promise.resolve(cached);
+  if (catalogPromise) return catalogPromise;
+  catalogPromise = fetch(CATALOG_URL)
+    .then((r) => r.json())
+    .then((d: CatalogData) => {
+      try {
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: d }));
+      } catch {
+        /* превышен лимит storage — не критично */
+      }
+      return d;
+    })
+    .catch((e) => {
+      catalogPromise = null;
+      throw e;
+    });
+  return catalogPromise;
+}
