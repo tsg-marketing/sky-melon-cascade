@@ -108,24 +108,33 @@ def _build() -> dict:
         if cat_id in target_subcats:
             by_subcat[cat_id].append(_parse_offer(offer))
 
-    categories = []
-    for cat_id, info in target_subcats.items():
-        items = by_subcat.get(cat_id, [])
+    def _make_category(cat_id, slug, title, parent_id, items):
         items.sort(key=lambda x: (x["price"] is None, x["price"] if x["price"] is not None else 0))
-        # Самая дорогая позиция (для баннера)
         priced = [i for i in items if i["price"] is not None]
         most_expensive = max(priced, key=lambda x: x["price"]) if priced else (items[0] if items else None)
-        categories.append({
+        return {
             "id": cat_id,
-            "slug": _slugify(info["name"]),
-            "title": info["name"],
-            "parent_id": info["parent"],
-            "parent": cats.get(info["parent"], {}).get("name", ""),
+            "slug": slug,
+            "title": title,
+            "parent_id": parent_id,
+            "parent": cats.get(parent_id, {}).get("name", ""),
             "is_landing": cat_id in LANDING_CAT_IDS,
             "count": len(items),
             "banner_image": most_expensive["picture"] if most_expensive else None,
             "items": items,
-        })
+        }
+
+    categories = []
+    for cat_id, info in target_subcats.items():
+        items = by_subcat.get(cat_id, [])
+        # Категория "Волчки, мясорубки" (id=221) делится на две по названию товара
+        if cat_id == "221":
+            myaso = [i for i in items if "мясорубк" in i["name"].lower()]
+            volchki = [i for i in items if "волчок" in i["name"].lower() and "мясорубк" not in i["name"].lower()]
+            categories.append(_make_category("221", "myasorubka", "Мясорубки", info["parent"], myaso))
+            categories.append(_make_category("221-volchki", "volchki", "Волчки", info["parent"], volchki))
+            continue
+        categories.append(_make_category(cat_id, _slugify(info["name"]), info["name"], info["parent"], items))
 
     categories.sort(key=lambda c: (c["parent_id"], c["title"].lower()))
 
