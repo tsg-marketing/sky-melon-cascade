@@ -108,7 +108,7 @@ const Index = () => {
   const [modalConsent, setModalConsent] = useState(false);
 
   useEffect(() => {
-    document.title = "Оборудование для мясо и рыбопереработки — купить | Техносиб";
+    document.title = "Оборудование для мясо и рыбопереработки — купить | meatmassagers.ru";
     const setMeta = (name: string, content: string, property?: boolean) => {
       const attr = property ? "property" : "name";
       let el = document.querySelector(`meta[${attr}="${name}"]`);

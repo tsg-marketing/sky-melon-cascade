@@ -191,7 +191,7 @@ const Slicers = () => {
   const [contactsConsent, setContactsConsent] = useState(false);
 
   useEffect(() => {
-    document.title = "Слайсеры - Купить слайсеры от производителя недорого с гарантией. Доставка и установка и по всей России.";
+    document.title = "Слайсеры - Купить слайсеры от производителя недорого с гарантией на meatmassagers.ru. Доставка и установка и по всей России.";
     const setMeta = (name: string, content: string, property?: boolean) => {
       const attr = property ? "property" : "name";
       let el = document.querySelector(`meta[${attr}="${name}"]`);

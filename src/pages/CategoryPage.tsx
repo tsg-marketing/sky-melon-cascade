@@ -143,7 +143,7 @@ const CategoryPage = () => {
     } else {
       const name = category.title;
       const nameLower = name.toLowerCase();
-      document.title = `${name} - Купить ${nameLower} от производителя недорого с гарантией. Доставка и установка и по всей России.`;
+      document.title = `${name} - Купить ${nameLower} от производителя недорого с гарантией на meatmassagers.ru. Доставка и установка и по всей России.`;
       setMeta("description", `Купить ${nameLower} от производителя недорого с гарантией. Доставка и установка и по всей России. 21 категория. Более 1000 моделей для мясо и рыбопереработки от ведущих европейских, азиатских и российских производителей.`);
     }
   }, [category, product]);
