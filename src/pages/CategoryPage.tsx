@@ -139,7 +139,7 @@ const CategoryPage = () => {
       el.setAttribute("content", c);
     };
     if (product) {
-      document.title = `${product.name} — купить | Техносиб`;
+      document.title = `${product.name} - купить на сайте meatmassagers.ru. Широкий ассортимент оборудования для мясо и рыбопереработки.`;
     } else {
       const name = category.title;
       const nameLower = name.toLowerCase();
