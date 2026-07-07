@@ -6,7 +6,7 @@ import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
 
 const HOME_CATALOG_URL = "https://functions.poehali.dev/19e6f517-e766-4ac9-b359-029df68cf0fa";
-const HERO_IMG = "https://cdn.poehali.dev/projects/63874bed-e293-4b07-975b-a3b344891b91/files/48e646fe-cdd9-4e60-9c2a-fc7daabf0e5d.jpg";
+const HERO_IMG = "https://cdn.poehali.dev/projects/63874bed-e293-4b07-975b-a3b344891b91/bucket/ad6dcf2b-75be-4c10-b179-c8c18d5fb7f9.png";
 
 const inputCls = "w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary transition-colors";
 const inputError = "w-full px-4 py-3 bg-background border border-red-400 rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-red-500 transition-colors";
@@ -63,7 +63,7 @@ const ConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (v
 const HERO_BULLETS = [
   "21 категория, более 1000 моделей оборудования",
   "Оборудование по ценам заводов-изготовителей от ведущих Европейских, Азиатских и Российских производителей",
-  "Оборудование на любые производства — от ресторанов до крупных мясо- и рыбокомбинатов",
+  "Оборудование на любые производства — от ресторанов до крупных рыбокомбинатов",
   "Доставка и пусконаладка по всей России",
 ];
 
@@ -103,14 +103,14 @@ const Index = () => {
   const [contactsConsent, setContactsConsent] = useState(false);
 
   useEffect(() => {
-    document.title = "Оборудование для мясо- и рыбопереработки — купить | Техносиб";
+    document.title = "Оборудование для мясо и рыбопереработки — купить | Техносиб";
     const setMeta = (name: string, content: string, property?: boolean) => {
       const attr = property ? "property" : "name";
       let el = document.querySelector(`meta[${attr}="${name}"]`);
       if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.setAttribute("content", content);
     };
-    setMeta("description", "Оборудование для мясо- и рыбопереработки: более 1000 моделей от ведущих европейских, азиатских и российских производителей по ценам заводов. Доставка и пусконаладка по всей России.");
+    setMeta("description", "Оборудование для мясо и рыбопереработки: более 1000 моделей от ведущих европейских, азиатских и российских производителей по ценам заводов. Доставка и пусконаладка по всей России.");
   }, []);
 
   useEffect(() => {
@@ -175,7 +175,7 @@ const Index = () => {
             <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0 min-w-0">
               <a href="/" className="flex flex-col min-w-0">
                 <img src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg" alt="Техносиб" className="h-8 sm:h-9 w-auto object-contain" />
-                <span className="text-xs text-muted-foreground leading-tight mt-0.5 hidden sm:block">Оборудование для мясо- и рыбопереработки</span>
+                <span className="text-xs text-muted-foreground leading-tight mt-0.5 hidden sm:block">Оборудование для мясо и рыбопереработки</span>
               </a>
               <nav className="hidden lg:flex gap-6 text-sm font-semibold items-center">
                 <div className="relative" onMouseEnter={() => setEquipMenuOpen(true)} onMouseLeave={() => setEquipMenuOpen(false)}>
@@ -243,13 +243,13 @@ const Index = () => {
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           <div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-black tracking-tight text-foreground leading-tight mb-8">
-              Оборудование для мясо- и рыбопереработки
+              Оборудование для мясо и рыбопереработки
             </h1>
-            <ul className="space-y-4 mb-9">
+            <ul className="space-y-5 mb-9">
               {HERO_BULLETS.map((b, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <Icon name="CheckCircle2" fallback="Check" size={24} className="text-primary flex-shrink-0 mt-0.5" />
-                  <span className="text-base sm:text-lg text-muted-foreground leading-snug">{b}</span>
+                  <Icon name="CheckCircle2" fallback="Check" size={28} className="text-primary flex-shrink-0 mt-1" />
+                  <span className="text-lg sm:text-xl lg:text-2xl text-foreground font-medium leading-snug">{b}</span>
                 </li>
               ))}
             </ul>
@@ -263,9 +263,7 @@ const Index = () => {
             </div>
           </div>
           <div className="relative">
-            <div className="rounded-3xl overflow-hidden shadow-2xl border border-border bg-white">
-              <img src={HERO_IMG} alt="Оборудование для мясо- и рыбопереработки" className="w-full h-full object-cover aspect-[4/3]" />
-            </div>
+            <img src={HERO_IMG} alt="Оборудование для мясо и рыбопереработки" className="w-full h-full object-contain aspect-[4/3]" />
           </div>
         </div>
       </section>
@@ -274,7 +272,7 @@ const Index = () => {
       <section id="catalog" className="py-14 px-4 sm:px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black text-foreground mb-3">
-            Каталог оборудования мясо- и рыбопереработки
+            Каталог оборудования для мясо и рыбопереработки
           </h2>
           <p className="text-muted-foreground text-lg mb-10">Актуальные позиции и цены из нашего каталога</p>
 
@@ -475,7 +473,7 @@ const Index = () => {
                       <Icon name="Factory" size={56} className="text-primary" />
                     </div>
                   </div>
-                  <p className="text-center text-sm font-medium text-muted-foreground mb-6">Оборудование для мясо- и рыбопереработки</p>
+                  <p className="text-center text-sm font-medium text-muted-foreground mb-6">Оборудование для мясо и рыбопереработки</p>
                   <div className="space-y-4">
                     {[
                       { icon: "Phone", label: "Телефон", value: "8 800 505-91-24", href: "tel:88005059124" },
@@ -633,7 +631,7 @@ const Index = () => {
           <div className="grid md:grid-cols-4 gap-8 mb-10">
             <div className="md:col-span-1">
               <img src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg" alt="Техносиб" className="h-8 w-auto object-contain mb-2" />
-              <p className="text-xs text-muted-foreground mb-4">Оборудование для мясо- и рыбопереработки</p>
+              <p className="text-xs text-muted-foreground mb-4">Оборудование для мясо и рыбопереработки</p>
               <div className="space-y-2">
                 <a href="tel:88005059124" className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors">
                   <Icon name="Phone" size={14} className="text-primary" />8 800 505-91-24
