@@ -58,11 +58,20 @@ def _parse_offer(offer) -> dict:
         price = None
     pictures = [p.text for p in offer.findall("picture") if p.text]
     params = []
+    video = None
     for p in offer.findall("param"):
         pname = (p.get("name") or "").strip()
         pval = (p.text or "").strip()
-        if pname and pname != "GUID" and pval:
-            params.append({"name": pname, "value": pval})
+        if not pname or not pval:
+            continue
+        low = pname.lower()
+        if pname == "GUID":
+            continue
+        if "видео" in low or "video" in low:
+            if not video:
+                video = pval
+            continue
+        params.append({"name": pname, "value": pval})
     name = (offer.findtext("name") or "").strip()
     oid = offer.get("id")
     return {
@@ -74,6 +83,7 @@ def _parse_offer(offer) -> dict:
         "picture": pictures[0] if pictures else None,
         "pictures": pictures,
         "params": params,
+        "video": video,
         "description": (offer.findtext("description") or "").strip(),
         "vendor": (offer.findtext("vendor") or "").strip() or None,
         "url": offer.findtext("url"),
@@ -131,8 +141,8 @@ def _get_model() -> dict:
     return data
 
 
-def _light_item(it: dict, max_params: int = 4) -> dict:
-    """Облегчённый товар для листингов: без описания, с усечёнными характеристиками."""
+def _light_item(it: dict) -> dict:
+    """Облегчённый товар для листингов: без описания, но со всеми характеристиками и видео."""
     return {
         "id": it["id"],
         "slug": it["slug"],
@@ -141,7 +151,8 @@ def _light_item(it: dict, max_params: int = 4) -> dict:
         "price_display": it["price_display"],
         "picture": it["picture"],
         "pictures": it["pictures"],
-        "params": it["params"][:max_params],
+        "params": it["params"],
+        "video": it.get("video"),
         "vendor": it["vendor"],
     }
 

@@ -4,6 +4,9 @@ import Icon from "@/components/ui/icon";
 import ThankYouModal from "@/components/ThankYouModal";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
+import SiteHeader from "@/components/site/SiteHeader";
+import SiteFooter from "@/components/site/SiteFooter";
+import HomeSections from "@/components/site/HomeSections";
 
 const CATALOG_FN = "https://functions.poehali.dev/19e6f517-e766-4ac9-b359-029df68cf0fa";
 const inputCls = "w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary transition-colors";
@@ -18,7 +21,8 @@ interface FeedItem {
   picture: string | null;
   pictures: string[];
   params: { name: string; value: string }[];
-  description: string;
+  video?: string | null;
+  description?: string;
   vendor: string | null;
   url: string | null;
 }
@@ -39,7 +43,7 @@ function isValidPhone(v: string): boolean {
   if (/^375\d{9}$/.test(digits)) return true;
   return false;
 }
-function formatPhone(prev: string, next: string): string {
+function formatPhone(_prev: string, next: string): string {
   let raw = next.replace(/[^\d+]/g, "");
   if (raw.startsWith("8")) raw = "7" + raw.slice(1);
   if (/^[9]/.test(raw)) raw = "7" + raw;
@@ -62,25 +66,18 @@ const ConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (v
   </label>
 );
 
-const equipmentLinks = [
-  { href: "/massagers", label: "Массажёры мяса" },
-  { href: "/injector", label: "Инъекторы" },
-  { href: "/slicers", label: "Слайсеры" },
-  { href: "/ldogenerator", label: "Льдогенераторы" },
-];
-
 const CategoryPage = () => {
   const { slug, productSlug } = useParams();
   const navigate = useNavigate();
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
-  const { addItem, removeItem, getQuantity, totalCount } = useCart();
+  const { addItem, removeItem, getQuantity } = useCart();
 
   const [category, setCategory] = useState<CategoryInfo | null>(null);
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const [lightbox, setLightbox] = useState<{ pics: string[]; index: number } | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   // Modal ФОС
   const [modalOpen, setModalOpen] = useState(false);
@@ -161,36 +158,7 @@ const CategoryPage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* HEADER */}
-      <header className="fixed top-0 w-full bg-white/90 backdrop-blur-xl border-b border-border z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3 sm:gap-6">
-          <a href="/" className="flex-shrink-0"><img src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg" alt="Техносиб" className="h-8 sm:h-9 w-auto object-contain" /></a>
-          <nav className="hidden lg:flex gap-6 text-sm font-semibold items-center">
-            {equipmentLinks.map((l) => (
-              <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">{l.label}</a>
-            ))}
-          </nav>
-          <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-shrink-0">
-            <a href="tel:88005059124" className="hidden sm:flex items-center gap-1.5 text-sm font-bold text-foreground hover:text-primary transition-colors whitespace-nowrap">
-              <Icon name="Phone" size={14} className="text-primary" />8 800 505-91-24
-            </a>
-            <button onClick={() => navigate("/cart")} className="relative flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2 sm:gap-2 border-2 border-primary/30 text-primary rounded-full text-sm font-semibold hover:border-primary hover:bg-primary/5 transition-all">
-              <Icon name="ShoppingCart" size={16} />
-              <span className="hidden sm:inline">Корзина</span>
-              {totalCount > 0 && <span className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">{totalCount}</span>}
-            </button>
-            <button onClick={() => openModal("Получить предложение")} className="hidden sm:block px-5 py-2 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm whitespace-nowrap">Получить КП</button>
-            <button className="lg:hidden p-2 text-muted-foreground" onClick={() => setMenuOpen(!menuOpen)}><Icon name={menuOpen ? "X" : "Menu"} size={22} /></button>
-          </div>
-        </div>
-        {menuOpen && (
-          <div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-3">
-            {equipmentLinks.map((l) => (
-              <a key={l.href} href={l.href} className="text-sm text-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>{l.label}</a>
-            ))}
-          </div>
-        )}
-      </header>
+      <SiteHeader onGetKp={() => openModal("Получить предложение")} />
 
       <main className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
@@ -286,6 +254,9 @@ const CategoryPage = () => {
                         <button onClick={submitProduct} disabled={!pPhoneValid || !pConsent || sending} className="w-full py-4 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-base transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Получить консультацию"}</button>
                       </div>
                       <div className="flex gap-3 mt-4">
+                        {product.video && (
+                          <button onClick={() => setVideoUrl(product.video || null)} className="flex-1 py-3 bg-white/20 hover:bg-white/30 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2"><Icon name="Play" size={16} />Смотреть видео</button>
+                        )}
                         {getQuantity(product.id) > 0 ? (
                           <div className="flex items-center gap-1 border-2 border-white/60 rounded-xl px-2 flex-1 justify-center">
                             <button onClick={() => removeItem(product.id)} className="w-9 h-9 flex items-center justify-center text-white font-bold text-lg hover:bg-white/15 rounded-lg transition-colors">−</button>
@@ -374,6 +345,7 @@ const CategoryPage = () => {
                       onAdd={() => addItem(cartPayload(it))}
                       onRemove={() => removeItem(it.id)}
                       onZoom={(pics, index) => setLightbox({ pics, index })}
+                      onVideo={it.video ? () => setVideoUrl(it.video || null) : undefined}
                     />
                   ))}
                 </div>
@@ -385,6 +357,11 @@ const CategoryPage = () => {
           )}
         </div>
       </main>
+
+      {/* Общие блоки сайта — на листинге категории (после каталога) */}
+      {!loading && category && !productSlug && <HomeSections topic={category.title} />}
+
+      <SiteFooter onGetKp={() => openModal("Получить предложение")} />
 
       {/* МОДАЛ ФОС */}
       {modalOpen && (
@@ -422,12 +399,22 @@ const CategoryPage = () => {
         </div>
       )}
 
+      {/* ВИДЕО */}
+      {videoUrl && (
+        <div className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4" onClick={() => setVideoUrl(null)}>
+          <button onClick={() => setVideoUrl(null)} className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"><Icon name="X" size={24} className="text-white" /></button>
+          <div className="w-full max-w-4xl aspect-video" onClick={(e) => e.stopPropagation()}>
+            <iframe src={videoUrl} title="Видео" className="w-full h-full rounded-xl" frameBorder="0" allow="autoplay; encrypted-media; fullscreen" allowFullScreen />
+          </div>
+        </div>
+      )}
+
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
     </div>
   );
 };
 
-const ProductCard = ({ item, qty, onOpen, onInquiry, onAdd, onRemove, onZoom }: {
+const ProductCard = ({ item, qty, onOpen, onInquiry, onAdd, onRemove, onZoom, onVideo }: {
   item: FeedItem;
   qty: number;
   onOpen: () => void;
@@ -435,6 +422,7 @@ const ProductCard = ({ item, qty, onOpen, onInquiry, onAdd, onRemove, onZoom }: 
   onAdd: () => void;
   onRemove: () => void;
   onZoom: (pics: string[], index: number) => void;
+  onVideo?: () => void;
 }) => {
   const [slide, setSlide] = useState(0);
   const pics = item.pictures && item.pictures.length ? item.pictures : (item.picture ? [item.picture] : []);
@@ -458,10 +446,11 @@ const ProductCard = ({ item, qty, onOpen, onInquiry, onAdd, onRemove, onZoom }: 
         <h4 onClick={onOpen} className="font-bold text-base text-foreground leading-snug mb-3 line-clamp-2 min-h-[2.6em] cursor-pointer hover:text-primary transition-colors">{item.name}</h4>
         {item.params.length > 0 && (
           <div className="mb-3 space-y-1">
-            {item.params.slice(0, 3).map((p, pi) => (
+            {item.params.map((p, pi) => (
               <div key={pi} className="flex items-start gap-2 text-xs">
-                <span className="text-muted-foreground flex-1 line-clamp-1">{p.name}</span>
-                <span className="font-semibold text-foreground text-right line-clamp-1">{p.value}</span>
+                <span className="text-muted-foreground flex-shrink-0">{p.name}</span>
+                <span className="flex-1 border-b border-dotted border-border/60 translate-y-[-3px]" />
+                <span className="font-semibold text-foreground text-right">{p.value}</span>
               </div>
             ))}
           </div>
@@ -469,6 +458,9 @@ const ProductCard = ({ item, qty, onOpen, onInquiry, onAdd, onRemove, onZoom }: 
         <div className="mt-auto">
           {item.price_display ? <p className="text-xl font-display font-black text-primary mb-4">{item.price_display}</p> : <p className="text-base font-semibold text-muted-foreground mb-4">Цена по запросу</p>}
           <div className="flex flex-col gap-2.5">
+            {onVideo && (
+              <button onClick={onVideo} className="w-full py-2.5 bg-sky-100 text-sky-600 rounded-xl text-sm font-bold hover:bg-sky-200 transition-all flex items-center justify-center gap-2"><Icon name="Play" size={16} />Смотреть видео</button>
+            )}
             <button onClick={onOpen} className="w-full py-2.5 bg-orange-100 text-orange-600 rounded-xl text-sm font-bold hover:bg-orange-200 transition-all">Подробнее</button>
             <div className="flex gap-2.5">
               <button onClick={onInquiry} style={{ backgroundColor: "#F97316" }} className="flex-1 py-2.5 text-white rounded-xl text-sm font-bold hover:brightness-95 transition-all shadow-md shadow-orange-500/20">Получить предложение</button>
