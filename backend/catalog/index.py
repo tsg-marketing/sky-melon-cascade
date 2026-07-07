@@ -108,7 +108,7 @@ def parse_offer(offer: ET.Element) -> dict:
 def get_catalog():
     global _cache, _cache_ts
     now = time.time()
-    if _cache and now - _cache_ts < 3600:
+    if _cache and now - _cache_ts < 86400:
         return _cache
 
     req = urllib.request.Request(FEED_URL, headers={"User-Agent": "Mozilla/5.0"})
@@ -164,6 +164,10 @@ def handler(event: dict, context) -> dict:
 
     return {
         "statusCode": 200,
-        "headers": {**cors, "Content-Type": "application/json"},
+        "headers": {
+            **cors,
+            "Content-Type": "application/json",
+            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+        },
         "body": json.dumps(result, ensure_ascii=False),
     }

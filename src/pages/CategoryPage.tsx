@@ -131,10 +131,19 @@ const CategoryPage = () => {
   useEffect(() => { setProdSlide(0); window.scrollTo(0, 0); }, [productSlug]);
 
   useEffect(() => {
-    if (category) {
-      document.title = product
-        ? `${product.name} — купить | Техносиб`
-        : `${category.title} — купить, цены | Техносиб`;
+    if (!category) return;
+    const setMeta = (n: string, c: string) => {
+      let el = document.querySelector(`meta[name="${n}"]`);
+      if (!el) { el = document.createElement("meta"); el.setAttribute("name", n); document.head.appendChild(el); }
+      el.setAttribute("content", c);
+    };
+    if (product) {
+      document.title = `${product.name} — купить | Техносиб`;
+    } else {
+      const name = category.title;
+      const nameLower = name.toLowerCase();
+      document.title = `${name} - Купить ${nameLower} от производителя недорого с гарантией. Доставка и установка и по всей России.`;
+      setMeta("description", `Купить ${nameLower} от производителя недорого с гарантией. Доставка и установка и по всей России. 21 категория. Более 1000 моделей для мясо и рыбопереработки от ведущих европейских, азиатских и российских производителей.`);
     }
   }, [category, product]);
 
@@ -155,7 +164,21 @@ const CategoryPage = () => {
   };
 
   const pPhoneValid = isValidPhone(pPhone);
-  const related = product ? items.filter((it) => it.id !== product.id).slice(0, 4) : [];
+  const related = (() => {
+    if (!product) return [];
+    const others = items.filter((it) => it.id !== product.id);
+    if (product.price) {
+      const min = product.price * 0.8;
+      const max = product.price * 1.2;
+      const inRange = others.filter((it) => it.price != null && it.price >= min && it.price <= max);
+      if (inRange.length > 0) {
+        return inRange
+          .sort((a, b) => Math.abs((a.price || 0) - product.price!) - Math.abs((b.price || 0) - product.price!))
+          .slice(0, 5);
+      }
+    }
+    return others.slice(0, 5);
+  })();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -284,13 +307,24 @@ const CategoryPage = () => {
                     <h2 className="text-2xl font-display font-black text-foreground mb-6">Другие {category.title.toLowerCase()}</h2>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
                       {related.map((it) => (
-                        <button key={it.id} onClick={() => navigate(`/${category.slug}/${it.slug}`)} className="text-left bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
+                        <button key={it.id} onClick={() => navigate(`/${category.slug}/${it.slug}`)} className="text-left bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow flex flex-col">
                           <div className="bg-gray-50 aspect-square flex items-center justify-center p-4">
                             {it.picture ? <img src={it.picture} alt={it.name} referrerPolicy="no-referrer" className="w-full h-full object-contain" /> : <Icon name="ImageOff" size={36} className="text-muted-foreground opacity-30" />}
                           </div>
-                          <div className="p-4">
+                          <div className="p-4 flex flex-col flex-1">
                             <h4 className="font-bold text-sm text-foreground leading-snug mb-2 line-clamp-2 min-h-[2.6em]">{it.name}</h4>
-                            {it.price_display ? <p className="text-lg font-display font-black text-primary">{it.price_display}</p> : <p className="text-sm font-semibold text-muted-foreground">Цена по запросу</p>}
+                            {it.price_display ? <p className="text-lg font-display font-black text-primary mb-3">{it.price_display}</p> : <p className="text-sm font-semibold text-muted-foreground mb-3">Цена по запросу</p>}
+                            {pickListingParams(it.params).length > 0 && (
+                              <div className="mt-auto space-y-1">
+                                {pickListingParams(it.params).map((p, pi) => (
+                                  <div key={pi} className="flex items-baseline gap-2 text-xs">
+                                    <span className="text-muted-foreground flex-shrink-0">{p.name}</span>
+                                    <span className="flex-1 border-b border-dotted border-border/60" />
+                                    <span className="font-semibold text-foreground text-right break-words">{p.value}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </button>
                       ))}

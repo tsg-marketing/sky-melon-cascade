@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import ThankYouModal from "@/components/ThankYouModal";
 import { useLeadForm } from "@/hooks/useLeadForm";
-import { useCart } from "@/hooks/useCart";
 import {
   CATEGORIES,
   CatalogData,
@@ -11,7 +10,9 @@ import {
   fetchCatalog,
   itemSlug,
   productPath,
+  pickListingParams,
 } from "@/lib/catalog";
+import SiteHeader from "@/components/site/SiteHeader";
 
 function isValidPhone(v: string): boolean {
   const digits = v.replace(/\D/g, "");
@@ -33,9 +34,7 @@ function formatPhone(prev: string, next: string): string {
 const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
   const category = CATEGORIES[categorySlug];
   const { slug } = useParams();
-  const navigate = useNavigate();
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
-  const { totalCount } = useCart();
 
   const [data, setData] = useState<CatalogData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,10 +67,21 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
     [items, slug]
   );
 
-  const related = useMemo(
-    () => (item ? items.filter((it) => it.id !== item.id).slice(0, 3) : []),
-    [items, item]
-  );
+  const related = useMemo(() => {
+    if (!item) return [];
+    const others = items.filter((it) => it.id !== item.id);
+    if (item.price) {
+      const min = item.price * 0.8;
+      const max = item.price * 1.2;
+      const inRange = others.filter((it) => it.price != null && it.price >= min && it.price <= max);
+      if (inRange.length > 0) {
+        return inRange
+          .sort((a, b) => Math.abs((a.price || 0) - item.price!) - Math.abs((b.price || 0) - item.price!))
+          .slice(0, 5);
+      }
+    }
+    return others.slice(0, 5);
+  }, [items, item]);
 
   useEffect(() => { setSlide(0); }, [slug]);
 
@@ -131,30 +141,9 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
     setName(""); setPhone(""); setPhoneTouched(false); setConsent(false);
   };
 
-  const equipmentLinks = [
-    { href: "/", label: "Мясомассажеры" },
-    { href: "/injector", label: "Инъекторы" },
-    { href: "/slicers", label: "Слайсеры" },
-    { href: "/ldogenerator", label: "Льдогенераторы" },
-  ];
-
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="fixed top-0 w-full bg-white/90 backdrop-blur-xl border-b border-border z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3 sm:gap-6">
-          <a href="/"><img src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg" alt="Техносиб" className="h-8 sm:h-9 w-auto object-contain" /></a>
-          <nav className="hidden lg:flex gap-6 text-sm font-semibold items-center">
-            {equipmentLinks.map((l) => (<a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">{l.label}</a>))}
-          </nav>
-          <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-shrink-0">
-            <a href="tel:88005059124" className="hidden md:flex items-center gap-1.5 text-sm font-bold text-foreground hover:text-primary transition-colors whitespace-nowrap"><Icon name="Phone" size={14} className="text-primary" />8 800 505-91-24</a>
-            <button onClick={() => navigate("/cart")} className="relative flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2 sm:gap-2 border-2 border-primary/30 text-primary rounded-full text-sm font-semibold hover:border-primary hover:bg-primary/5 transition-all">
-              <Icon name="ShoppingCart" size={16} /><span className="hidden sm:inline">Корзина</span>
-              {totalCount > 0 && (<span className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">{totalCount}</span>)}
-            </button>
-          </div>
-        </div>
-      </header>
+      <SiteHeader current={category.path} />
 
       <main className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
@@ -272,9 +261,20 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
                         <div className="relative bg-gray-50" style={{ aspectRatio: "4/3" }}>
                           <img src={it.pictures[0]} alt={it.name} referrerPolicy="no-referrer" loading="lazy" className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500" />
                         </div>
-                        <div className="p-4">
+                        <div className="p-4 flex flex-col flex-1">
                           <h3 className="font-bold text-lg text-foreground leading-snug mb-1 group-hover:text-primary transition-colors">{it.name}</h3>
-                          {it.price_display && <p className="text-primary font-black">{it.price_display}</p>}
+                          {it.price_display && <p className="text-primary font-black mb-3">{it.price_display}</p>}
+                          {pickListingParams(it.all_params).length > 0 && (
+                            <div className="mt-auto space-y-1">
+                              {pickListingParams(it.all_params).map((p, pi) => (
+                                <div key={pi} className="flex items-baseline gap-2 text-sm">
+                                  <span className="text-muted-foreground flex-shrink-0">{p.name}</span>
+                                  <span className="flex-1 border-b border-dotted border-border/70" />
+                                  <span className="font-semibold text-foreground text-right break-words">{p.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </Link>
                     ))}

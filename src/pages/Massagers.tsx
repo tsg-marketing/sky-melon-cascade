@@ -236,14 +236,14 @@ const Massagers = () => {
   const [contactsConsent, setContactsConsent] = useState(false);
 
   useEffect(() => {
-    document.title = "Вакуумные массажеры для мяса — купить промышленный массажер | Техно-Сиб";
+    document.title = "Массажёры мяса - Купить массажёры мяса от производителя недорого с гарантией. Доставка и установка и по всей России.";
     const setMeta = (name: string, content: string, property?: boolean) => {
       const attr = property ? "property" : "name";
       let el = document.querySelector(`meta[${attr}="${name}"]`);
       if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.setAttribute("content", content);
     };
-    setMeta("description", "Вакуумные массажеры для мяса от Daribo. Увеличение выхода до 30%, равномерный посол, 99 программ PLC. Подбор, поставка и пусконаладка по всей России. Техно-Сиб — 25 лет на рынке.");
+    setMeta("description", "Купить массажёры мяса от производителя недорого с гарантией. Доставка и установка и по всей России. 21 категория. Более 1000 моделей для мясо и рыбопереработки от ведущих европейских, азиатских и российских производителей.");
     setMeta("keywords", "вакуумный массажер для мяса, массажер Daribo, промышленный массажер, оборудование для посола мяса, оборудование для маринования, купить вакуумный массажер");
     setMeta("og:title", "Вакуумные массажеры для мяса — промышленное оборудование | Техно-Сиб", true);
     setMeta("og:description", "Вакуумные массажеры для равномерного посола и маринования мяса. Подбор модели под ваш продукт, поставка и сервис.", true);

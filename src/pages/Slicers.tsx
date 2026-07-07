@@ -191,14 +191,14 @@ const Slicers = () => {
   const [contactsConsent, setContactsConsent] = useState(false);
 
   useEffect(() => {
-    document.title = "Слайсеры для нарезки мяса и овощей — купить промышленный слайсер | Техно-Сиб";
+    document.title = "Слайсеры - Купить слайсеры от производителя недорого с гарантией. Доставка и установка и по всей России.";
     const setMeta = (name: string, content: string, property?: boolean) => {
       const attr = property ? "property" : "name";
       let el = document.querySelector(`meta[${attr}="${name}"]`);
       if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.setAttribute("content", content);
     };
-    setMeta("description", "Промышленные слайсеры для точной нарезки мяса, рыбы и овощей. Толщина от 1 мм, до 260 резов/мин. Подбор, поставка и сервис по всей России. Техно-Сиб — 25 лет на рынке.");
+    setMeta("description", "Купить слайсеры от производителя недорого с гарантией. Доставка и установка и по всей России. 21 категория. Более 1000 моделей для мясо и рыбопереработки от ведущих европейских, азиатских и российских производителей.");
     setMeta("keywords", "слайсер для мяса, промышленный слайсер, слайсер для нарезки, оборудование для нарезки мяса, купить слайсер");
     setMeta("og:title", "Слайсеры для нарезки мяса и овощей — промышленное оборудование | Техно-Сиб", true);
     setMeta("og:description", "Промышленные слайсеры для точной нарезки мяса, рыбы и овощей. Подбор модели под ваш продукт, поставка и сервис по всей России.", true);

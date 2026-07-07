@@ -201,6 +201,10 @@ def handler(event: dict, context) -> dict:
 
     return {
         "statusCode": 200,
-        "headers": {**cors, "Content-Type": "application/json"},
+        "headers": {
+            **cors,
+            "Content-Type": "application/json",
+            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+        },
         "body": json.dumps({**data, "updated_at": updated_at}, ensure_ascii=False),
     }
