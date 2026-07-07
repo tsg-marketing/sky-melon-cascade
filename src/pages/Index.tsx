@@ -145,6 +145,7 @@ const Index = () => {
     { href: "#catalog", label: "Каталог" },
     { href: "#technosib", label: "О компании" },
     { href: "#advantages", label: "Преимущества" },
+    { href: "#delivery", label: "Доставка" },
     { href: "#contacts", label: "Контакты" },
   ];
   const equipmentLinks = [
@@ -337,25 +338,109 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ПРЕИМУЩЕСТВА / СЕРВИС / ДОСТАВКА — заглушка */}
-      <section id="advantages" className="py-14 px-6 bg-white">
+      {/* НАШИ ПРЕИМУЩЕСТВА */}
+      <section id="advantages" className="py-16 px-4 sm:px-6 bg-background">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-display font-black text-center mb-3 text-foreground">Наши преимущества, сервис и доставка</h2>
-          <p className="text-center text-muted-foreground text-lg mb-10">Раздел в разработке — скоро здесь появится подробная информация</p>
-          <div className="grid sm:grid-cols-3 gap-5">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl lg:text-5xl font-display font-black text-foreground mb-3">Наши преимущества</h2>
+            <p className="text-muted-foreground text-lg">Почему заказчики работают с нами годами</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: "Award", title: "Наши преимущества", desc: "Скоро здесь появится описание" },
-              { icon: "Wrench", title: "Сервис", desc: "Скоро здесь появится описание" },
-              { icon: "Truck", title: "Доставка", desc: "Скоро здесь появится описание" },
+              { icon: "Globe", title: "Прямые контракты с производителями", desc: "Без посредников — выгодные цены и оригинальные запчасти" },
+              { icon: "Truck", title: "Склад запчастей в РФ", desc: "Базовые комплектующие — на складе, отгрузка в день заказа" },
+              { icon: "SlidersHorizontal", title: "Монтаж и пусконаладка", desc: "Свои инженеры запускают линию в вашем цехе" },
+              { icon: "GraduationCap", title: "Обучение персонала", desc: "Готовим операторов к самостоятельной работе на оборудовании" },
+              { icon: "ShieldCheck", title: "Гарантия 12 месяцев", desc: "Расширенная гарантия и сервисное обслуживание" },
+              { icon: "FileText", title: "Документы для сетей", desc: "Сертификаты, декларации, маркировка под требования ритейлеров" },
             ].map((s, i) => (
-              <div key={i} className="bg-background border border-border rounded-2xl p-8 text-center opacity-80">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Icon name={s.icon} fallback="Star" size={30} className="text-primary" />
+              <div key={i} className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-7">
+                <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center mb-5">
+                  <Icon name={s.icon} fallback="Star" size={24} className="text-orange-500" />
                 </div>
-                <h3 className="font-bold text-lg text-foreground mb-1">{s.title}</h3>
-                <p className="text-muted-foreground text-sm">{s.desc}</p>
+                <h3 className="font-bold text-lg text-foreground mb-2 leading-snug">{s.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* СЕРВИС И ПОДДЕРЖКА */}
+      <section id="service" className="py-16 px-4 sm:px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl lg:text-5xl font-display font-black text-foreground">Сервис и поддержка</h2>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-6">
+            {[
+              { icon: "Truck", title: "Доставка и монтаж", desc: "Доставляем по всей России. Монтаж и пусконаладка выполняются нашими специалистами" },
+              { icon: "GraduationCap", title: "Обучение персонала", desc: "Проводим инструктаж и обучение ваших сотрудников работе с оборудованием" },
+              { icon: "Wrench", title: "Гарантийное обслуживание", desc: "12 месяцев гарантии. Быстрое реагирование на заявки и наличие запчастей на складе" },
+            ].map((s, i) => (
+              <div key={i} className="bg-background rounded-2xl shadow-sm p-8 text-center">
+                <div className="w-16 h-16 rounded-full bg-sky-100 flex items-center justify-center mx-auto mb-5">
+                  <Icon name={s.icon} fallback="Star" size={30} className="text-sky-500" />
+                </div>
+                <h3 className="font-bold text-lg text-foreground mb-2">{s.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ДОСТАВКА ТОВАРА */}
+      <section id="delivery" className="py-16 px-4 sm:px-6 bg-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl lg:text-5xl font-display font-black text-foreground mb-3">Доставка товара</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Доставка в пределах г. Новосибирск и г. Москва — <strong className="text-orange-500">бесплатно</strong>. Выгрузка товара осуществляется силами Покупателя.
+            </p>
+          </div>
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Самовывоз */}
+            <div className="bg-orange-50 border border-orange-100 rounded-2xl p-8">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-11 h-11 rounded-full bg-orange-100 flex items-center justify-center">
+                  <Icon name="MapPin" size={22} className="text-orange-500" />
+                </div>
+                <h3 className="font-bold text-xl text-foreground">Самовывоз</h3>
+              </div>
+              <p className="text-muted-foreground text-sm mb-4">Забрать оплаченный товар можно на складе по адресу:</p>
+              <ul className="space-y-3">
+                {["г. Новосибирск, ул. Электрозаводская, 2, корпус 5", "г. Москва, ш. Энтузиастов, д. 56, стр. 32"].map((a, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-foreground">
+                    <Icon name="MapPin" size={16} className="text-orange-500 flex-shrink-0 mt-0.5" />
+                    <span>{a}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* Доставка по России */}
+            <div className="bg-sky-50 border border-sky-100 rounded-2xl p-8">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-11 h-11 rounded-full bg-sky-100 flex items-center justify-center">
+                  <Icon name="Truck" size={22} className="text-sky-500" />
+                </div>
+                <h3 className="font-bold text-xl text-foreground">Доставка по России</h3>
+              </div>
+              <ul className="space-y-3.5">
+                {[
+                  { icon: "Check", node: <>Доставка по России осуществляется через транспортные компании.</> },
+                  { icon: "Check", node: <><strong className="text-green-600">Бесплатно</strong> доставим товар до терминала любой ТК в пределах г. Новосибирск и г. Москва.</> },
+                  { icon: "Check", node: <>Перевозчики: «Деловые линии», «ПЭК», «СДЭК».</> },
+                  { icon: "Clock", node: <>Сроки поставки зависят от места назначения и выбора перевозчика.</> },
+                  { icon: "CreditCard", node: <>Оплата доставки — заказчиком при получении по тарифам перевозчика.</> },
+                ].map((r, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-foreground leading-relaxed">
+                    <Icon name={r.icon} fallback="Check" size={17} className="text-sky-500 flex-shrink-0 mt-0.5" />
+                    <span>{r.node}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -544,6 +629,8 @@ const Index = () => {
                 <a href="#catalog" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Каталог</a>
                 <a href="#technosib" className="block text-sm text-muted-foreground hover:text-primary transition-colors">О компании</a>
                 <a href="#advantages" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Преимущества</a>
+                <a href="#service" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Сервис и поддержка</a>
+                <a href="#delivery" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Доставка</a>
                 <a href="#contacts" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Контакты</a>
               </div>
             </div>
