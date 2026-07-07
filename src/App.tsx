@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Massagers from "./pages/Massagers";
 import Injector from "./pages/Injector";
 import Slicers from "./pages/Slicers";
 import LDOGenerator from "./pages/LDOGenerator";
@@ -23,6 +24,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/massagers" element={<Massagers />} />
           <Route path="/injector" element={<Injector />} />
           <Route path="/slicers" element={<Slicers />} />
           <Route path="/ldogenerator" element={<LDOGenerator />} />

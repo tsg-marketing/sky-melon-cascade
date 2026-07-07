@@ -39,7 +39,7 @@ export const CATEGORIES: Record<string, CategoryMeta> = {
   massagers: {
     slug: "massagers",
     path: "/massagers",
-    categoryLink: "/",
+    categoryLink: "/massagers",
     dataKey: "massagers",
     title: "Массажёры мяса",
     singular: "массажёр",
