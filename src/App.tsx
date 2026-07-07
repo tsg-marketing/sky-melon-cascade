@@ -10,6 +10,7 @@ import Injector from "./pages/Injector";
 import Slicers from "./pages/Slicers";
 import LDOGenerator from "./pages/LDOGenerator";
 import ProductPage from "./pages/ProductPage";
+import CategoryPage from "./pages/CategoryPage";
 import Cart from "./pages/Cart";
 import CalculatorMassager from "./pages/CalculatorMassager";
 import NotFound from "./pages/NotFound";
@@ -32,6 +33,8 @@ const App = () => (
           <Route path="/injector/:slug" element={<ProductPage categorySlug="injector" />} />
           <Route path="/slicers/:slug" element={<ProductPage categorySlug="slicers" />} />
           <Route path="/ldogenerator/:slug" element={<ProductPage categorySlug="ldogenerator" />} />
+          <Route path="/category/:slug" element={<CategoryPage />} />
+          <Route path="/category/:slug/:productSlug" element={<CategoryPage />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/calculator_massager" element={<CalculatorMassager />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

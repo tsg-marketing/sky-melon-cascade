@@ -7,9 +7,21 @@
       "expectedStatus": 200
     },
     {
-      "name": "Get catalog groups",
+      "name": "Home groups",
       "method": "GET",
       "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Categories list",
+      "method": "GET",
+      "path": "/?mode=categories",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Sitemap",
+      "method": "GET",
+      "path": "/?mode=sitemap",
       "expectedStatus": 200
     }
   ]

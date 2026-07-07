@@ -28,7 +28,18 @@ interface FeedGroup {
   subcategory: string;
   parent_id: string;
   parent: string;
+  slug: string;
   items: FeedItem[];
+}
+
+const LANDING_LINKS: Record<string, string> = {
+  "229": "/massagers",
+  "223": "/injector",
+  "230": "/slicers",
+  "228": "/ldogenerator",
+};
+function categoryHref(g: FeedGroup): string {
+  return LANDING_LINKS[g.subcategory_id] || `/category/${g.slug}`;
 }
 
 function isValidPhone(v: string): boolean {
@@ -719,9 +730,14 @@ const CatalogGrid = ({ group, onInquiry, onDetail, onFullRange, onAdd, onRemove,
   if (!group.items.length) return null;
   return (
     <div className="mb-14">
-      <div className="mb-6">
-        <h3 className="text-xl sm:text-2xl font-display font-black text-foreground">{group.subcategory}</h3>
-        <p className="text-sm text-muted-foreground">{group.parent}</p>
+      <div className="mb-6 flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <a href={categoryHref(group)} className="text-xl sm:text-2xl font-display font-black text-foreground hover:text-primary transition-colors">{group.subcategory}</a>
+          <p className="text-sm text-muted-foreground">{group.parent}</p>
+        </div>
+        <a href={categoryHref(group)} className="text-sm font-semibold text-primary hover:underline flex items-center gap-1 whitespace-nowrap">
+          Все товары раздела <Icon name="ArrowRight" size={16} />
+        </a>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {group.items.map((it) => (
