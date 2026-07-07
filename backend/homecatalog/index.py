@@ -128,7 +128,13 @@ def _build() -> dict:
         })
 
     categories.sort(key=lambda c: (c["parent_id"], c["title"].lower()))
-    return {"categories": categories}
+
+    # Статистика фида: сколько категорий и всего товаров (для главного баннера)
+    stats = {
+        "categories_count": len(categories),
+        "products_count": sum(c["count"] for c in categories),
+    }
+    return {"categories": categories, "stats": stats}
 
 
 def _get_model() -> dict:
@@ -169,7 +175,7 @@ def _home_groups(model: dict) -> dict:
             "slug": c["slug"],
             "items": [_light_item(it) for it in c["items"][:PER_SUBCATEGORY]],
         })
-    return {"groups": groups}
+    return {"groups": groups, "stats": model.get("stats", {})}
 
 
 def _categories_list(model: dict) -> dict:

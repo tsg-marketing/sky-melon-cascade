@@ -9,7 +9,15 @@ import SiteFooter from "@/components/site/SiteFooter";
 import HomeSections from "@/components/site/HomeSections";
 
 const HOME_CATALOG_URL = "https://functions.poehali.dev/19e6f517-e766-4ac9-b359-029df68cf0fa";
-const HERO_IMG = "https://cdn.poehali.dev/projects/63874bed-e293-4b07-975b-a3b344891b91/bucket/ad6dcf2b-75be-4c10-b179-c8c18d5fb7f9.png";
+const HERO_IMG = "https://cdn.poehali.dev/projects/63874bed-e293-4b07-975b-a3b344891b91/bucket/b0efa14b-ee12-4293-a757-46615b16d148.png";
+
+function plural(n: number, one: string, few: string, many: string): string {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
+  return many;
+}
 
 const inputCls = "w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary transition-colors";
 const inputError = "w-full px-4 py-3 bg-background border border-red-400 rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-red-500 transition-colors";
@@ -76,7 +84,6 @@ const ConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (v
 );
 
 const HERO_BULLETS = [
-  "21 категория, более 1000 моделей оборудования",
   "Оборудование по ценам заводов-изготовителей от ведущих Европейских, Азиатских и Российских производителей",
   "Оборудование на любые производства — от ресторанов до крупных рыбокомбинатов",
   "Доставка и пусконаладка по всей России",
@@ -92,6 +99,7 @@ const Index = () => {
 
   // Catalog feed
   const [groups, setGroups] = useState<FeedGroup[]>([]);
+  const [stats, setStats] = useState<{ categories_count: number; products_count: number } | null>(null);
   const [catalogLoading, setCatalogLoading] = useState(true);
 
   // Detail modal (Подробнее)
@@ -122,7 +130,7 @@ const Index = () => {
     setCatalogLoading(true);
     fetch(HOME_CATALOG_URL)
       .then((r) => r.json())
-      .then((d) => { setGroups(d.groups || []); })
+      .then((d) => { setGroups(d.groups || []); setStats(d.stats || null); })
       .catch(() => setGroups([]))
       .finally(() => setCatalogLoading(false));
   }, []);
@@ -162,6 +170,14 @@ const Index = () => {
               Оборудование для мясо и рыбопереработки
             </h1>
             <ul className="space-y-5 mb-9">
+              {stats && (
+                <li className="flex items-start gap-3">
+                  <Icon name="CheckCircle2" fallback="Check" size={28} className="text-primary flex-shrink-0 mt-1" />
+                  <span className="text-lg sm:text-xl lg:text-2xl text-foreground font-medium leading-snug">
+                    {stats.categories_count} {plural(stats.categories_count, "категория", "категории", "категорий")}, более {stats.products_count} моделей оборудования
+                  </span>
+                </li>
+              )}
               {HERO_BULLETS.map((b, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <Icon name="CheckCircle2" fallback="Check" size={28} className="text-primary flex-shrink-0 mt-1" />
