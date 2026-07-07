@@ -5,7 +5,6 @@ import SiteFooter from "@/components/site/SiteFooter";
 
 const PHONE = "8 800 505-91-24";
 const PHONE_HREF = "tel:88005059124";
-const EMAIL_INFO = "info@t-sib.ru";
 const EMAIL_SERVICE = "massagers@t-sib.ru";
 
 const OFFICES = [
@@ -54,9 +53,6 @@ export default function Contacts() {
                   </ContactRow>
                   <ContactRow icon="Clock" label="График работы офиса:">
                     <span className="text-foreground">Пн-Пт <strong>09:00-18:00</strong></span>
-                  </ContactRow>
-                  <ContactRow icon="Mail" label="Почта">
-                    <a href={`mailto:${EMAIL_INFO}`} className="font-semibold text-primary hover:underline">{EMAIL_INFO}</a>
                   </ContactRow>
                   <ContactRow icon="Clock" label="График работы склада:">
                     <span className="text-foreground">Пн-Пт <strong>09:00-17:00</strong></span>
