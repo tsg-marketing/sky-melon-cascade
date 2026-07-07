@@ -63,7 +63,7 @@ export default function SiteHeader({ onGetKp, current, subtitle = "Оборуд�
     { href: "#technosib", label: "О компании" },
     { href: "#advantages", label: "Преимущества" },
     { href: "#delivery", label: "Доставка" },
-    { href: "#contacts", label: "Контакты" },
+    { href: "/contacts", label: "Контакты" },
   ];
 
   const kpBtn = onGetKp

@@ -42,7 +42,7 @@ export default function SiteFooter({ onGetKp }: { onGetKp?: () => void }) {
               <a href="#advantages" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Преимущества</a>
               <a href="#service" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Сервис и поддержка</a>
               <a href="#delivery" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Доставка</a>
-              <a href="#contacts" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Контакты</a>
+              <a href="/contacts" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Контакты</a>
             </div>
           </div>
           <div>

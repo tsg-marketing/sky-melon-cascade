@@ -13,7 +13,9 @@ import ProductPage from "./pages/ProductPage";
 import CategoryPage from "./pages/CategoryPage";
 import Cart from "./pages/Cart";
 import CalculatorMassager from "./pages/CalculatorMassager";
-import NotFound from "./pages/NotFound";
+import Contacts from "./pages/Contacts";
+import NotFoundPage from "./pages/NotFoundPage";
+import RouteMeta from "./components/site/RouteMeta";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <RouteMeta />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/massagers" element={<Massagers />} />
@@ -35,11 +38,12 @@ const App = () => (
           <Route path="/ldogenerator/:slug" element={<ProductPage categorySlug="ldogenerator" />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/calculator_massager" element={<CalculatorMassager />} />
+          <Route path="/contacts" element={<Contacts />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           {/* Динамические категории — держим НИЖЕ всех статических маршрутов */}
           <Route path="/:slug" element={<CategoryPage />} />
           <Route path="/:slug/:productSlug" element={<CategoryPage />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

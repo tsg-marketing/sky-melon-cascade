@@ -13,6 +13,7 @@ import {
   pickListingParams,
 } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
+import NotFoundPage from "@/pages/NotFoundPage";
 
 function isValidPhone(v: string): boolean {
   const digits = v.replace(/\D/g, "");
@@ -141,6 +142,11 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
     setName(""); setPhone(""); setPhoneTouched(false); setConsent(false);
   };
 
+  // Товар не найден — отдаём 404
+  if (!loading && !item) {
+    return <NotFoundPage />;
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader current={category.path} />
@@ -171,9 +177,6 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
 
           {!loading && item && (
             <>
-              {item.brand && item.brand.toLowerCase() !== "hualian" && (
-                <p className="text-sm font-bold text-primary uppercase tracking-wider mb-1">{item.brand}</p>
-              )}
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black text-foreground leading-tight mb-8">{item.name}</h1>
 
               <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 items-start">

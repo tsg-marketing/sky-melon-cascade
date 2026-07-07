@@ -8,6 +8,7 @@ import { pickListingParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import HomeSections from "@/components/site/HomeSections";
+import NotFoundPage from "@/pages/NotFoundPage";
 
 const CATALOG_FN = "https://functions.poehali.dev/19e6f517-e766-4ac9-b359-029df68cf0fa";
 const inputCls = "w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary transition-colors";
@@ -179,6 +180,11 @@ const CategoryPage = () => {
     }
     return others.slice(0, 5);
   })();
+
+  // 404 для несуществующих разделов и товаров (после загрузки данных)
+  if (!loading && (!category || (productSlug && !product))) {
+    return <NotFoundPage />;
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">

@@ -247,10 +247,10 @@ const Massagers = () => {
     setMeta("keywords", "вакуумный массажер для мяса, массажер Daribo, промышленный массажер, оборудование для посола мяса, оборудование для маринования, купить вакуумный массажер");
     setMeta("og:title", "Вакуумные массажеры для мяса — промышленное оборудование | Техно-Сиб", true);
     setMeta("og:description", "Вакуумные массажеры для равномерного посола и маринования мяса. Подбор модели под ваш продукт, поставка и сервис.", true);
-    setMeta("og:url", "https://meatmassagers.ru/", true);
+    setMeta("og:url", "https://meatmassagers.ru/massagers", true);
     const link = document.querySelector("link[rel='canonical']") || document.createElement("link");
     link.setAttribute("rel", "canonical");
-    link.setAttribute("href", "https://meatmassagers.ru/");
+    link.setAttribute("href", "https://meatmassagers.ru/massagers");
     if (!link.parentNode) document.head.appendChild(link);
 
     const schema = {
