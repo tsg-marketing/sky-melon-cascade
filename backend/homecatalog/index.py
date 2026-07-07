@@ -131,8 +131,23 @@ def _get_model() -> dict:
     return data
 
 
+def _light_item(it: dict, max_params: int = 4) -> dict:
+    """Облегчённый товар для листингов: без описания, с усечёнными характеристиками."""
+    return {
+        "id": it["id"],
+        "slug": it["slug"],
+        "name": it["name"],
+        "price": it["price"],
+        "price_display": it["price_display"],
+        "picture": it["picture"],
+        "pictures": it["pictures"],
+        "params": it["params"][:max_params],
+        "vendor": it["vendor"],
+    }
+
+
 def _home_groups(model: dict) -> dict:
-    """Совместимость: главная — по 10 товаров в каждой субкатегории."""
+    """Совместимость: главная — по 10 товаров в каждой субкатегории (облегчённые)."""
     groups = []
     for c in model["categories"]:
         groups.append({
@@ -141,7 +156,7 @@ def _home_groups(model: dict) -> dict:
             "parent_id": c["parent_id"],
             "parent": c["parent"],
             "slug": c["slug"],
-            "items": c["items"][:PER_SUBCATEGORY],
+            "items": [_light_item(it) for it in c["items"][:PER_SUBCATEGORY]],
         })
     return {"groups": groups}
 
@@ -200,9 +215,9 @@ def _sitemap(model: dict) -> str:
             for it in c["items"]:
                 urls.append((f"{SITE_URL}{base}/{it['slug']}", "0.7", "weekly"))
             continue
-        urls.append((f"{SITE_URL}/category/{c['slug']}", "0.8", "weekly"))
+        urls.append((f"{SITE_URL}/{c['slug']}", "0.8", "weekly"))
         for it in c["items"]:
-            urls.append((f"{SITE_URL}/category/{c['slug']}/{it['slug']}", "0.6", "weekly"))
+            urls.append((f"{SITE_URL}/{c['slug']}/{it['slug']}", "0.6", "weekly"))
 
     parts = ['<?xml version="1.0" encoding="UTF-8"?>',
              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']

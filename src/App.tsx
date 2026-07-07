@@ -33,11 +33,12 @@ const App = () => (
           <Route path="/injector/:slug" element={<ProductPage categorySlug="injector" />} />
           <Route path="/slicers/:slug" element={<ProductPage categorySlug="slicers" />} />
           <Route path="/ldogenerator/:slug" element={<ProductPage categorySlug="ldogenerator" />} />
-          <Route path="/category/:slug" element={<CategoryPage />} />
-          <Route path="/category/:slug/:productSlug" element={<CategoryPage />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/calculator_massager" element={<CalculatorMassager />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          {/* Динамические категории — держим НИЖЕ всех статических маршрутов */}
+          <Route path="/:slug" element={<CategoryPage />} />
+          <Route path="/:slug/:productSlug" element={<CategoryPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

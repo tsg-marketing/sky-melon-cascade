@@ -100,10 +100,27 @@ const CategoryPage = () => {
 
   useEffect(() => {
     let alive = true;
-    setLoading(true);
+    const key = `cat_${slug}`;
+    let hasCache = false;
+    // Мгновенно показываем из кэша, если есть
+    try {
+      const raw = sessionStorage.getItem(key);
+      if (raw) {
+        const cached = JSON.parse(raw) as { ts: number; category: CategoryInfo; items: FeedItem[] };
+        if (Date.now() - cached.ts < 10 * 60 * 1000) {
+          setCategory(cached.category); setItems(cached.items || []); setLoading(false); hasCache = true;
+        }
+      }
+    } catch { /* ignore */ }
+    if (!hasCache) setLoading(true);
+
     fetch(`${CATALOG_FN}?category=${encodeURIComponent(slug || "")}`)
       .then((r) => r.json())
-      .then((d) => { if (alive) { setCategory(d.category); setItems(d.items || []); setLoading(false); } })
+      .then((d) => {
+        if (!alive) return;
+        setCategory(d.category); setItems(d.items || []); setLoading(false);
+        try { sessionStorage.setItem(key, JSON.stringify({ ts: Date.now(), category: d.category, items: d.items || [] })); } catch { /* ignore */ }
+      })
       .catch(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, [slug]);
@@ -183,7 +200,7 @@ const CategoryPage = () => {
             <Icon name="ChevronRight" size={14} />
             {category && (
               <>
-                <a href={`/category/${category.slug}`} className="hover:text-primary transition-colors">{category.title}</a>
+                <a href={`/${category.slug}`} className="hover:text-primary transition-colors">{category.title}</a>
                 {product && (<><Icon name="ChevronRight" size={14} /><span className="text-foreground truncate max-w-[200px] sm:max-w-none">{product.name}</span></>)}
               </>
             )}
@@ -295,7 +312,7 @@ const CategoryPage = () => {
                     <h2 className="text-2xl font-display font-black text-foreground mb-6">Другие {category.title.toLowerCase()}</h2>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
                       {related.map((it) => (
-                        <button key={it.id} onClick={() => navigate(`/category/${category.slug}/${it.slug}`)} className="text-left bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
+                        <button key={it.id} onClick={() => navigate(`/${category.slug}/${it.slug}`)} className="text-left bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
                           <div className="bg-gray-50 aspect-square flex items-center justify-center p-4">
                             {it.picture ? <img src={it.picture} alt={it.name} referrerPolicy="no-referrer" className="w-full h-full object-contain" /> : <Icon name="ImageOff" size={36} className="text-muted-foreground opacity-30" />}
                           </div>
@@ -310,14 +327,14 @@ const CategoryPage = () => {
                 )}
 
                 <div className="mt-10 text-center">
-                  <a href={`/category/${category.slug}`} className="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary/30 text-primary rounded-full font-semibold hover:border-primary hover:bg-primary/5 transition-all"><Icon name="ArrowLeft" size={18} />Все {category.title.toLowerCase()}</a>
+                  <a href={`/${category.slug}`} className="inline-flex items-center gap-2 px-6 py-3 border-2 border-primary/30 text-primary rounded-full font-semibold hover:border-primary hover:bg-primary/5 transition-all"><Icon name="ArrowLeft" size={18} />Все {category.title.toLowerCase()}</a>
                 </div>
               </>
             ) : (
               <div className="text-center py-24">
                 <Icon name="PackageX" size={56} className="mx-auto mb-5 text-muted-foreground opacity-30" />
                 <h1 className="text-2xl font-display font-black text-foreground mb-3">Товар не найден</h1>
-                <a href={`/category/${category.slug}`} className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary/90 transition-all"><Icon name="ArrowLeft" size={18} />Все {category.title.toLowerCase()}</a>
+                <a href={`/${category.slug}`} className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-full font-semibold hover:bg-primary/90 transition-all"><Icon name="ArrowLeft" size={18} />Все {category.title.toLowerCase()}</a>
               </div>
             )
           )}
@@ -328,12 +345,11 @@ const CategoryPage = () => {
               {/* Баннер */}
               <section className="grid lg:grid-cols-2 gap-10 items-center mb-14 bg-gradient-to-br from-primary/5 to-background rounded-3xl p-6 sm:p-10">
                 <div>
-                  <p className="text-sm font-bold text-primary uppercase tracking-wider mb-2">{category.parent}</p>
-                  <h1 className="text-4xl sm:text-5xl font-display font-black text-foreground leading-tight mb-6">{category.title}</h1>
-                  <p className="text-lg text-muted-foreground mb-8">{category.count} моделей в наличии и под заказ. Поставка и пусконаладка по всей России.</p>
+                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-black text-foreground leading-[1.05] mb-6">{category.title}</h1>
+                  <p className="text-xl sm:text-2xl text-muted-foreground leading-snug mb-9">{category.count} моделей в наличии и под заказ. Поставка и пусконаладка по всей России.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button onClick={() => openModal("Получить предложение", category.title)} className="px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">Получить предложение</button>
-                    <a href="#cat-list" className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all text-center">Смотреть каталог</a>
+                    <button onClick={() => openModal("Получить предложение", category.title)} style={{ backgroundColor: "#F97316" }} className="px-9 py-5 text-white rounded-full font-bold text-lg hover:brightness-95 transition-all shadow-xl shadow-orange-500/30">Получить предложение</button>
+                    <a href="#cat-list" className="px-9 py-5 border-2 border-orange-500 text-orange-600 bg-orange-50 rounded-full font-bold text-lg hover:bg-orange-100 transition-all text-center">Смотреть каталог</a>
                   </div>
                 </div>
                 <div className="relative">
@@ -353,7 +369,7 @@ const CategoryPage = () => {
                       key={it.id}
                       item={it}
                       qty={getQuantity(it.id)}
-                      onOpen={() => navigate(`/category/${category.slug}/${it.slug}`)}
+                      onOpen={() => navigate(`/${category.slug}/${it.slug}`)}
                       onInquiry={() => openModal("Получить предложение", it.name)}
                       onAdd={() => addItem(cartPayload(it))}
                       onRemove={() => removeItem(it.id)}
@@ -439,7 +455,17 @@ const ProductCard = ({ item, qty, onOpen, onInquiry, onAdd, onRemove, onZoom }: 
         </>)}
       </div>
       <div className="p-4 flex flex-col flex-1">
-        <h4 onClick={onOpen} className="font-bold text-base text-foreground leading-snug mb-3 line-clamp-3 min-h-[3.9em] cursor-pointer hover:text-primary transition-colors">{item.name}</h4>
+        <h4 onClick={onOpen} className="font-bold text-base text-foreground leading-snug mb-3 line-clamp-2 min-h-[2.6em] cursor-pointer hover:text-primary transition-colors">{item.name}</h4>
+        {item.params.length > 0 && (
+          <div className="mb-3 space-y-1">
+            {item.params.slice(0, 3).map((p, pi) => (
+              <div key={pi} className="flex items-start gap-2 text-xs">
+                <span className="text-muted-foreground flex-1 line-clamp-1">{p.name}</span>
+                <span className="font-semibold text-foreground text-right line-clamp-1">{p.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="mt-auto">
           {item.price_display ? <p className="text-xl font-display font-black text-primary mb-4">{item.price_display}</p> : <p className="text-base font-semibold text-muted-foreground mb-4">Цена по запросу</p>}
           <div className="flex flex-col gap-2.5">

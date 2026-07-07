@@ -19,7 +19,7 @@ interface FeedItem {
   picture: string | null;
   pictures: string[];
   params: { name: string; value: string }[];
-  description: string;
+  description?: string;
   vendor: string | null;
   url: string | null;
 }
@@ -39,7 +39,7 @@ const LANDING_LINKS: Record<string, string> = {
   "228": "/ldogenerator",
 };
 function categoryHref(g: FeedGroup): string {
-  return LANDING_LINKS[g.subcategory_id] || `/category/${g.slug}`;
+  return LANDING_LINKS[g.subcategory_id] || `/${g.slug}`;
 }
 
 function isValidPhone(v: string): boolean {
@@ -787,7 +787,17 @@ const ProductCard = ({ item, onInquiry, onDetail, onAdd, onRemove, qty, onZoom }
         )}
       </div>
       <div className="p-4 flex flex-col flex-1">
-        <h4 className="font-bold text-base text-foreground leading-snug mb-3 line-clamp-3 min-h-[3.9em]">{item.name}</h4>
+        <h4 className="font-bold text-base text-foreground leading-snug mb-3 line-clamp-2 min-h-[2.6em]">{item.name}</h4>
+        {item.params && item.params.length > 0 && (
+          <div className="mb-3 space-y-1">
+            {item.params.slice(0, 3).map((p, pi) => (
+              <div key={pi} className="flex items-start gap-2 text-xs">
+                <span className="text-muted-foreground flex-1 line-clamp-1">{p.name}</span>
+                <span className="font-semibold text-foreground text-right line-clamp-1">{p.value}</span>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="mt-auto">
           {item.price_display ? (
             <p className="text-xl font-display font-black text-primary mb-4">{item.price_display}</p>
