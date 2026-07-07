@@ -205,7 +205,6 @@ const Index = () => {
               group={g}
               onInquiry={(name) => openModal("Получить предложение", name)}
               onDetail={openDetail}
-              onFullRange={() => openModal("Получить весь ассортимент", `Весь ассортимент — ${g.subcategory}`)}
               onAdd={(it) => addItem(cartPayload(it))}
               onRemove={(id) => removeItem(id)}
               getQty={getQuantity}
@@ -372,11 +371,10 @@ const Index = () => {
   );
 };
 
-const CatalogGrid = ({ group, onInquiry, onDetail, onFullRange, onAdd, onRemove, getQty, onZoom, onVideo }: {
+const CatalogGrid = ({ group, onInquiry, onDetail, onAdd, onRemove, getQty, onZoom, onVideo }: {
   group: FeedGroup;
   onInquiry: (product: string) => void;
   onDetail: (item: FeedItem) => void;
-  onFullRange: () => void;
   onAdd: (item: FeedItem) => void;
   onRemove: (id: string) => void;
   getQty: (id: string) => number;
@@ -401,9 +399,9 @@ const CatalogGrid = ({ group, onInquiry, onDetail, onFullRange, onAdd, onRemove,
         ))}
       </div>
       <div className="text-center mt-8">
-        <button onClick={onFullRange} style={{ backgroundColor: "#F97316" }} className="px-8 py-4 text-white rounded-full font-bold text-lg hover:brightness-95 transition-all shadow-lg shadow-orange-500/30">
-          Оставить заявку
-        </button>
+        <a href={categoryHref(group)} style={{ backgroundColor: "#F97316" }} className="inline-flex items-center gap-2 px-8 py-4 text-white rounded-full font-bold text-lg hover:brightness-95 transition-all shadow-lg shadow-orange-500/30">
+          Смотреть все {group.subcategory.toLowerCase()} <Icon name="ArrowRight" size={20} />
+        </a>
       </div>
     </div>
   );
