@@ -70,10 +70,13 @@ const HERO_BULLETS = [
 const Index = () => {
   const navigate = useNavigate();
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
-  const { totalCount } = useCart();
+  const { addItem, removeItem, getQuantity, totalCount } = useCart();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [equipMenuOpen, setEquipMenuOpen] = useState(false);
+
+  // Lightbox (просмотр фото)
+  const [lightbox, setLightbox] = useState<{ pics: string[]; index: number } | null>(null);
 
   // Catalog feed
   const [groups, setGroups] = useState<FeedGroup[]>([]);
@@ -126,6 +129,14 @@ const Index = () => {
   const openDetail = (item: FeedItem) => {
     setDetailItem(item); setDetailSlide(0);
   };
+
+  const cartPayload = (item: FeedItem) => ({
+    id: item.id,
+    name: item.name,
+    price: item.price,
+    price_display: item.price_display,
+    picture: (item.pictures && item.pictures[0]) || item.picture || "",
+  });
 
   const submitModal = () => {
     if (modalName.trim() && isValidPhone(modalPhone) && modalConsent && !sending) {
@@ -281,6 +292,10 @@ const Index = () => {
               onInquiry={(name) => openModal("Получить предложение", name)}
               onDetail={openDetail}
               onFullRange={() => openModal("Получить весь ассортимент", `Весь ассортимент — ${g.subcategory}`)}
+              onAdd={(it) => addItem(cartPayload(it))}
+              onRemove={(id) => removeItem(id)}
+              getQty={getQuantity}
+              onZoom={(pics, index) => setLightbox({ pics, index })}
             />
           ))}
         </div>
@@ -544,7 +559,7 @@ const Index = () => {
               <div>
                 <div className="relative bg-gray-50 rounded-2xl overflow-hidden aspect-square flex items-center justify-center">
                   {detailItem.pictures.length ? (
-                    <img src={detailItem.pictures[detailSlide]} alt={detailItem.name} referrerPolicy="no-referrer" className="w-full h-full object-contain p-4" />
+                    <img src={detailItem.pictures[detailSlide]} alt={detailItem.name} referrerPolicy="no-referrer" onClick={() => setLightbox({ pics: detailItem.pictures, index: detailSlide })} className="w-full h-full object-contain p-4 cursor-zoom-in" />
                   ) : (
                     <Icon name="ImageOff" size={48} className="text-muted-foreground opacity-30" />
                   )}
@@ -584,9 +599,22 @@ const Index = () => {
                     </div>
                   </div>
                 )}
-                <button onClick={() => { const n = detailItem.name; setDetailItem(null); openModal("Получить предложение", n); }} style={{ backgroundColor: "#F97316" }} className="w-full py-4 text-white rounded-xl font-bold text-base hover:brightness-95 transition-all shadow-md">
-                  Получить предложение
-                </button>
+                <div className="flex gap-3">
+                  <button onClick={() => { const n = detailItem.name; setDetailItem(null); openModal("Получить предложение", n); }} style={{ backgroundColor: "#F97316" }} className="flex-1 py-4 text-white rounded-xl font-bold text-base hover:brightness-95 transition-all shadow-md">
+                    Получить предложение
+                  </button>
+                  {getQuantity(detailItem.id) > 0 ? (
+                    <div className="flex items-center gap-1 border-2 border-primary/40 rounded-xl px-2 flex-shrink-0">
+                      <button onClick={() => removeItem(detailItem.id)} className="w-9 h-9 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">−</button>
+                      <span className="w-5 text-center font-bold text-primary">{getQuantity(detailItem.id)}</span>
+                      <button onClick={() => addItem(cartPayload(detailItem))} className="w-9 h-9 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">+</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => addItem(cartPayload(detailItem))} title="В корзину" className="py-4 px-4 border-2 border-primary/30 text-primary rounded-xl hover:border-primary hover:bg-primary/5 transition-all flex-shrink-0">
+                      <Icon name="ShoppingCart" size={20} />
+                    </button>
+                  )}
+                </div>
               </div>
               {detailItem.description && (
                 <div className="md:col-span-2">
@@ -648,16 +676,47 @@ const Index = () => {
         </div>
       </footer>
 
+      {/* ЛАЙТБОКС */}
+      {lightbox && lightbox.pics.length > 0 && (
+        <div className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center" onClick={() => setLightbox(null)}>
+          <button onClick={() => setLightbox(null)} className="absolute top-4 right-4 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+            <Icon name="X" size={24} className="text-white" />
+          </button>
+          {lightbox.pics.length > 1 && (
+            <>
+              <button onClick={(e) => { e.stopPropagation(); setLightbox((lb) => lb ? { ...lb, index: (lb.index - 1 + lb.pics.length) % lb.pics.length } : lb); }} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                <Icon name="ChevronLeft" size={28} className="text-white" />
+              </button>
+              <button onClick={(e) => { e.stopPropagation(); setLightbox((lb) => lb ? { ...lb, index: (lb.index + 1) % lb.pics.length } : lb); }} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                <Icon name="ChevronRight" size={28} className="text-white" />
+              </button>
+            </>
+          )}
+          <img src={lightbox.pics[lightbox.index]} alt="" referrerPolicy="no-referrer" onClick={(e) => e.stopPropagation()} className="max-w-[90vw] max-h-[85vh] object-contain" />
+          {lightbox.pics.length > 1 && (
+            <div className="absolute bottom-5 left-0 right-0 flex justify-center gap-2">
+              {lightbox.pics.map((_, i) => (
+                <button key={i} onClick={(e) => { e.stopPropagation(); setLightbox((lb) => lb ? { ...lb, index: i } : lb); }} className={`w-2.5 h-2.5 rounded-full transition-colors ${i === lightbox.index ? "bg-white" : "bg-white/40"}`} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
     </div>
   );
 };
 
-const CatalogGrid = ({ group, onInquiry, onDetail, onFullRange }: {
+const CatalogGrid = ({ group, onInquiry, onDetail, onFullRange, onAdd, onRemove, getQty, onZoom }: {
   group: FeedGroup;
   onInquiry: (product: string) => void;
   onDetail: (item: FeedItem) => void;
   onFullRange: () => void;
+  onAdd: (item: FeedItem) => void;
+  onRemove: (id: string) => void;
+  getQty: (id: string) => number;
+  onZoom: (pics: string[], index: number) => void;
 }) => {
   if (!group.items.length) return null;
   return (
@@ -668,7 +727,7 @@ const CatalogGrid = ({ group, onInquiry, onDetail, onFullRange }: {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {group.items.map((it) => (
-          <ProductCard key={it.id} item={it} onInquiry={onInquiry} onDetail={onDetail} />
+          <ProductCard key={it.id} item={it} onInquiry={onInquiry} onDetail={onDetail} onAdd={onAdd} onRemove={onRemove} qty={getQty(it.id)} onZoom={onZoom} />
         ))}
       </div>
       <div className="text-center mt-8">
@@ -680,10 +739,14 @@ const CatalogGrid = ({ group, onInquiry, onDetail, onFullRange }: {
   );
 };
 
-const ProductCard = ({ item, onInquiry, onDetail }: {
+const ProductCard = ({ item, onInquiry, onDetail, onAdd, onRemove, qty, onZoom }: {
   item: FeedItem;
   onInquiry: (product: string) => void;
   onDetail: (item: FeedItem) => void;
+  onAdd: (item: FeedItem) => void;
+  onRemove: (id: string) => void;
+  qty: number;
+  onZoom: (pics: string[], index: number) => void;
 }) => {
   const [slide, setSlide] = useState(0);
   const pics = item.pictures && item.pictures.length ? item.pictures : (item.picture ? [item.picture] : []);
@@ -692,7 +755,7 @@ const ProductCard = ({ item, onInquiry, onDetail }: {
     <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow flex flex-col">
       <div className="relative bg-gray-50 aspect-square flex items-center justify-center p-4 group">
         {count ? (
-          <img src={pics[slide]} alt={item.name} referrerPolicy="no-referrer" className="w-full h-full object-contain" />
+          <img src={pics[slide]} alt={item.name} referrerPolicy="no-referrer" onClick={() => onZoom(pics, slide)} className="w-full h-full object-contain cursor-zoom-in" />
         ) : (
           <Icon name="ImageOff" size={40} className="text-muted-foreground opacity-30" />
         )}
@@ -719,7 +782,20 @@ const ProductCard = ({ item, onInquiry, onDetail }: {
           )}
           <div className="flex flex-col gap-2.5">
             <button onClick={() => onDetail(item)} className="w-full py-2.5 bg-orange-100 text-orange-600 rounded-xl text-sm font-bold hover:bg-orange-200 transition-all">Подробнее</button>
-            <button onClick={() => onInquiry(item.name)} style={{ backgroundColor: "#F97316" }} className="w-full py-2.5 text-white rounded-xl text-sm font-bold hover:brightness-95 transition-all shadow-md shadow-orange-500/20">Получить предложение</button>
+            <div className="flex gap-2.5">
+              <button onClick={() => onInquiry(item.name)} style={{ backgroundColor: "#F97316" }} className="flex-1 py-2.5 text-white rounded-xl text-sm font-bold hover:brightness-95 transition-all shadow-md shadow-orange-500/20">Получить предложение</button>
+              {qty > 0 ? (
+                <div className="flex items-center gap-1 border-2 border-primary/40 rounded-xl px-1.5 flex-shrink-0">
+                  <button onClick={() => onRemove(item.id)} className="w-7 h-7 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">−</button>
+                  <span className="w-4 text-center font-bold text-primary text-sm">{qty}</span>
+                  <button onClick={() => onAdd(item)} className="w-7 h-7 flex items-center justify-center text-primary font-bold text-lg hover:bg-primary/10 rounded-lg transition-colors">+</button>
+                </div>
+              ) : (
+                <button onClick={() => onAdd(item)} title="В корзину" className="py-2.5 px-3.5 border-2 border-primary/30 text-primary rounded-xl hover:border-primary hover:bg-primary/5 transition-all flex-shrink-0">
+                  <Icon name="ShoppingCart" size={18} />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

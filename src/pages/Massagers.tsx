@@ -398,14 +398,14 @@ const Massagers = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
           <div className="flex items-center gap-3 sm:gap-6">
             <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0 min-w-0">
-              <div className="flex flex-col min-w-0">
+              <a href="/" className="flex flex-col min-w-0">
                 <img
                   src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg"
                   alt="Техносиб"
                   className="h-8 sm:h-9 w-auto object-contain"
                 />
                 <span className="text-xs text-muted-foreground leading-tight mt-0.5 hidden sm:block">Оборудование для маринования и посола мяса</span>
-              </div>
+              </a>
               <nav className="hidden lg:flex gap-6 text-sm font-semibold items-center">
                 <div
                   className="relative"
