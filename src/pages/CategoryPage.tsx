@@ -158,7 +158,7 @@ const CategoryPage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader onGetKp={() => openModal("Получить предложение")} />
+      <SiteHeader current={slug ? `/${slug}` : undefined} onGetKp={() => openModal("Получить предложение")} />
 
       <main className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
@@ -350,7 +350,7 @@ const CategoryPage = () => {
                   ))}
                 </div>
                 <div className="text-center mt-10">
-                  <button onClick={() => openModal("Получить весь ассортимент", `Весь ассортимент — ${category.title}`)} style={{ backgroundColor: "#F97316" }} className="px-8 py-4 text-white rounded-full font-bold text-lg hover:brightness-95 transition-all shadow-lg shadow-orange-500/30">Получить весь ассортимент</button>
+                  <button onClick={() => openModal("Оставить заявку", `Весь ассортимент — ${category.title}`)} style={{ backgroundColor: "#F97316" }} className="px-8 py-4 text-white rounded-full font-bold text-lg hover:brightness-95 transition-all shadow-lg shadow-orange-500/30">Оставить заявку</button>
                 </div>
               </div>
             </>

@@ -15,30 +15,48 @@ const MAIN_LINKS = [
 interface CatLink { slug: string; title: string; }
 
 let _catCache: CatLink[] | null = null;
+const CATS_SS_KEY = "menu_cats_v1";
+
+function readCatsCache(): CatLink[] | null {
+  if (_catCache) return _catCache;
+  try {
+    const raw = sessionStorage.getItem(CATS_SS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as CatLink[];
+      _catCache = parsed;
+      return parsed;
+    }
+  } catch { /* ignore */ }
+  return null;
+}
 
 /**
  * Единый хедер сайта с выпадающим меню "Оборудование":
  * сначала основные разделы, затем все категории из фида.
  * onGetKp — открыть форму КП (если задан), иначе ведёт на #contacts.
+ * current — путь текущей страницы (её пункт в меню показывается без ссылки).
  */
-export default function SiteHeader({ onGetKp, subtitle = "Оборудование для мясо и рыбопереработки" }: { onGetKp?: () => void; subtitle?: string }) {
+export default function SiteHeader({ onGetKp, current, subtitle = "Оборудование для мясо и рыбопереработки" }: { onGetKp?: () => void; current?: string; subtitle?: string }) {
   const navigate = useNavigate();
   const { totalCount } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [equipOpen, setEquipOpen] = useState(false);
-  const [cats, setCats] = useState<CatLink[]>(_catCache || []);
+  const [cats, setCats] = useState<CatLink[]>(() => readCatsCache() || []);
 
   useEffect(() => {
-    if (_catCache) return;
+    if (_catCache && _catCache.length) return;
     fetch(`${CATALOG_FN}?mode=categories`)
       .then((r) => r.json())
       .then((d) => {
         const list: CatLink[] = (d.categories || []).map((c: { slug: string; title: string }) => ({ slug: c.slug, title: c.title }));
         _catCache = list;
+        try { sessionStorage.setItem(CATS_SS_KEY, JSON.stringify(list)); } catch { /* ignore */ }
         setCats(list);
       })
       .catch(() => { /* ignore */ });
   }, []);
+
+  const isCurrent = (href: string) => current === href;
 
   const navLinks = [
     { href: "#catalog", label: "Каталог" },
@@ -71,11 +89,15 @@ export default function SiteHeader({ onGetKp, subtitle = "Оборудовани
                   <div className="absolute top-full left-0 pt-2 z-50">
                     <div className="bg-white border border-border rounded-xl shadow-lg py-2 min-w-[260px] max-h-[70vh] overflow-y-auto">
                       {MAIN_LINKS.map((l) => (
-                        <a key={l.href} href={l.href} className="block px-4 py-2.5 text-sm font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors" onClick={() => setEquipOpen(false)}>{l.label}</a>
+                        isCurrent(l.href)
+                          ? <span key={l.href} className="block px-4 py-2.5 text-sm font-semibold text-primary bg-primary/5 cursor-default">{l.label}</span>
+                          : <a key={l.href} href={l.href} className="block px-4 py-2.5 text-sm font-semibold text-foreground hover:text-primary hover:bg-primary/5 transition-colors" onClick={() => setEquipOpen(false)}>{l.label}</a>
                       ))}
                       {cats.length > 0 && <div className="my-1.5 border-t border-border" />}
                       {cats.map((c) => (
-                        <a key={c.slug} href={`/${c.slug}`} className="block px-4 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors" onClick={() => setEquipOpen(false)}>{c.title}</a>
+                        isCurrent(`/${c.slug}`)
+                          ? <span key={c.slug} className="block px-4 py-2 text-sm text-primary bg-primary/5 cursor-default">{c.title}</span>
+                          : <a key={c.slug} href={`/${c.slug}`} className="block px-4 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors" onClick={() => setEquipOpen(false)}>{c.title}</a>
                       ))}
                     </div>
                   </div>
@@ -110,10 +132,14 @@ export default function SiteHeader({ onGetKp, subtitle = "Оборудовани
         <div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-3 max-h-[75vh] overflow-y-auto">
           <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Оборудование</div>
           {MAIN_LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="text-sm font-semibold text-foreground hover:text-primary transition-colors pl-3 border-l-2 border-primary/20" onClick={() => setMenuOpen(false)}>{l.label}</a>
+            isCurrent(l.href)
+              ? <span key={l.href} className="text-sm font-semibold text-primary pl-3 border-l-2 border-primary">{l.label}</span>
+              : <a key={l.href} href={l.href} className="text-sm font-semibold text-foreground hover:text-primary transition-colors pl-3 border-l-2 border-primary/20" onClick={() => setMenuOpen(false)}>{l.label}</a>
           ))}
           {cats.map((c) => (
-            <a key={c.slug} href={`/${c.slug}`} className="text-sm text-muted-foreground hover:text-primary transition-colors pl-3 border-l-2 border-border" onClick={() => setMenuOpen(false)}>{c.title}</a>
+            isCurrent(`/${c.slug}`)
+              ? <span key={c.slug} className="text-sm text-primary pl-3 border-l-2 border-primary">{c.title}</span>
+              : <a key={c.slug} href={`/${c.slug}`} className="text-sm text-muted-foreground hover:text-primary transition-colors pl-3 border-l-2 border-border" onClick={() => setMenuOpen(false)}>{c.title}</a>
           ))}
           <div className="h-px bg-border my-1" />
           {navLinks.map((l) => (

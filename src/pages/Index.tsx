@@ -401,7 +401,7 @@ const CatalogGrid = ({ group, onInquiry, onDetail, onFullRange, onAdd, onRemove,
       </div>
       <div className="text-center mt-8">
         <button onClick={onFullRange} style={{ backgroundColor: "#F97316" }} className="px-8 py-4 text-white rounded-full font-bold text-lg hover:brightness-95 transition-all shadow-lg shadow-orange-500/30">
-          Получить весь ассортимент
+          Оставить заявку
         </button>
       </div>
     </div>

@@ -6,6 +6,7 @@ import QuizSideTrigger from "@/components/QuizSideTrigger";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
 import { productPath, fetchCatalog } from "@/lib/catalog";
+import SiteHeader from "@/components/site/SiteHeader";
 
 interface CatalogItem {
   id: string;
@@ -199,10 +200,9 @@ const ConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (v
 
 const Massagers = () => {
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
-  const { addItem, removeItem, getQuantity, totalCount } = useCart();
+  const { addItem, removeItem, getQuantity } = useCart();
   const navigate = useNavigate();
   const [visibleSections, setVisibleSections] = useState<Record<string, boolean>>({});
-  const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalProduct, setModalProduct] = useState("");
   const [modalName, setModalName] = useState("");
@@ -373,141 +373,13 @@ const Massagers = () => {
     );
   }, [catalogData, catalogSearch]);
 
-  const [equipMenuOpen, setEquipMenuOpen] = useState(false);
 
-  const navLinks = [
-    { href: "#catalog",        label: "Каталог" },
-    { href: "#advantages",     label: "Преимущества" },
-    { href: "#selector",       label: "Подбор" },
-    { href: "#technosib",      label: "О компании" },
-    { href: "#faq",            label: "Вопросы" },
-    { href: "#contacts",       label: "Контакты" },
-  ];
 
-  const equipmentLinks = [
-    { href: "/injector",              label: "Инъекторы" },
-    { href: "/slicers",               label: "Слайсеры" },
-    { href: "/ldogenerator",          label: "Льдогенераторы" },
-  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
 
-      {/* HEADER */}
-      <header className="fixed top-0 w-full bg-white/90 backdrop-blur-xl border-b border-border z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
-          <div className="flex items-center gap-3 sm:gap-6">
-            <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0 min-w-0">
-              <a href="/" className="flex flex-col min-w-0">
-                <img
-                  src="https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg"
-                  alt="Техносиб"
-                  className="h-8 sm:h-9 w-auto object-contain"
-                />
-                <span className="text-xs text-muted-foreground leading-tight mt-0.5 hidden sm:block">Оборудование для маринования и посола мяса</span>
-              </a>
-              <nav className="hidden lg:flex gap-6 text-sm font-semibold items-center">
-                <div
-                  className="relative"
-                  onMouseEnter={() => setEquipMenuOpen(true)}
-                  onMouseLeave={() => setEquipMenuOpen(false)}
-                >
-                  <button className="flex items-center gap-1 text-foreground hover:text-primary transition-colors whitespace-nowrap">
-                    Оборудование
-                    <Icon name="ChevronDown" size={14} className={`transition-transform ${equipMenuOpen ? "rotate-180" : ""}`} />
-                  </button>
-                  {equipMenuOpen && (
-                    <div className="absolute top-full left-0 pt-2 z-50">
-                      <div className="bg-white border border-border rounded-xl shadow-lg py-2 min-w-[220px]">
-                        {equipmentLinks.map((l) => (
-                          <a
-                            key={l.href}
-                            href={l.href}
-                            className="block px-4 py-2.5 text-sm text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
-                            onClick={() => setEquipMenuOpen(false)}
-                          >
-                            {l.label}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <a href="/calculator_massager" className="text-orange-500 hover:text-orange-600 transition-colors whitespace-nowrap flex items-center gap-1">
-                  <Icon name="Calculator" size={14} />
-                  Калькулятор
-                </a>
-                {navLinks.map((l) => (
-                  <a key={l.href} href={l.href} className="text-foreground hover:text-primary transition-colors whitespace-nowrap">
-                    {l.label}
-                  </a>
-                ))}
-              </nav>
-            </div>
-
-            <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-shrink-0">
-              <a href="tel:88005059124" className="hidden sm:flex items-center gap-1.5 text-sm font-bold text-foreground hover:text-primary transition-colors whitespace-nowrap">
-                <Icon name="Phone" size={14} className="text-primary" />
-                8 800 505-91-24
-              </a>
-
-              <button
-                onClick={() => navigate("/cart")}
-                className="relative flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2 sm:gap-2 border-2 border-primary/30 text-primary rounded-full text-sm font-semibold hover:border-primary hover:bg-primary/5 transition-all"
-              >
-                <Icon name="ShoppingCart" size={16} />
-                <span className="hidden sm:inline">Корзина</span>
-                {totalCount > 0 && (
-                  <span className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                    {totalCount}
-                  </span>
-                )}
-              </button>
-
-              <button
-                onClick={() => { setModalProduct(""); setModalOpen(true); }}
-                className="hidden sm:block px-5 py-2 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm whitespace-nowrap"
-              >
-                Рассчитать решение
-              </button>
-
-              <button className="lg:hidden p-2 text-muted-foreground flex-shrink-0" onClick={() => setMenuOpen(!menuOpen)}>
-                <Icon name={menuOpen ? "X" : "Menu"} size={22} />
-              </button>
-            </div>
-          </div>
-          <div className="sm:hidden mt-1.5 flex items-center justify-between">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-muted-foreground leading-tight">Оборудование для маринования и посола мяса</span>
-              <a href="tel:88005059124" className="flex items-center gap-1 text-sm font-bold text-primary hover:text-primary/80 transition-colors">
-                <Icon name="Phone" size={14} className="flex-shrink-0" />
-                8 800 505-91-24
-              </a>
-            </div>
-          </div>
-        </div>
-        {menuOpen && (
-          <div className="lg:hidden border-t border-border bg-white px-6 py-4 flex flex-col gap-4">
-            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Оборудование</div>
-            {equipmentLinks.map((l) => (
-              <a key={l.href} href={l.href} className="text-sm text-foreground hover:text-primary transition-colors pl-3 border-l-2 border-primary/20" onClick={() => setMenuOpen(false)}>
-                {l.label}
-              </a>
-            ))}
-            <div className="h-px bg-border" />
-            <a href="/calculator_massager" className="flex items-center gap-2 text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors" onClick={() => setMenuOpen(false)}>
-              <Icon name="Calculator" size={14} />
-              Калькулятор окупаемости
-            </a>
-            <div className="h-px bg-border" />
-            {navLinks.map((l) => (
-              <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setMenuOpen(false)}>
-                {l.label}
-              </a>
-            ))}
-          </div>
-        )}
-      </header>
+      <SiteHeader current="/massagers" onGetKp={() => { setModalProduct(""); setModalOpen(true); }} />
 
       {/* ЭКРАН 1: HERO */}
       <section id="hero" className="relative pt-24 sm:pt-28 pb-12 sm:pb-20 px-4 sm:px-6 min-h-screen flex items-center bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
@@ -733,23 +605,13 @@ const Massagers = () => {
                             <p className="text-xl font-black text-primary mb-3">{item.price_display}</p>
                           )}
 
-                          {/* Ключевые параметры */}
-                          <div className="space-y-1.5 mb-4 flex-1">
-                            {item.productivity && (
-                              <div className="flex items-start gap-2 text-base">
-                                <Icon name="Zap" size={16} className="text-primary flex-shrink-0 mt-0.5" />
-                                <span className="text-muted-foreground"><span className="font-medium text-foreground">{item.productivity.name}:</span> {item.productivity.value}</span>
-                              </div>
-                            )}
-                            {item.all_params
-                              .filter((p) => {
-                                const n = p.name.toLowerCase();
-                                return n.includes("бренд") || n.includes("загрузк") || n.includes("объем") || n.includes("объём");
-                              })
-                              .map((p, pi) => (
-                              <div key={pi} className="flex items-start gap-2 text-base">
-                                <Icon name="ChevronRight" size={16} className="text-primary flex-shrink-0 mt-0.5" />
-                                <span className="text-muted-foreground"><span className="font-medium text-foreground">{p.name}:</span> {p.value}</span>
+                          {/* Характеристики */}
+                          <div className="mb-4 flex-1 space-y-1">
+                            {item.all_params.filter((p) => { const n = p.name.toLowerCase(); return p.name !== "GUID" && !n.includes("видео") && !n.includes("video"); }).map((p, pi) => (
+                              <div key={pi} className="flex items-baseline gap-2 text-sm">
+                                <span className="text-muted-foreground flex-shrink-0">{p.name}</span>
+                                <span className="flex-1 border-b border-dotted border-border/70" />
+                                <span className="font-semibold text-foreground text-right break-words">{p.value}</span>
                               </div>
                             ))}
                           </div>
