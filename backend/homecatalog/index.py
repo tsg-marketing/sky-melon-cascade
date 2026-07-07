@@ -41,12 +41,22 @@ def _build_catalog() -> dict:
         except ValueError:
             price = None
         pictures = [p.text for p in offer.findall("picture") if p.text]
+        params = []
+        for p in offer.findall("param"):
+            pname = (p.get("name") or "").strip()
+            pval = (p.text or "").strip()
+            if pname and pname != "GUID" and pval:
+                params.append({"name": pname, "value": pval})
+        description = (offer.findtext("description") or "").strip()
         by_subcat[cat_id].append({
             "id": offer.get("id"),
             "name": (offer.findtext("name") or "").strip(),
             "price": price,
             "price_display": (f"{int(price):,}".replace(",", " ") + " \u20bd") if price else None,
             "picture": pictures[0] if pictures else None,
+            "pictures": pictures,
+            "params": params,
+            "description": description,
             "vendor": (offer.findtext("vendor") or "").strip() or None,
             "url": offer.findtext("url"),
         })

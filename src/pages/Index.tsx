@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import ThankYouModal from "@/components/ThankYouModal";
@@ -17,6 +17,9 @@ interface FeedItem {
   price: number | null;
   price_display: string | null;
   picture: string | null;
+  pictures: string[];
+  params: { name: string; value: string }[];
+  description: string;
   vendor: string | null;
   url: string | null;
 }
@@ -76,6 +79,10 @@ const Index = () => {
   const [groups, setGroups] = useState<FeedGroup[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(true);
 
+  // Detail modal (Подробнее)
+  const [detailItem, setDetailItem] = useState<FeedItem | null>(null);
+  const [detailSlide, setDetailSlide] = useState(0);
+
   // Modal ФОС
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("Получить предложение");
@@ -114,6 +121,10 @@ const Index = () => {
 
   const openModal = (title: string, product = "") => {
     setModalTitle(title); setModalProduct(product); setModalOpen(true);
+  };
+
+  const openDetail = (item: FeedItem) => {
+    setDetailItem(item); setDetailSlide(0);
   };
 
   const submitModal = () => {
@@ -263,14 +274,14 @@ const Index = () => {
           )}
 
           {!catalogLoading && groups.map((g) => (
-            <CatalogSlider key={g.subcategory_id} group={g} onInquiry={(name) => openModal("Получить предложение", name)} />
+            <CatalogGrid
+              key={g.subcategory_id}
+              group={g}
+              onInquiry={(name) => openModal("Получить предложение", name)}
+              onDetail={openDetail}
+              onFullRange={() => openModal("Получить весь ассортимент", `Весь ассортимент — ${g.subcategory}`)}
+            />
           ))}
-
-          <div className="text-center mt-4">
-            <button onClick={() => openModal("Получить весь ассортимент", "Весь ассортимент оборудования")} className="px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
-              Получить весь ассортимент
-            </button>
-          </div>
         </div>
       </section>
 
@@ -434,6 +445,75 @@ const Index = () => {
         </div>
       )}
 
+      {/* МОДАЛ ПОДРОБНЕЕ */}
+      {detailItem && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setDetailItem(null)}>
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-border px-6 py-4 flex items-center justify-between z-10">
+              <h3 className="font-display font-bold text-xl text-foreground pr-4 leading-snug">{detailItem.name}</h3>
+              <button onClick={() => setDetailItem(null)} className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-background hover:bg-primary/10 transition-colors">
+                <Icon name="X" size={20} className="text-muted-foreground" />
+              </button>
+            </div>
+            <div className="p-6 grid md:grid-cols-2 gap-6">
+              <div>
+                <div className="relative bg-gray-50 rounded-2xl overflow-hidden aspect-square flex items-center justify-center">
+                  {detailItem.pictures.length ? (
+                    <img src={detailItem.pictures[detailSlide]} alt={detailItem.name} referrerPolicy="no-referrer" className="w-full h-full object-contain p-4" />
+                  ) : (
+                    <Icon name="ImageOff" size={48} className="text-muted-foreground opacity-30" />
+                  )}
+                  {detailItem.pictures.length > 1 && (
+                    <>
+                      <button onClick={() => setDetailSlide((s) => (s - 1 + detailItem.pictures.length) % detailItem.pictures.length)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 hover:bg-white rounded-full shadow flex items-center justify-center"><Icon name="ChevronLeft" size={18} className="text-foreground" /></button>
+                      <button onClick={() => setDetailSlide((s) => (s + 1) % detailItem.pictures.length)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 hover:bg-white rounded-full shadow flex items-center justify-center"><Icon name="ChevronRight" size={18} className="text-foreground" /></button>
+                    </>
+                  )}
+                </div>
+                {detailItem.pictures.length > 1 && (
+                  <div className="flex gap-2 overflow-x-auto pt-3">
+                    {detailItem.pictures.map((pic, pi) => (
+                      <button key={pi} onClick={() => setDetailSlide(pi)} className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${pi === detailSlide ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"}`}>
+                        <img src={pic} alt="" referrerPolicy="no-referrer" className="w-full h-full object-contain bg-white p-1" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                {detailItem.price_display ? (
+                  <p className="text-3xl font-display font-black text-primary mb-5">{detailItem.price_display}</p>
+                ) : (
+                  <p className="text-xl font-bold text-muted-foreground mb-5">Цена по запросу</p>
+                )}
+                {detailItem.params.length > 0 && (
+                  <div className="mb-5">
+                    <h4 className="font-bold text-sm text-foreground mb-2 uppercase tracking-wider">Характеристики</h4>
+                    <div className="space-y-0.5">
+                      {detailItem.params.map((p, pi) => (
+                        <div key={pi} className="flex items-start gap-3 py-2 border-b border-border/50 last:border-0">
+                          <span className="text-sm text-muted-foreground flex-1">{p.name}</span>
+                          <span className="text-sm font-semibold text-foreground text-right">{p.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <button onClick={() => { const n = detailItem.name; setDetailItem(null); openModal("Получить предложение", n); }} style={{ backgroundColor: "#F97316" }} className="w-full py-4 text-white rounded-xl font-bold text-base hover:brightness-95 transition-all shadow-md">
+                  Получить предложение
+                </button>
+              </div>
+              {detailItem.description && (
+                <div className="md:col-span-2">
+                  <h4 className="font-bold text-sm text-foreground mb-2 uppercase tracking-wider">Описание</h4>
+                  <div className="prose prose-sm max-w-none text-muted-foreground leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_li]:my-1 [&_p]:my-2 [&_strong]:text-foreground" dangerouslySetInnerHTML={{ __html: detailItem.description }} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ФУТЕР */}
       <footer className="border-t border-border py-12 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
@@ -486,56 +566,75 @@ const Index = () => {
   );
 };
 
-const CatalogSlider = ({ group, onInquiry }: { group: FeedGroup; onInquiry: (product: string) => void }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollBy = (dir: number) => {
-    if (scrollRef.current) scrollRef.current.scrollBy({ left: dir * 320, behavior: "smooth" });
-  };
+const CatalogGrid = ({ group, onInquiry, onDetail, onFullRange }: {
+  group: FeedGroup;
+  onInquiry: (product: string) => void;
+  onDetail: (item: FeedItem) => void;
+  onFullRange: () => void;
+}) => {
   if (!group.items.length) return null;
   return (
-    <div className="mb-12">
-      <div className="flex items-center justify-between mb-5">
-        <div>
-          <h3 className="text-xl sm:text-2xl font-display font-black text-foreground">{group.subcategory}</h3>
-          <p className="text-sm text-muted-foreground">{group.parent}</p>
-        </div>
-        <div className="hidden sm:flex gap-2">
-          <button onClick={() => scrollBy(-1)} className="w-10 h-10 rounded-full border border-border bg-white hover:border-primary hover:text-primary flex items-center justify-center transition-colors">
-            <Icon name="ChevronLeft" size={18} />
-          </button>
-          <button onClick={() => scrollBy(1)} className="w-10 h-10 rounded-full border border-border bg-white hover:border-primary hover:text-primary flex items-center justify-center transition-colors">
-            <Icon name="ChevronRight" size={18} />
-          </button>
-        </div>
+    <div className="mb-14">
+      <div className="mb-6">
+        <h3 className="text-xl sm:text-2xl font-display font-black text-foreground">{group.subcategory}</h3>
+        <p className="text-sm text-muted-foreground">{group.parent}</p>
       </div>
-      <div ref={scrollRef} className="flex gap-5 overflow-x-auto pb-3 snap-x scroll-smooth [scrollbar-width:thin]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {group.items.map((it) => (
-          <div key={it.id} className="flex-shrink-0 w-[280px] snap-start bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow flex flex-col">
-            <div className="bg-gray-50 aspect-square flex items-center justify-center p-4">
-              {it.picture ? (
-                <img src={it.picture} alt={it.name} referrerPolicy="no-referrer" className="w-full h-full object-contain" />
-              ) : (
-                <Icon name="ImageOff" size={40} className="text-muted-foreground opacity-30" />
-              )}
-            </div>
-            <div className="p-4 flex flex-col flex-1">
-              <h4 className="font-bold text-base text-foreground leading-snug mb-2 line-clamp-2 min-h-[2.6em]">{it.name}</h4>
-              <div className="mt-auto">
-                {it.price_display ? (
-                  <p className="text-xl font-display font-black text-primary mb-3">{it.price_display}</p>
-                ) : (
-                  <p className="text-base font-semibold text-muted-foreground mb-3">Цена по запросу</p>
-                )}
-                <div className="flex flex-col gap-2">
-                  {it.url && (
-                    <a href={it.url} target="_blank" rel="noopener noreferrer" className="w-full py-2.5 border-2 border-primary/30 text-primary rounded-xl text-sm font-semibold hover:border-primary hover:bg-primary/5 transition-all text-center">Подробнее</a>
-                  )}
-                  <button onClick={() => onInquiry(it.name)} style={{ backgroundColor: "#D98E5C" }} className="w-full py-2.5 text-white rounded-xl text-sm font-semibold hover:brightness-95 transition-all">Получить предложение</button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ProductCard key={it.id} item={it} onInquiry={onInquiry} onDetail={onDetail} />
         ))}
+      </div>
+      <div className="text-center mt-8">
+        <button onClick={onFullRange} style={{ backgroundColor: "#F97316" }} className="px-8 py-4 text-white rounded-full font-bold text-lg hover:brightness-95 transition-all shadow-lg shadow-orange-500/30">
+          Получить весь ассортимент
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const ProductCard = ({ item, onInquiry, onDetail }: {
+  item: FeedItem;
+  onInquiry: (product: string) => void;
+  onDetail: (item: FeedItem) => void;
+}) => {
+  const [slide, setSlide] = useState(0);
+  const pics = item.pictures && item.pictures.length ? item.pictures : (item.picture ? [item.picture] : []);
+  const count = pics.length;
+  return (
+    <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow flex flex-col">
+      <div className="relative bg-gray-50 aspect-square flex items-center justify-center p-4 group">
+        {count ? (
+          <img src={pics[slide]} alt={item.name} referrerPolicy="no-referrer" className="w-full h-full object-contain" />
+        ) : (
+          <Icon name="ImageOff" size={40} className="text-muted-foreground opacity-30" />
+        )}
+        {count > 1 && (
+          <>
+            <span className="absolute top-2 right-2 bg-slate-700/80 text-white text-[11px] font-semibold px-2 py-0.5 rounded-md">{slide + 1} / {count}</span>
+            <button onClick={() => setSlide((s) => (s - 1 + count) % count)} className="absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full shadow flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Icon name="ChevronLeft" size={16} className="text-foreground" /></button>
+            <button onClick={() => setSlide((s) => (s + 1) % count)} className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full shadow flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Icon name="ChevronRight" size={16} className="text-foreground" /></button>
+            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 px-4 overflow-hidden">
+              {pics.slice(0, 12).map((_, pi) => (
+                <button key={pi} onClick={() => setSlide(pi)} className={`w-1.5 h-1.5 rounded-full transition-colors ${pi === slide ? "bg-primary" : "bg-slate-300"}`} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      <div className="p-4 flex flex-col flex-1">
+        <h4 className="font-bold text-base text-foreground leading-snug mb-3 line-clamp-3 min-h-[3.9em]">{item.name}</h4>
+        <div className="mt-auto">
+          {item.price_display ? (
+            <p className="text-xl font-display font-black text-primary mb-4">{item.price_display}</p>
+          ) : (
+            <p className="text-base font-semibold text-muted-foreground mb-4">Цена по запросу</p>
+          )}
+          <div className="flex flex-col gap-2.5">
+            <button onClick={() => onDetail(item)} className="w-full py-2.5 bg-orange-100 text-orange-600 rounded-xl text-sm font-bold hover:bg-orange-200 transition-all">Подробнее</button>
+            <button onClick={() => onInquiry(item.name)} style={{ backgroundColor: "#F97316" }} className="w-full py-2.5 text-white rounded-xl text-sm font-bold hover:brightness-95 transition-all shadow-md shadow-orange-500/20">Получить предложение</button>
+          </div>
+        </div>
       </div>
     </div>
   );
