@@ -3,6 +3,7 @@ import Icon from "@/components/ui/icon";
 import ThankYouModal from "@/components/ThankYouModal";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
+import { pickListingParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import HomeSections from "@/components/site/HomeSections";
@@ -444,9 +445,9 @@ const ProductCard = ({ item, onInquiry, onDetail, onAdd, onRemove, qty, onZoom, 
       </div>
       <div className="p-4 flex flex-col flex-1">
         <h4 className="font-bold text-base text-foreground leading-snug mb-3 line-clamp-2 min-h-[2.6em]">{item.name}</h4>
-        {item.params && item.params.length > 0 && (
+        {item.params && pickListingParams(item.params).length > 0 && (
           <div className="mb-3 space-y-1">
-            {item.params.map((p, pi) => (
+            {pickListingParams(item.params).map((p, pi) => (
               <div key={pi} className="flex items-start gap-2 text-xs">
                 <span className="text-muted-foreground flex-shrink-0">{p.name}</span>
                 <span className="flex-1 border-b border-dotted border-border/60 translate-y-[-3px]" />

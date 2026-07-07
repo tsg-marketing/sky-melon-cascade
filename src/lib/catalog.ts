@@ -103,6 +103,26 @@ export function productPath(categorySlug: string, item: CatalogItem): string {
   return `${cat.path}/${itemSlug(item)}`;
 }
 
+// Приоритетные параметры для листингов: бренд, производительность, мощность, объём.
+const PRIORITY_PARAM_WORDS = ["бренд", "производительн", "мощност", "объем", "объём"];
+
+/**
+ * Отбирает параметры для карточки в листинге:
+ * исключает GUID и видео, оставляет максимум `limit` параметров,
+ * приоритет — тем, чьи названия содержат ключевые слова.
+ */
+export function pickListingParams<T extends { name: string; value: string }>(params: T[], limit = 5): T[] {
+  const cleaned = (params || []).filter((p) => {
+    const n = p.name.toLowerCase();
+    return p.name !== "GUID" && !n.includes("видео") && !n.includes("video");
+  });
+  const priority = cleaned.filter((p) => {
+    const n = p.name.toLowerCase();
+    return PRIORITY_PARAM_WORDS.some((w) => n.includes(w));
+  });
+  return priority.slice(0, limit);
+}
+
 const CACHE_KEY = "mm_catalog_cache";
 const CACHE_TTL = 10 * 60 * 1000; // 10 минут
 let catalogPromise: Promise<CatalogData> | null = null;

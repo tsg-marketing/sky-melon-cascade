@@ -1,7 +1,8 @@
 """
 YML-фид товаров для meatmassagers.ru.
 Парсит каталог t-sib.ru и генерирует стандартный YML (Яндекс.Маркет)
-с URL товаров: массажёры — /#product-{id}, инъекторы — /injector/#product-{id}.
+с URL товаров, ведущими на страницу карточки товара:
+{SITE_URL}/{категория}/{slug-товара}.
 """
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -23,6 +24,41 @@ CATEGORY_NAMES = {
     "230": "Слайсеры",
     "228": "Льдогенераторы",
 }
+
+# Путь лендинга категории для формирования URL товара (совпадает с фронтом).
+CATEGORY_PATHS = {
+    "229": "/massagers",
+    "223": "/injector",
+    "230": "/slicers",
+    "228": "/ldogenerator",
+}
+
+TRANSLIT = {
+    "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "e",
+    "ж": "zh", "з": "z", "и": "i", "й": "y", "к": "k", "л": "l", "м": "m",
+    "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",
+    "ф": "f", "х": "h", "ц": "ts", "ч": "ch", "ш": "sh", "щ": "sch",
+    "ъ": "", "ы": "y", "ь": "", "э": "e", "ю": "yu", "я": "ya",
+}
+
+
+def slugify(name: str, ident: str = "") -> str:
+    """Slug товара — идентично фронту (src/lib/catalog.ts) и функции homecatalog."""
+    s = (name or "").lower().strip()
+    out = []
+    for ch in s:
+        if ch in TRANSLIT:
+            out.append(TRANSLIT[ch])
+        elif ch.isascii() and ch.isalnum():
+            out.append(ch)
+        else:
+            out.append("-")
+    slug = "".join(out)
+    while "--" in slug:
+        slug = slug.replace("--", "-")
+    slug = slug.strip("-")[:60].strip("-")
+    short = (ident or "").replace("-", "")[-6:] or "0"
+    return f"{slug}-{short}" if slug else short
 
 _cache = None
 _cache_ts = 0
@@ -93,14 +129,8 @@ def build_yml(xml_data: bytes) -> str:
             if p_name and p_val:
                 params.append((p_name, p_val))
 
-        if cat_id == "223":
-            item_url = f"{SITE_URL}/injector/#product-{offer_id}"
-        elif cat_id == "230":
-            item_url = f"{SITE_URL}/slicers/#product-{offer_id}"
-        elif cat_id == "228":
-            item_url = f"{SITE_URL}/ldogenerator/#product-{offer_id}"
-        else:
-            item_url = f"{SITE_URL}/#product-{offer_id}"
+        cat_path = CATEGORY_PATHS.get(cat_id, "/massagers")
+        item_url = f"{SITE_URL}{cat_path}/{slugify(name, offer_id)}"
 
         lines.append(f'    <offer id="{offer_id}" available="true">')
         lines.append(f"      <url>{escape_xml(item_url)}</url>")
@@ -129,7 +159,7 @@ def build_yml(xml_data: bytes) -> str:
 
 
 def handler(event: dict, context) -> dict:
-    """YML-фид товаров meatmassagers.ru с якорными ссылками на товары сайта"""
+    """YML-фид товаров meatmassagers.ru со ссылками на карточки товаров сайта"""
     cors = {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, OPTIONS",

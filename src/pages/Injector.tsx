@@ -5,7 +5,7 @@ import ThankYouModal from "@/components/ThankYouModal";
 import QuizSideTrigger from "@/components/QuizSideTrigger";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
-import { productPath, fetchCatalog } from "@/lib/catalog";
+import { productPath, fetchCatalog, pickListingParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 
 
@@ -419,7 +419,7 @@ const Injector = () => {
                           <h3 className="font-bold text-2xl text-foreground mb-2 leading-snug cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(productPath("injector", item))}>{item.name}</h3>
                           {item.price_display && (<p className="text-xl font-black text-primary mb-3">{item.price_display}</p>)}
                           <div className="mb-4 flex-1 space-y-1">
-                            {item.all_params.filter((p) => { const n = p.name.toLowerCase(); return p.name !== "GUID" && !n.includes("видео") && !n.includes("video"); }).map((p, pi) => (
+                            {pickListingParams(item.all_params).map((p, pi) => (
                               <div key={pi} className="flex items-baseline gap-2 text-sm">
                                 <span className="text-muted-foreground flex-shrink-0">{p.name}</span>
                                 <span className="flex-1 border-b border-dotted border-border/70" />
