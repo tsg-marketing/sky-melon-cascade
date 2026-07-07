@@ -5,9 +5,8 @@ import ThankYouModal from "@/components/ThankYouModal";
 import QuizSideTrigger from "@/components/QuizSideTrigger";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
-import { productPath } from "@/lib/catalog";
+import { productPath, fetchCatalog } from "@/lib/catalog";
 
-const CATALOG_URL = "https://functions.poehali.dev/7093349e-12b4-4025-a465-82ce3b87b0b2";
 
 interface CatalogItem {
   id: string;
@@ -297,7 +296,7 @@ const Injector = () => {
 
   useEffect(() => {
     setCatalogLoading(true);
-    fetch(CATALOG_URL).then((r) => r.json()).then((d) => {
+    fetchCatalog().then((d: any) => {
       setCatalogData(d);
       const hash = window.location.hash;
       if (hash.startsWith("#product-")) {

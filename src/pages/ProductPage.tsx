@@ -35,7 +35,7 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
-  const { addItem, removeItem, getQuantity, totalCount } = useCart();
+  const { totalCount } = useCart();
 
   const [data, setData] = useState<CatalogData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -138,8 +138,6 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
     { href: "/ldogenerator", label: "Льдогенераторы" },
   ];
 
-  const qty = item ? getQuantity(item.id) : 0;
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="fixed top-0 w-full bg-white/90 backdrop-blur-xl border-b border-border z-50 shadow-sm">
@@ -206,38 +204,29 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
                   )}
                 </div>
 
-                {/* Характеристики */}
+                {/* Характеристики + цена */}
                 <div>
-                  {item.all_params.filter((p) => p.name !== "GUID").length > 0 ? (
-                    <div>
-                      <h2 className="text-2xl font-display font-black text-foreground mb-4">Характеристики</h2>
-                      <div className="space-y-0.5">
-                        {item.all_params.filter((p) => p.name !== "GUID").map((p, pi) => (
-                          <div key={pi} className="flex items-start gap-3 py-3.5 border-b border-border/60 last:border-0">
-                            <span className="text-base text-muted-foreground flex-1">{p.name}</span>
-                            <span className="text-base font-bold text-foreground text-right">{p.value}</span>
-                          </div>
-                        ))}
-                      </div>
+                  <h2 className="text-2xl font-display font-black text-foreground mb-4">Характеристики</h2>
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-3 py-3.5 border-b border-border/60">
+                      <span className="text-base text-muted-foreground flex-1">Цена</span>
+                      {item.price_display ? (
+                        <span className="text-2xl font-display font-black text-primary text-right">{item.price_display}</span>
+                      ) : (
+                        <span className="text-base font-bold text-foreground text-right">По запросу</span>
+                      )}
                     </div>
-                  ) : (
-                    <div className="text-muted-foreground">Характеристики уточняйте у менеджера.</div>
-                  )}
+                    {item.all_params.filter((p) => p.name !== "GUID").map((p, pi) => (
+                      <div key={pi} className="flex items-start gap-3 py-3.5 border-b border-border/60 last:border-0">
+                        <span className="text-base text-muted-foreground flex-1">{p.name}</span>
+                        <span className="text-base font-bold text-foreground text-right">{p.value}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Цена + ФОС */}
+                {/* ФОС */}
                 <div className="space-y-5 lg:sticky lg:top-24">
-                  <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
-                    {item.price_display ? (
-                      <span className="text-4xl font-display font-black text-primary">{item.price_display}</span>
-                    ) : (
-                      <>
-                        <span className="text-2xl font-display font-black text-foreground">Цена по запросу</span>
-                        <p className="text-sm text-muted-foreground mt-1">Оставьте заявку — пришлём актуальную цену</p>
-                      </>
-                    )}
-                  </div>
-
                   <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 shadow-xl shadow-orange-500/25">
                     <h2 className="font-display font-black text-2xl text-white mb-1">Получить предложение</h2>
                     <p className="text-sm text-orange-50 mb-5">Оставьте контакты — технолог свяжется в течение 2 часов и рассчитает стоимость</p>
@@ -258,18 +247,9 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
                       </label>
                       <button onClick={submit} disabled={!phoneValid || !consent || sending} className="w-full py-4 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-base transition-all shadow-md disabled:opacity-40">{sending ? "Отправляем..." : "Получить консультацию"}</button>
                     </div>
-                    <div className="flex gap-3 mt-4">
-                      {item.video && (<button onClick={() => setVideoOpen(true)} className="flex-1 py-3 bg-white/20 hover:bg-white/30 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2"><Icon name="Play" size={16} />Видео</button>)}
-                      {qty > 0 ? (
-                        <div className="flex items-center gap-1 border-2 border-white/60 rounded-xl px-2">
-                          <button onClick={() => removeItem(item.id)} className="w-9 h-9 flex items-center justify-center text-white font-bold text-lg hover:bg-white/15 rounded-lg transition-colors">−</button>
-                          <span className="w-6 text-center font-bold text-white">{qty}</span>
-                          <button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="w-9 h-9 flex items-center justify-center text-white font-bold text-lg hover:bg-white/15 rounded-lg transition-colors">+</button>
-                        </div>
-                      ) : (
-                        <button onClick={() => addItem({ id: item.id, name: item.name, price: item.price, price_display: item.price_display, picture: item.pictures[0] })} className="flex-1 py-3 border-2 border-white/50 text-white rounded-xl text-sm font-semibold hover:bg-white/15 transition-all flex items-center justify-center gap-2"><Icon name="ShoppingCart" size={16} />В корзину</button>
-                      )}
-                    </div>
+                    {item.video && (
+                      <button onClick={() => setVideoOpen(true)} className="w-full py-3 mt-4 bg-white/20 hover:bg-white/30 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2"><Icon name="Play" size={16} />Смотреть видео</button>
+                    )}
                   </div>
                 </div>
               </div>
