@@ -15,7 +15,7 @@ const MAIN_LINKS = [
 interface CatLink { slug: string; title: string; }
 
 let _catCache: CatLink[] | null = null;
-const CATS_SS_KEY = "menu_cats_v1";
+const CATS_SS_KEY = "menu_cats_v2";
 
 function readCatsCache(): CatLink[] | null {
   if (_catCache) return _catCache;
@@ -44,7 +44,6 @@ export default function SiteHeader({ onGetKp, current, subtitle = "Оборуд�
   const [cats, setCats] = useState<CatLink[]>(() => readCatsCache() || []);
 
   useEffect(() => {
-    if (_catCache && _catCache.length) return;
     fetch(`${CATALOG_FN}?mode=categories`)
       .then((r) => r.json())
       .then((d) => {
