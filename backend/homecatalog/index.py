@@ -218,6 +218,7 @@ def _sitemap(model: dict) -> str:
         (f"{SITE_URL}/injector", "0.9", "weekly"),
         (f"{SITE_URL}/slicers", "0.9", "weekly"),
         (f"{SITE_URL}/ldogenerator", "0.9", "weekly"),
+        (f"{SITE_URL}/contacts", "0.5", "monthly"),
     ]
     for c in model["categories"]:
         if c["is_landing"]:
