@@ -9,6 +9,7 @@ import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import HomeSections from "@/components/site/HomeSections";
 import NotFoundPage from "@/pages/NotFoundPage";
+import { categoryGraph, productGraph, setJsonLd, type Crumb } from "@/lib/jsonld";
 
 const CATALOG_FN = "https://functions.poehali.dev/19e6f517-e766-4ac9-b359-029df68cf0fa";
 const inputCls = "w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground placeholder-muted-foreground text-sm focus:outline-none focus:border-primary transition-colors";
@@ -140,17 +141,45 @@ const CategoryPage = () => {
       if (!el) { el = document.createElement("meta"); el.setAttribute("name", n); document.head.appendChild(el); }
       el.setAttribute("content", c);
     };
+    const SITE = "https://meatmassagers.ru";
+    const catUrl = `${SITE}/${category.slug}`;
+    const crumbs: Crumb[] = [{ name: "Главная", url: `${SITE}/` }];
+    if (category.parent) crumbs.push({ name: category.parent, url: catUrl });
+    crumbs.push({ name: category.title, url: catUrl });
+
     if (product) {
+      const prodUrl = `${catUrl}/${product.slug}`;
       document.title = `${product.name} - купить на сайте meatmassagers.ru. Широкий ассортимент оборудования для мясо и рыбопереработки.`;
+      const prodDesc = (product.description || `${product.name} — купить от производителя с гарантией. Доставка и установка по всей России.`).slice(0, 500);
+      setMeta("description", prodDesc);
+      setJsonLd(productGraph({
+        pageUrl: prodUrl,
+        name: product.name,
+        description: prodDesc,
+        image: product.pictures && product.pictures.length ? product.pictures : (product.picture ? [product.picture] : []),
+        sku: product.id,
+        brand: product.vendor,
+        category: category.title,
+        price: product.price,
+        crumbs: [...crumbs, { name: product.name, url: prodUrl }],
+      }));
     } else {
       const name = category.title;
       const nameLower = name.toLowerCase();
+      const desc = category.meta_description
+        || `Купить ${nameLower} от производителя недорого с гарантией. Доставка и установка и по всей России. Более 1000 моделей для мясо и рыбопереработки от ведущих европейских, азиатских и российских производителей.`;
       document.title = category.meta_title
         || `${name} - Купить ${nameLower} от производителя недорого с гарантией на meatmassagers.ru. Доставка и установка и по всей России.`;
-      setMeta("description", category.meta_description
-        || `Купить ${nameLower} от производителя недорого с гарантией. Доставка и установка и по всей России. 21 категория. Более 1000 моделей для мясо и рыбопереработки от ведущих европейских, азиатских и российских производителей.`);
+      setMeta("description", desc);
+      setJsonLd(categoryGraph({
+        pageUrl: catUrl,
+        h1: name,
+        description: desc,
+        crumbs,
+        products: items.map((it) => ({ name: it.name, url: `${catUrl}/${it.slug}` })),
+      }));
     }
-  }, [category, product]);
+  }, [category, product, items]);
 
   const openModal = (title: string, prod = "") => { setModalTitle(title); setModalProduct(prod); setModalOpen(true); };
   const cartPayload = (it: FeedItem) => ({ id: it.id, name: it.name, price: it.price, price_display: it.price_display, picture: (it.pictures && it.pictures[0]) || it.picture || "" });

@@ -7,6 +7,7 @@ import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
 import { productPath, fetchCatalog, pickListingParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
+import { breadcrumbGraph } from "@/lib/jsonld";
 
 interface CatalogItem {
   id: string;
@@ -299,11 +300,20 @@ const Massagers = () => {
     if (!scriptEl) { scriptEl = document.createElement("script"); scriptEl.id = "schema-index"; scriptEl.setAttribute("type", "application/ld+json"); document.head.appendChild(scriptEl); }
     scriptEl.textContent = JSON.stringify(schema);
 
+    let bcEl = document.getElementById("schema-breadcrumb");
+    if (!bcEl) { bcEl = document.createElement("script"); bcEl.id = "schema-breadcrumb"; bcEl.setAttribute("type", "application/ld+json"); document.head.appendChild(bcEl); }
+    bcEl.textContent = JSON.stringify(breadcrumbGraph([
+      { name: "Главная", url: "https://meatmassagers.ru/" },
+      { name: "Массажёры мяса", url: "https://meatmassagers.ru/massagers" },
+    ]));
+
     return () => {
       const canonical = document.querySelector("link[rel='canonical']");
       if (canonical) canonical.remove();
       const schemaEl = document.getElementById("schema-index");
       if (schemaEl) schemaEl.remove();
+      const bc = document.getElementById("schema-breadcrumb");
+      if (bc) bc.remove();
     };
   }, []);
 

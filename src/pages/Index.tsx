@@ -7,6 +7,7 @@ import { pickListingParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import HomeSections from "@/components/site/HomeSections";
+import { homeGraph, setJsonLd } from "@/lib/jsonld";
 
 const HOME_CATALOG_URL = "https://functions.poehali.dev/19e6f517-e766-4ac9-b359-029df68cf0fa";
 const HERO_IMG = "https://cdn.poehali.dev/projects/63874bed-e293-4b07-975b-a3b344891b91/bucket/b0efa14b-ee12-4293-a757-46615b16d148.png";
@@ -124,6 +125,10 @@ const Index = () => {
       el.setAttribute("content", content);
     };
     setMeta("description", "Оборудование для мясной и рыбной переработки от производителя: массажёры, инъекторы, куттеры, шприцы, термокамеры. Доставка и установка по всей России.");
+    setJsonLd(homeGraph({
+      h1: "Оборудование для мясо- и рыбопереработки",
+      description: "Оборудование для мясной и рыбной переработки от производителя: массажёры, инъекторы, куттеры, шприцы, термокамеры. Доставка и установка по всей России.",
+    }));
   }, []);
 
   useEffect(() => {

@@ -7,6 +7,7 @@ import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
 import { productPath, pickListingParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
+import { categoryGraph, setJsonLd } from "@/lib/jsonld";
 
 const CATALOG_URL = "https://functions.poehali.dev/6070fa9b-5de5-408c-984f-0ae244eb68ef";
 
@@ -214,6 +215,16 @@ const LDOGenerator = () => {
     link.setAttribute("rel", "canonical");
     link.setAttribute("href", "https://meatmassagers.ru/ldogenerator");
     if (!link.parentNode) document.head.appendChild(link);
+    setJsonLd(categoryGraph({
+      pageUrl: "https://meatmassagers.ru/ldogenerator",
+      h1: "Льдогенераторы",
+      description: "Льдогенераторы чешуйчатого и гранулированного льда для мясо- и рыбоцехов. Купить от производителя с гарантией. Доставка и монтаж по России. Подбор мощности.",
+      crumbs: [
+        { name: "Главная", url: "https://meatmassagers.ru/" },
+        { name: "Льдогенераторы", url: "https://meatmassagers.ru/ldogenerator" },
+      ],
+      products: [],
+    }));
     return () => {
       document.title = "Массажеры и инъекторы от Техносиб";
       const canonical = document.querySelector("link[rel='canonical']");
