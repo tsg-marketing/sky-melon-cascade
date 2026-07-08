@@ -12,6 +12,35 @@ SITE_URL = "https://meatmassagers.ru"
 # Категории, у которых уже есть свои лендинги (их НЕ отдаём как /category/*)
 LANDING_CAT_IDS = {"229", "223", "230", "228"}  # массажеры, инъекторы, слайсеры, льдогенераторы
 
+# Переопределения категорий: id фида -> {slug, title, ...meta}
+CAT_OVERRIDES = {
+    "238": {
+        "title": "Колбасные шприцы",
+        "slug": "kolbasnye-shpritsy",
+        "meta_title": "Колбасные шприцы - купить колбасный шприц от производителя недорого с гарантией на meatmassagers.ru. Доставка и установка по всей России.",
+        "meta_description": "Колбасные шприцы для набивки колбас и сосисок от производителя. Купить колбасный шприц недорого с гарантией. Доставка и установка по всей России. Более 40 моделей вакуумных и поршневых шприцев для мясопереработки.",
+    },
+    "235": {
+        "title": "Коптильные камеры",
+        "slug": "koptilnye-kamery",
+        "meta_title": "Коптильные камеры - купить коптильную камеру от производителя недорого с гарантией на meatmassagers.ru. Доставка и установка по всей России.",
+        "meta_description": "Коптильные камеры (термокамеры) для копчения и термообработки мяса и рыбы от производителя. Купить коптильную камеру недорого с гарантией. Доставка и установка по всей России. Универсальные термокамеры для мясопереработки.",
+    },
+}
+# Объединяемые категории: id -> целевой ключ группы
+MERGE_MAP = {
+    "237": "shkurosemnye-mashiny",
+    "283": "shkurosemnye-mashiny",
+}
+MERGE_META = {
+    "shkurosemnye-mashiny": {
+        "id": "shkurosemnye-mashiny",
+        "slug": "shkurosemnye-mashiny",
+        "title": "Шкуросъёмные машины",
+        "parent_id": "219",
+    },
+}
+
 _cache = {"ts": 0, "data": None}
 CACHE_TTL = 86400  # 24 часа
 
@@ -108,7 +137,7 @@ def _build() -> dict:
         if cat_id in target_subcats:
             by_subcat[cat_id].append(_parse_offer(offer))
 
-    def _make_category(cat_id, slug, title, parent_id, items):
+    def _make_category(cat_id, slug, title, parent_id, items, meta_title=None, meta_description=None):
         items.sort(key=lambda x: (x["price"] is None, x["price"] if x["price"] is not None else 0))
         priced = [i for i in items if i["price"] is not None]
         most_expensive = max(priced, key=lambda x: x["price"]) if priced else (items[0] if items else None)
@@ -122,9 +151,12 @@ def _build() -> dict:
             "count": len(items),
             "banner_image": most_expensive["picture"] if most_expensive else None,
             "items": items,
+            "meta_title": meta_title,
+            "meta_description": meta_description,
         }
 
     categories = []
+    merged = defaultdict(list)  # ключ группы -> объединённые товары
     for cat_id, info in target_subcats.items():
         items = by_subcat.get(cat_id, [])
         # Категория "Волчки, мясорубки" (id=221) делится на две по названию товара
@@ -134,7 +166,25 @@ def _build() -> dict:
             categories.append(_make_category("221", "myasorubka", "Мясорубки", info["parent"], myaso))
             categories.append(_make_category("221-volchki", "volchki", "Волчки", info["parent"], volchki))
             continue
-        categories.append(_make_category(cat_id, _slugify(info["name"]), info["name"], info["parent"], items))
+        # Объединяемые категории (напр. дубли "Шкуросъёмные машины") — копим товары
+        if cat_id in MERGE_MAP:
+            merged[MERGE_MAP[cat_id]].extend(items)
+            continue
+        ov = CAT_OVERRIDES.get(cat_id, {})
+        slug = ov.get("slug") or _slugify(info["name"])
+        title = ov.get("title") or info["name"]
+        categories.append(_make_category(
+            cat_id, slug, title, info["parent"], items,
+            meta_title=ov.get("meta_title"), meta_description=ov.get("meta_description"),
+        ))
+
+    # Собираем объединённые категории
+    for key, items in merged.items():
+        m = MERGE_META[key]
+        categories.append(_make_category(
+            m["id"], m["slug"], m["title"], m["parent_id"], items,
+            meta_title=m.get("meta_title"), meta_description=m.get("meta_description"),
+        ))
 
     categories.sort(key=lambda c: (c["parent_id"], c["title"].lower()))
 
@@ -220,6 +270,8 @@ def _category_detail(model: dict, slug: str) -> dict:
                     "parent": c["parent"], "parent_id": c["parent_id"],
                     "count": c["count"], "banner_image": c["banner_image"],
                     "banner_product": most,
+                    "meta_title": c.get("meta_title"),
+                    "meta_description": c.get("meta_description"),
                 },
                 "items": c["items"],
             }

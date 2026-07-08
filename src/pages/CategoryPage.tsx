@@ -37,6 +37,8 @@ interface CategoryInfo {
   count: number;
   banner_image: string | null;
   banner_product?: FeedItem | null;
+  meta_title?: string | null;
+  meta_description?: string | null;
 }
 
 function isValidPhone(v: string): boolean {
@@ -143,8 +145,10 @@ const CategoryPage = () => {
     } else {
       const name = category.title;
       const nameLower = name.toLowerCase();
-      document.title = `${name} - Купить ${nameLower} от производителя недорого с гарантией на meatmassagers.ru. Доставка и установка и по всей России.`;
-      setMeta("description", `Купить ${nameLower} от производителя недорого с гарантией. Доставка и установка и по всей России. 21 категория. Более 1000 моделей для мясо и рыбопереработки от ведущих европейских, азиатских и российских производителей.`);
+      document.title = category.meta_title
+        || `${name} - Купить ${nameLower} от производителя недорого с гарантией на meatmassagers.ru. Доставка и установка и по всей России.`;
+      setMeta("description", category.meta_description
+        || `Купить ${nameLower} от производителя недорого с гарантией. Доставка и установка и по всей России. 21 категория. Более 1000 моделей для мясо и рыбопереработки от ведущих европейских, азиатских и российских производителей.`);
     }
   }, [category, product]);
 
@@ -361,7 +365,7 @@ const CategoryPage = () => {
                   <p className="text-xl sm:text-2xl text-muted-foreground leading-snug mb-9">{category.count} моделей в наличии и под заказ. Поставка и пусконаладка по всей России.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <button onClick={() => openModal("Получить предложение", category.title)} style={{ backgroundColor: "#F97316" }} className="px-9 py-5 text-white rounded-full font-bold text-lg hover:brightness-95 transition-all shadow-xl shadow-orange-500/30">Получить предложение</button>
-                    <a href="#cat-list" className="px-9 py-5 border-2 border-orange-500 text-orange-600 bg-orange-50 rounded-full font-bold text-lg hover:bg-orange-100 transition-all text-center">Смотреть каталог</a>
+                    <a href="#catalog" className="px-9 py-5 border-2 border-orange-500 text-orange-600 bg-orange-50 rounded-full font-bold text-lg hover:bg-orange-100 transition-all text-center">Смотреть каталог</a>
                   </div>
                 </div>
                 <div className="relative">
@@ -373,7 +377,7 @@ const CategoryPage = () => {
                 </div>
               </section>
 
-              <div id="cat-list">
+              <div id="catalog">
                 <h2 className="text-2xl sm:text-3xl font-display font-black text-foreground mb-6">Каталог: {category.title}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                   {items.map((it) => (
