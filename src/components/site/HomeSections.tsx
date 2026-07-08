@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Icon from "@/components/ui/icon";
 import ThankYouModal from "@/components/ThankYouModal";
 import { useLeadForm } from "@/hooks/useLeadForm";
@@ -40,7 +40,7 @@ const ConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (v
  * Форма "Обсудим задачу" использует единый механизм useLeadForm (formType: 'contacts').
  * topic — тема раздела (для лендингов категорий), попадает в заявку.
  */
-export default function HomeSections({ topic }: { topic?: string }) {
+export default function HomeSections({ topic, afterDelivery }: { topic?: string; afterDelivery?: ReactNode }) {
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -213,6 +213,8 @@ export default function HomeSections({ topic }: { topic?: string }) {
           </div>
         </div>
       </section>
+
+      {afterDelivery}
 
       {/* ОБСУДИМ ВАШУ ЗАДАЧУ */}
       <section id="contacts" className="py-12 px-6 bg-gradient-to-b from-white to-background">

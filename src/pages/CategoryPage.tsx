@@ -8,6 +8,7 @@ import { pickListingParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import HomeSections from "@/components/site/HomeSections";
+import OtherCategories from "@/components/site/OtherCategories";
 import NotFoundPage from "@/pages/NotFoundPage";
 import { categoryGraph, productGraph, setJsonLd, type Crumb } from "@/lib/jsonld";
 
@@ -141,6 +142,16 @@ const CategoryPage = () => {
       if (!el) { el = document.createElement("meta"); el.setAttribute("name", n); document.head.appendChild(el); }
       el.setAttribute("content", c);
     };
+    const setOg = (p: string, c: string) => {
+      let el = document.querySelector(`meta[property="${p}"]`);
+      if (!el) { el = document.createElement("meta"); el.setAttribute("property", p); document.head.appendChild(el); }
+      el.setAttribute("content", c);
+    };
+    const setCanonical = (href: string) => {
+      let el = document.querySelector("link[rel='canonical']") as HTMLLinkElement | null;
+      if (!el) { el = document.createElement("link"); el.setAttribute("rel", "canonical"); document.head.appendChild(el); }
+      el.setAttribute("href", href);
+    };
     const SITE = "https://meatmassagers.ru";
     const catUrl = `${SITE}/${category.slug}`;
     const crumbs: Crumb[] = [{ name: "Главная", url: `${SITE}/` }];
@@ -149,9 +160,17 @@ const CategoryPage = () => {
 
     if (product) {
       const prodUrl = `${catUrl}/${product.slug}`;
-      document.title = `${product.name} - купить на сайте meatmassagers.ru. Широкий ассортимент оборудования для мясо и рыбопереработки.`;
-      const prodDesc = (product.description || `${product.name} — купить от производителя с гарантией. Доставка и установка по всей России.`).slice(0, 500);
+      const prodTitle = `${product.name} - купить на сайте meatmassagers.ru. Широкий ассортимент оборудования для мясо и рыбопереработки.`;
+      document.title = prodTitle;
+      const prodDesc = (product.description ? product.description.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim() : `${product.name} — купить от производителя с гарантией. Доставка и установка по всей России.`).slice(0, 500);
       setMeta("description", prodDesc);
+      setOg("og:title", prodTitle);
+      setOg("og:description", prodDesc);
+      setOg("og:url", prodUrl);
+      setOg("og:type", "product");
+      const prodImg = (product.pictures && product.pictures[0]) || product.picture;
+      if (prodImg) setOg("og:image", prodImg);
+      setCanonical(prodUrl);
       setJsonLd(productGraph({
         pageUrl: prodUrl,
         name: product.name,
@@ -168,9 +187,16 @@ const CategoryPage = () => {
       const nameLower = name.toLowerCase();
       const desc = category.meta_description
         || `Купить ${nameLower} от производителя недорого с гарантией. Доставка и установка и по всей России. Более 1000 моделей для мясо и рыбопереработки от ведущих европейских, азиатских и российских производителей.`;
-      document.title = category.meta_title
+      const catTitle = category.meta_title
         || `${name} - Купить ${nameLower} от производителя недорого с гарантией на meatmassagers.ru. Доставка и установка и по всей России.`;
+      document.title = catTitle;
       setMeta("description", desc);
+      setOg("og:title", catTitle);
+      setOg("og:description", desc);
+      setOg("og:url", catUrl);
+      setOg("og:type", "website");
+      if (category.banner_image) setOg("og:image", category.banner_image);
+      setCanonical(catUrl);
       setJsonLd(categoryGraph({
         pageUrl: catUrl,
         h1: name,
@@ -433,7 +459,12 @@ const CategoryPage = () => {
       </main>
 
       {/* Общие блоки сайта — на листинге категории (после каталога) */}
-      {!loading && category && !productSlug && <HomeSections topic={category.title} />}
+      {!loading && category && !productSlug && (
+        <HomeSections
+          topic={category.title}
+          afterDelivery={<OtherCategories currentSlug={category.slug} />}
+        />
+      )}
 
       <SiteFooter onGetKp={() => openModal("Получить предложение")} />
 
