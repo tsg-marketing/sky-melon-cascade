@@ -12,6 +12,14 @@ interface Group {
 
 let cache: Group[] | null = null;
 
+// Категории-лендинги: у них отдельные страницы вне фида — фиксируем правильные URL и названия
+const LANDING_SLUGS: Record<string, { slug: string; name: string }> = {
+  "229": { slug: "massagers", name: "Массажёры мяса" },
+  "223": { slug: "injector", name: "Инъекторы для мяса" },
+  "230": { slug: "slicers", name: "Слайсеры" },
+  "228": { slug: "ldogenerator", name: "Льдогенераторы" },
+};
+
 export default function OtherCategories({ currentSlug }: { currentSlug?: string }) {
   const [groups, setGroups] = useState<Group[]>(cache || []);
 
@@ -20,12 +28,15 @@ export default function OtherCategories({ currentSlug }: { currentSlug?: string 
     fetch(`${CATALOG_FN}?categories=1`)
       .then((r) => r.json())
       .then((d) => {
-        const list: Group[] = (d.groups || []).map((g: Group) => ({
-          subcategory_id: g.subcategory_id,
-          subcategory: g.subcategory,
-          parent: g.parent,
-          slug: g.slug,
-        }));
+        const list: Group[] = (d.groups || []).map((g: Group) => {
+          const override = LANDING_SLUGS[g.subcategory_id];
+          return {
+            subcategory_id: g.subcategory_id,
+            subcategory: override ? override.name : g.subcategory,
+            parent: g.parent,
+            slug: override ? override.slug : g.slug,
+          };
+        });
         cache = list;
         setGroups(list);
       })
