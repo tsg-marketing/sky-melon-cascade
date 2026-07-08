@@ -116,14 +116,14 @@ const Index = () => {
   const [modalConsent, setModalConsent] = useState(false);
 
   useEffect(() => {
-    document.title = "Оборудование для мясо и рыбопереработки — купить | meatmassagers.ru";
+    document.title = "Оборудование для мясо- и рыбопереработки от производителя";
     const setMeta = (name: string, content: string, property?: boolean) => {
       const attr = property ? "property" : "name";
       let el = document.querySelector(`meta[${attr}="${name}"]`);
       if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.setAttribute("content", content);
     };
-    setMeta("description", "Оборудование для мясо и рыбопереработки: более 1000 моделей от ведущих европейских, азиатских и российских производителей по ценам заводов. Доставка и пусконаладка по всей России.");
+    setMeta("description", "Оборудование для мясной и рыбной переработки от производителя: массажёры, инъекторы, куттеры, шприцы, термокамеры. Доставка и установка по всей России.");
   }, []);
 
   useEffect(() => {

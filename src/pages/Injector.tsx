@@ -198,14 +198,14 @@ const Injector = () => {
   const [contactsConsent, setContactsConsent] = useState(false);
 
   useEffect(() => {
-    document.title = "Инъекторы - Купить инъекторы от производителя недорого с гарантией на meatmassagers.ru. Доставка и установка и по всей России.";
+    document.title = "Инъекторы для мяса — купить от производителя | meatmassagers.ru";
     const setMeta = (name: string, content: string, property?: boolean) => {
       const attr = property ? "property" : "name";
       let el = document.querySelector(`meta[${attr}="${name}"]`);
       if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.setAttribute("content", content);
     };
-    setMeta("description", "Купить инъекторы от производителя недорого с гарантией. Доставка и установка и по всей России. 21 категория. Более 1000 моделей для мясо и рыбопереработки от ведущих европейских, азиатских и российских производителей.");
+    setMeta("description", "Инъекторы для шприцевания мяса рассолом: игольчатые и многоигольные. Купить от производителя с гарантией. Доставка и монтаж по России. Консультация технолога.");
     setMeta("keywords", "инъектор для мяса, инъектор рассола, промышленный инъектор, инъектор Daribo, инъектор XiaoJin, инъектор INWESTPOL, оборудование для маринования мяса, купить инъектор для мяса");
     setMeta("og:title", "Инъекторы для мяса — промышленное оборудование для маринования | Техно-Сиб", true);
     setMeta("og:description", "Промышленные инъекторы для равномерного маринования мяса. Подбор модели под ваш продукт, поставка и сервис по всей России.", true);

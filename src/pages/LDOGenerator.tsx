@@ -197,14 +197,14 @@ const LDOGenerator = () => {
   const [segLevel, setSegLevel] = useState(0);
 
   useEffect(() => {
-    document.title = "Льдогенераторы - Купить льдогенераторы от производителя недорого с гарантией на meatmassagers.ru. Доставка и установка и по всей России.";
+    document.title = "Льдогенераторы для пищевого производства — купить";
     const setMeta = (name: string, content: string, property?: boolean) => {
       const attr = property ? "property" : "name";
       let el = document.querySelector(`meta[${attr}="${name}"]`);
       if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.setAttribute("content", content);
     };
-    setMeta("description", "Купить льдогенераторы от производителя недорого с гарантией. Доставка и установка и по всей России. 21 категория. Более 1000 моделей для мясо и рыбопереработки от ведущих европейских, азиатских и российских производителей.");
+    setMeta("description", "Льдогенераторы чешуйчатого и гранулированного льда для мясо- и рыбоцехов. Купить от производителя с гарантией. Доставка и монтаж по России. Подбор мощности.");
     setMeta("keywords", "льдогенератор, промышленный льдогенератор, чешуйчатый лёд, генератор льда, купить льдогенератор");
     setMeta("og:title", "Промышленные льдогенераторы — чешуйчатый и гранулированный лёд | Техно-Сиб", true);
     setMeta("og:description", "Промышленные льдогенераторы от 90 до 10 000 кг льда в сутки для пищевого производства. Подбор модели под вашу производительность.", true);
