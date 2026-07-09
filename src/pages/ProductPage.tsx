@@ -14,6 +14,7 @@ import {
 } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 import NotFoundPage from "@/pages/NotFoundPage";
+import { setPageMeta } from "@/lib/seo";
 
 function isValidPhone(v: string): boolean {
   const digits = v.replace(/\D/g, "");
@@ -89,27 +90,20 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
   useEffect(() => {
     if (!item) return;
     const url = `https://meatmassagers.ru${productPath(categorySlug, item)}`;
-    document.title = `${item.name} — купить, цена, характеристики | Техно-Сиб`;
     const rawDesc = (item.description || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
     const desc = rawDesc
       ? rawDesc.slice(0, 300)
       : `${item.name}${item.price_display ? ` — ${item.price_display}` : ""}. Поставка, подбор и сервис оборудования Техно-Сиб по всей России.`;
-    const setMeta = (n: string, c: string, prop?: boolean) => {
-      const attr = prop ? "property" : "name";
-      let el = document.querySelector(`meta[${attr}="${n}"]`);
-      if (!el) { el = document.createElement("meta"); el.setAttribute(attr, n); document.head.appendChild(el); }
-      el.setAttribute("content", c);
-    };
-    setMeta("description", desc);
-    setMeta("keywords", `${item.name}, ${category.singular}, купить ${category.singular}, ${category.title.toLowerCase()}, цена`);
-    setMeta("og:title", `${item.name} | Техно-Сиб`, true);
-    setMeta("og:description", desc, true);
-    setMeta("og:url", url, true);
-    setMeta("og:type", "product", true);
-    if (item.pictures[0]) setMeta("og:image", item.pictures[0], true);
-    let link = document.querySelector("link[rel='canonical']") as HTMLLinkElement | null;
-    if (!link) { link = document.createElement("link"); link.setAttribute("rel", "canonical"); document.head.appendChild(link); }
-    link.setAttribute("href", url);
+    setPageMeta({
+      title: `${item.name} — купить, цена, характеристики | Техно-Сиб`,
+      description: desc,
+      keywords: `${item.name}, ${category.singular}, купить ${category.singular}, ${category.title.toLowerCase()}, цена`,
+      url,
+      ogTitle: `${item.name} | Техно-Сиб`,
+      ogDescription: desc,
+      ogType: "product",
+      image: item.pictures[0] || undefined,
+    });
 
     const ld = document.createElement("script");
     ld.type = "application/ld+json";

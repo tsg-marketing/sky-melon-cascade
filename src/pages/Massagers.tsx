@@ -8,6 +8,7 @@ import { useCart } from "@/hooks/useCart";
 import { productPath, fetchCatalog, pickListingParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 import { breadcrumbGraph } from "@/lib/jsonld";
+import { setPageMeta } from "@/lib/seo";
 
 interface CatalogItem {
   id: string;
@@ -237,22 +238,14 @@ const Massagers = () => {
   const [contactsConsent, setContactsConsent] = useState(false);
 
   useEffect(() => {
-    document.title = "Массажёры мяса — купить от производителя | meatmassagers.ru";
-    const setMeta = (name: string, content: string, property?: boolean) => {
-      const attr = property ? "property" : "name";
-      let el = document.querySelector(`meta[${attr}="${name}"]`);
-      if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
-      el.setAttribute("content", content);
-    };
-    setMeta("description", "Массажёры для мяса вакуумные и с охлаждением для посола и тендеризации. Купить от производителя с гарантией. Доставка и монтаж по всей России. Подбор под задачу.");
-    setMeta("keywords", "вакуумный массажер для мяса, массажер Daribo, промышленный массажер, оборудование для посола мяса, оборудование для маринования, купить вакуумный массажер");
-    setMeta("og:title", "Вакуумные массажеры для мяса — промышленное оборудование | Техно-Сиб", true);
-    setMeta("og:description", "Вакуумные массажеры для равномерного посола и маринования мяса. Подбор модели под ваш продукт, поставка и сервис.", true);
-    setMeta("og:url", "https://meatmassagers.ru/massagers", true);
-    const link = document.querySelector("link[rel='canonical']") || document.createElement("link");
-    link.setAttribute("rel", "canonical");
-    link.setAttribute("href", "https://meatmassagers.ru/massagers");
-    if (!link.parentNode) document.head.appendChild(link);
+    setPageMeta({
+      title: "Массажёры мяса — купить от производителя | meatmassagers.ru",
+      description: "Массажёры для мяса вакуумные и с охлаждением для посола и тендеризации. Купить от производителя с гарантией. Доставка и монтаж по всей России. Подбор под задачу.",
+      keywords: "вакуумный массажер для мяса, массажер Daribo, промышленный массажер, оборудование для посола мяса, оборудование для маринования, купить вакуумный массажер",
+      url: "/massagers",
+      ogTitle: "Вакуумные массажеры для мяса — промышленное оборудование | Техно-Сиб",
+      ogDescription: "Вакуумные массажеры для равномерного посола и маринования мяса. Подбор модели под ваш продукт, поставка и сервис.",
+    });
 
     const schema = {
       "@context": "https://schema.org",
