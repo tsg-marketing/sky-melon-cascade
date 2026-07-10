@@ -73,6 +73,61 @@ const esc = (s) =>
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const stripHtml = (s) => String(s ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 
+// Description для сниппета: чистый текст, обрезанный до ~160 символов по границе слова.
+function snippet(raw, max = 160) {
+  const t = stripHtml(raw);
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[\s.,;:—-]+$/, "") + "…";
+}
+
+// ── JSON-LD генераторы (тот же формат, что в src/lib/jsonld.ts) ──
+const ORG_ID = `${SITE}/#organization`;
+const WEBSITE_ID = `${SITE}/#website`;
+const organization = () => ({
+  "@type": "Organization", "@id": ORG_ID, name: "meatmassagers.ru", url: `${SITE}/`,
+  logo: "https://cdn.poehali.dev/files/b643e2cd-1c2b-461b-b32b-4053b1b9e72b.jpg",
+  telephone: "+7 800 505-91-24",
+  contactPoint: { "@type": "ContactPoint", contactType: "sales", telephone: "+7 800 505-91-24", areaServed: "RU", availableLanguage: "Russian" },
+});
+const website = () => ({ "@type": "WebSite", "@id": WEBSITE_ID, url: `${SITE}/`, name: "meatmassagers.ru", inLanguage: "ru-RU", publisher: { "@id": ORG_ID } });
+const breadcrumbList = (crumbs) => ({
+  "@type": "BreadcrumbList",
+  itemListElement: crumbs.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: c.url })),
+});
+function categoryJsonLd(catUrl, cat, items) {
+  const crumbs = [{ name: "Главная", url: `${SITE}/` }];
+  if (cat.parent) crumbs.push({ name: cat.parent, url: catUrl });
+  crumbs.push({ name: cat.title, url: catUrl });
+  const graph = [organization(), website(), breadcrumbList(crumbs)];
+  if (items.length) graph.push({
+    "@type": "ItemList", "@id": `${catUrl}#itemlist`,
+    itemListElement: items.map((it, i) => ({ "@type": "ListItem", position: i + 1, url: `${catUrl}/${it.slug}`, name: it.name })),
+  });
+  graph.push({
+    "@type": "CollectionPage", "@id": `${catUrl}#webpage`, url: catUrl, name: cat.title,
+    inLanguage: "ru-RU", isPartOf: { "@id": WEBSITE_ID },
+    ...(items.length ? { mainEntity: { "@id": `${catUrl}#itemlist` } } : {}),
+  });
+  return { "@context": "https://schema.org", "@graph": graph };
+}
+function productJsonLd(prodUrl, item, cat, desc) {
+  const crumbs = [{ name: "Главная", url: `${SITE}/` }];
+  if (cat.parent) crumbs.push({ name: cat.parent, url: `${SITE}/${cat.slug}` });
+  crumbs.push({ name: cat.title, url: `${SITE}/${cat.slug}` }, { name: item.name, url: prodUrl });
+  const offer = { "@type": "Offer", priceCurrency: "RUB", availability: "https://schema.org/InStock", url: prodUrl, seller: { "@id": ORG_ID } };
+  if (item.price != null) offer.price = item.price;
+  const product = {
+    "@type": "Product", "@id": `${prodUrl}#product`, name: item.name, description: desc,
+    sku: String(item.id || ""), category: cat.title, offers: offer,
+  };
+  const imgs = (item.pictures && item.pictures.length ? item.pictures : (item.picture ? [item.picture] : []));
+  if (imgs.length) product.image = imgs;
+  if (item.vendor) product.brand = { "@type": "Brand", name: item.vendor };
+  return { "@context": "https://schema.org", "@graph": [organization(), website(), breadcrumbList(crumbs), product] };
+}
+
 // title/description категории — та же логика, что в src/pages/CategoryPage.tsx
 function categoryMeta(cat) {
   const name = cat.title;
@@ -97,15 +152,19 @@ function productMeta(item) {
 function renderHtml(template, route, meta) {
   const url = route === "/" ? `${SITE}/` : `${SITE}${route}`;
   const title = esc(meta.title);
-  const desc = esc(meta.description);
+  const metaDesc = esc(snippet(meta.description)); // короткий для сниппета
   const ogTitle = esc(meta.ogTitle || meta.title);
   const ogDesc = esc(meta.ogDescription || meta.description);
   const img = esc(meta.image || DEFAULT_IMG);
   const type = meta.ogType || (route.split("/").filter(Boolean).length >= 2 ? "product" : "website");
 
   const tags = [
-    `<meta name="description" content="${desc}">`,
+    `<meta name="description" content="${metaDesc}">`,
+    meta.keywords ? `<meta name="keywords" content="${esc(meta.keywords)}">` : "",
+    `<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">`,
     `<link rel="canonical" href="${esc(url)}">`,
+    `<meta property="og:site_name" content="meatmassagers.ru">`,
+    `<meta property="og:locale" content="ru_RU">`,
     `<meta property="og:title" content="${ogTitle}">`,
     `<meta property="og:description" content="${ogDesc}">`,
     `<meta property="og:url" content="${esc(url)}">`,
@@ -115,18 +174,23 @@ function renderHtml(template, route, meta) {
     `<meta name="twitter:title" content="${ogTitle}">`,
     `<meta name="twitter:description" content="${ogDesc}">`,
     `<meta name="twitter:image" content="${img}">`,
-  ].join("\n    ");
+    meta.jsonLd ? `<script type="application/ld+json">${JSON.stringify(meta.jsonLd)}</script>` : "",
+  ].filter(Boolean).join("\n    ");
 
   let html = template;
   html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${title}</title>`);
   // Удаляем дефолтные теги из шаблона, чтобы не задваивать
   html = html
     .replace(/\s*<meta\s+name="description"[^>]*>/gi, "")
+    .replace(/\s*<meta\s+name="keywords"[^>]*>/gi, "")
+    .replace(/\s*<meta\s+name="robots"[^>]*>/gi, "")
     .replace(/\s*<meta\s+property="og:title"[^>]*>/gi, "")
     .replace(/\s*<meta\s+property="og:description"[^>]*>/gi, "")
     .replace(/\s*<meta\s+property="og:url"[^>]*>/gi, "")
     .replace(/\s*<meta\s+property="og:type"[^>]*>/gi, "")
-    .replace(/\s*<meta\s+property="og:image"[^>]*>/gi, "")
+    .replace(/\s*<meta\s+property="og:image"(?![:])[^>]*>/gi, "")
+    .replace(/\s*<meta\s+property="og:site_name"[^>]*>/gi, "")
+    .replace(/\s*<meta\s+property="og:locale"[^>]*>/gi, "")
     .replace(/\s*<meta\s+name="twitter:(card|title|description|image)"[^>]*>/gi, "")
     .replace(/\s*<link\s+rel="canonical"[^>]*>/gi, "");
   html = html.replace("</head>", `    ${tags}\n  </head>`);
@@ -180,17 +244,25 @@ async function main() {
       }
       const cat = (detail && detail.category) || { title: g.subcategory, slug };
       const items = (detail && detail.items) || g.items || [];
+      const catUrl = `${SITE}/${slug}`;
 
       // Страницу категории пишем только для НЕ-лендингов (у лендингов свои теги в STATIC)
       if (!isLanding) {
-        writeRoute(template, `/${slug}`, categoryMeta(cat));
+        writeRoute(template, `/${slug}`, {
+          ...categoryMeta(cat),
+          jsonLd: categoryJsonLd(catUrl, cat, items),
+        });
         count++;
       }
 
       // Товары
       for (const it of items) {
         if (!it.slug) continue;
-        writeRoute(template, `/${slug}/${it.slug}`, productMeta(it));
+        const pm = productMeta(it);
+        writeRoute(template, `/${slug}/${it.slug}`, {
+          ...pm,
+          jsonLd: productJsonLd(`${catUrl}/${it.slug}`, it, cat, pm.description),
+        });
         count++;
       }
     }

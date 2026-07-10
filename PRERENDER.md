@@ -115,6 +115,19 @@ grep -o '<title>[^<]*</title>' dist/blokorezki/index.html
 Всего ~360+ страниц. Список формируется автоматически из фида — при добавлении
 новых товаров/категорий ничего править не нужно, просто пересоберите проект.
 
+## Что попадает в HTML каждой страницы (SEO-практики)
+
+- Уникальные `<title>` и `<meta name="description">` (description обрезается до
+  ~160 символов по границе слова — под сниппет выдачи).
+- `<link rel="canonical">` с абсолютным URL страницы.
+- `<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">`.
+- Open Graph: `og:title/description/url/type/image` + `og:site_name`, `og:locale`.
+- Twitter Card: `summary_large_image`.
+- Микроразметка `application/ld+json` прямо в HTML:
+  - товары — `Product` + `Offer` + `BreadcrumbList`;
+  - категории — `CollectionPage` + `ItemList` + `BreadcrumbList`.
+  Это видят боты без JavaScript.
+
 ## Обслуживание
 
 - Логика формирования тегов в `scripts/prerender.mjs` полностью повторяет
