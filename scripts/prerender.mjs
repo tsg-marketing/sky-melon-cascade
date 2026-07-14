@@ -194,6 +194,14 @@ function renderHtml(template, route, meta) {
     .replace(/\s*<meta\s+name="twitter:(card|title|description|image)"[^>]*>/gi, "")
     .replace(/\s*<link\s+rel="canonical"[^>]*>/gi, "");
   html = html.replace("</head>", `    ${tags}\n  </head>`);
+
+  // Уникальный H1 в сыром HTML — для поисковых парсеров без JS.
+  // Кладём отдельным элементом сразу после <body>, ВНЕ #root, чтобы React
+  // при монтировании его не затирал. Скрыт визуально, но виден роботам.
+  if (meta.h1) {
+    const h1 = `<h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">${esc(meta.h1)}</h1>`;
+    html = html.replace(/<body([^>]*)>/i, `<body$1>\n    ${h1}`);
+  }
   return html;
 }
 
@@ -250,6 +258,7 @@ async function main() {
       if (!isLanding) {
         writeRoute(template, `/${slug}`, {
           ...categoryMeta(cat),
+          h1: cat.title,
           jsonLd: categoryJsonLd(catUrl, cat, items),
         });
         count++;
@@ -261,6 +270,7 @@ async function main() {
         const pm = productMeta(it);
         writeRoute(template, `/${slug}/${it.slug}`, {
           ...pm,
+          h1: it.name,
           jsonLd: productJsonLd(`${catUrl}/${it.slug}`, it, cat, pm.description),
         });
         count++;
