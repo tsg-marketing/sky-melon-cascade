@@ -1,0 +1,113 @@
+/**
+ * Генератор sitemap.xml — самостоятельный скрипт, не зависит от пре-рендера.
+ *
+ * Собирает актуальный список URL сайта из того же бэкенд-фида, что и фронтенд,
+ * и записывает sitemap.xml. Предназначен для запуска на сервере (например, по cron
+ * раз в сутки) отдельно от сборки фронтенда.
+ *
+ * Запуск:
+ *   node scripts/sitemap.mjs                     # пишет в dist/sitemap.xml
+ *   node scripts/sitemap.mjs public/sitemap.xml  # путь можно задать аргументом
+ *   SITEMAP_OUT=/var/www/site/sitemap.xml node scripts/sitemap.mjs
+ */
+
+import { writeFileSync, mkdirSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const SITE = "https://meatmassagers.ru";
+const CATALOG_FN = "https://functions.poehali.dev/19e6f517-e766-4ac9-b359-029df68cf0fa";
+
+// Категории-лендинги: subcategory_id -> реальный URL лендинга.
+const LANDING_ROUTES = { "229": "massagers", "223": "injector", "230": "slicers", "228": "ldogenerator" };
+
+// Статичные маршруты сайта: путь -> [priority, changefreq].
+const STATIC = {
+  "/": ["1.0", "daily"],
+  "/massagers": ["0.9", "weekly"],
+  "/injector": ["0.9", "weekly"],
+  "/slicers": ["0.9", "weekly"],
+  "/ldogenerator": ["0.9", "weekly"],
+  "/contacts": ["0.5", "monthly"],
+};
+
+// Куда писать sitemap: аргумент CLI > переменная окружения > dist/sitemap.xml.
+const OUT = process.argv[2] || process.env.SITEMAP_OUT || resolve(__dirname, "../dist/sitemap.xml");
+
+function esc(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+async function getJson(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return res.json();
+}
+
+async function main() {
+  const urls = [];
+  const seen = new Set();
+  const addUrl = (loc, priority, changefreq) => {
+    if (seen.has(loc)) return;
+    seen.add(loc);
+    urls.push({ loc, priority, changefreq });
+  };
+
+  // 1) Статичные маршруты
+  for (const [route, [priority, changefreq]] of Object.entries(STATIC)) {
+    addUrl(route === "/" ? `${SITE}/` : `${SITE}${route}`, priority, changefreq);
+  }
+
+  // 2) Категории и товары из фида
+  const catsData = await getJson(`${CATALOG_FN}?categories=1`);
+  const groups = catsData.groups || [];
+
+  for (const g of groups) {
+    const slug = LANDING_ROUTES[String(g.subcategory_id)] || g.slug;
+    if (!slug) continue;
+    const catUrl = `${SITE}/${slug}`;
+    addUrl(catUrl, "0.8", "weekly");
+
+    // Полные данные категории (в ?categories=1 список товаров может быть неполным).
+    let items = [];
+    try {
+      const detail = await getJson(`${CATALOG_FN}?category=${encodeURIComponent(slug)}`);
+      items = (detail && detail.items) || [];
+    } catch (e) {
+      console.warn(`[sitemap] нет деталей для /${slug}: ${e.message}`);
+    }
+    if (!items.length) items = g.items || [];
+
+    for (const it of items) {
+      if (!it.slug) continue;
+      addUrl(`${catUrl}/${it.slug}`, "0.6", "weekly");
+    }
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls
+      .map(
+        (u) =>
+          `  <url><loc>${esc(u.loc)}</loc><lastmod>${today}</lastmod><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`,
+      )
+      .join("\n") +
+    `\n</urlset>\n`;
+
+  mkdirSync(dirname(OUT), { recursive: true });
+  writeFileSync(OUT, xml, "utf8");
+  console.log(`[sitemap] готово. URL: ${urls.length}. Файл: ${OUT}`);
+}
+
+main().catch((e) => {
+  console.error("[sitemap] ошибка:", e.message);
+  process.exit(1);
+});

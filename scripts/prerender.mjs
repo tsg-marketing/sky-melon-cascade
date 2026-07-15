@@ -236,20 +236,10 @@ async function main() {
   const template = readFileSync(templatePath, "utf8");
   let count = 0;
 
-  // Накапливаем URL для sitemap.xml (loc -> priority/changefreq).
-  const sitemap = [];
-  const addUrl = (loc, priority, changefreq) => sitemap.push({ loc, priority, changefreq });
-
   // Список категорий (ссылки на них добавим в <body> статичных и всех страниц).
   const catLinks = [];
 
-  // 1) Статичные маршруты
-  addUrl(`${SITE}/`, "1.0", "daily");
-  for (const route of Object.keys(STATIC)) {
-    if (route !== "/") addUrl(`${SITE}${route}`, route === "/contacts" ? "0.5" : "0.9", route === "/contacts" ? "monthly" : "weekly");
-  }
-
-  // 2) Категории и товары из фида
+  // Категории и товары из фида
   try {
     const catsData = await getJson(`${CATALOG_FN}?categories=1`);
     const groups = catsData.groups || [];
@@ -291,7 +281,6 @@ async function main() {
         });
         count++;
       }
-      addUrl(catUrl, "0.8", "weekly");
 
       // Товары
       for (const it of items) {
@@ -304,7 +293,6 @@ async function main() {
           jsonLd: productJsonLd(`${catUrl}/${it.slug}`, it, cat, pm.description),
         });
         count++;
-        addUrl(`${catUrl}/${it.slug}`, "0.6", "weekly");
       }
     }
   } catch (e) {
@@ -320,23 +308,7 @@ async function main() {
     for (const [route, meta] of Object.entries(STATIC)) writeRoute(template, route, meta);
   }
 
-  // 3) sitemap.xml — динамически из текущего содержания сайта.
-  const today = new Date().toISOString().slice(0, 10);
-  const seen = new Set();
-  const urls = sitemap.filter((u) => (seen.has(u.loc) ? false : seen.add(u.loc)));
-  const xml =
-    `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-    urls
-      .map(
-        (u) =>
-          `  <url><loc>${esc(u.loc)}</loc><lastmod>${today}</lastmod><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`,
-      )
-      .join("\n") +
-    `\n</urlset>\n`;
-  writeFileSync(resolve(DIST, "sitemap.xml"), xml, "utf8");
-
-  console.log(`[prerender] готово. Страниц: ${count}. URL в sitemap: ${urls.length}.`);
+  console.log(`[prerender] готово. Страниц: ${count}.`);
 }
 
 main();
