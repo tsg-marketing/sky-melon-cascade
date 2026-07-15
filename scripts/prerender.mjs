@@ -195,12 +195,21 @@ function renderHtml(template, route, meta) {
     .replace(/\s*<link\s+rel="canonical"[^>]*>/gi, "");
   html = html.replace("</head>", `    ${tags}\n  </head>`);
 
-  // Уникальный H1 в сыром HTML — для поисковых парсеров без JS.
-  // Кладём отдельным элементом сразу после <body>, ВНЕ #root, чтобы React
+  // Уникальный H1 и внутренние ссылки в сыром HTML — для поисковых парсеров без JS.
+  // Кладём отдельным блоком сразу после <body>, ВНЕ #root, чтобы React
   // при монтировании его не затирал. Скрыт визуально, но виден роботам.
-  if (meta.h1) {
-    const h1 = `<h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">${esc(meta.h1)}</h1>`;
-    html = html.replace(/<body([^>]*)>/i, `<body$1>\n    ${h1}`);
+  const seoParts = [];
+  if (meta.h1) seoParts.push(`<h1>${esc(meta.h1)}</h1>`);
+  if (meta.links && meta.links.length) {
+    const lis = meta.links
+      .filter((l) => l && l.href && l.text)
+      .map((l) => `<li><a href="${esc(l.href)}">${esc(l.text)}</a></li>`)
+      .join("");
+    if (lis) seoParts.push(`<nav aria-label="Каталог"><ul>${lis}</ul></nav>`);
+  }
+  if (seoParts.length) {
+    const block = `<div style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">${seoParts.join("")}</div>`;
+    html = html.replace(/<body([^>]*)>/i, `<body$1>\n    ${block}`);
   }
   return html;
 }
@@ -227,16 +236,29 @@ async function main() {
   const template = readFileSync(templatePath, "utf8");
   let count = 0;
 
+  // Накапливаем URL для sitemap.xml (loc -> priority/changefreq).
+  const sitemap = [];
+  const addUrl = (loc, priority, changefreq) => sitemap.push({ loc, priority, changefreq });
+
+  // Список категорий (ссылки на них добавим в <body> статичных и всех страниц).
+  const catLinks = [];
+
   // 1) Статичные маршруты
-  for (const [route, meta] of Object.entries(STATIC)) {
-    writeRoute(template, route, meta);
-    count++;
+  addUrl(`${SITE}/`, "1.0", "daily");
+  for (const route of Object.keys(STATIC)) {
+    if (route !== "/") addUrl(`${SITE}${route}`, route === "/contacts" ? "0.5" : "0.9", route === "/contacts" ? "monthly" : "weekly");
   }
 
   // 2) Категории и товары из фида
   try {
     const catsData = await getJson(`${CATALOG_FN}?categories=1`);
     const groups = catsData.groups || [];
+
+    // Собираем ссылки на все категории — общий блок навигации для каждой страницы.
+    for (const g of groups) {
+      const s = LANDING_ROUTES[String(g.subcategory_id)] || g.slug;
+      if (s) catLinks.push({ href: `${SITE}/${s}`, text: g.subcategory });
+    }
 
     for (const g of groups) {
       const isLanding = LANDING_ROUTES[String(g.subcategory_id)];
@@ -254,15 +276,22 @@ async function main() {
       const items = (detail && detail.items) || g.items || [];
       const catUrl = `${SITE}/${slug}`;
 
+      // Ссылки на все товары категории — для парсеров без JS.
+      const itemLinks = items
+        .filter((it) => it.slug)
+        .map((it) => ({ href: `${catUrl}/${it.slug}`, text: it.name }));
+
       // Страницу категории пишем только для НЕ-лендингов (у лендингов свои теги в STATIC)
       if (!isLanding) {
         writeRoute(template, `/${slug}`, {
           ...categoryMeta(cat),
           h1: cat.title,
+          links: [...catLinks, ...itemLinks],
           jsonLd: categoryJsonLd(catUrl, cat, items),
         });
         count++;
       }
+      addUrl(catUrl, "0.8", "weekly");
 
       // Товары
       for (const it of items) {
@@ -271,16 +300,43 @@ async function main() {
         writeRoute(template, `/${slug}/${it.slug}`, {
           ...pm,
           h1: it.name,
+          links: [...catLinks, ...itemLinks],
           jsonLd: productJsonLd(`${catUrl}/${it.slug}`, it, cat, pm.description),
         });
         count++;
+        addUrl(`${catUrl}/${it.slug}`, "0.6", "weekly");
       }
     }
   } catch (e) {
     console.error("[prerender] не удалось загрузить каталог:", e.message);
   }
 
-  console.log(`[prerender] готово. Сгенерировано страниц с уникальными метатегами: ${count}`);
+  // Дописываем ссылки на категории в статичные страницы (главная, лендинги, контакты).
+  if (catLinks.length) {
+    for (const [route, meta] of Object.entries(STATIC)) {
+      writeRoute(template, route, { ...meta, links: catLinks });
+    }
+  } else {
+    for (const [route, meta] of Object.entries(STATIC)) writeRoute(template, route, meta);
+  }
+
+  // 3) sitemap.xml — динамически из текущего содержания сайта.
+  const today = new Date().toISOString().slice(0, 10);
+  const seen = new Set();
+  const urls = sitemap.filter((u) => (seen.has(u.loc) ? false : seen.add(u.loc)));
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls
+      .map(
+        (u) =>
+          `  <url><loc>${esc(u.loc)}</loc><lastmod>${today}</lastmod><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`,
+      )
+      .join("\n") +
+    `\n</urlset>\n`;
+  writeFileSync(resolve(DIST, "sitemap.xml"), xml, "utf8");
+
+  console.log(`[prerender] готово. Страниц: ${count}. URL в sitemap: ${urls.length}.`);
 }
 
 main();
