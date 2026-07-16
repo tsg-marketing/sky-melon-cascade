@@ -259,9 +259,11 @@ const ContactFooter = () => {
             </div>
           </div>
 
-          <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <p>© 2026 Pacific Protec. Все права защищены.</p>
-            <p>ООО "Пасифик Протек" | ИНН 2543XXXXXX</p>
+          <div className="pt-8 border-t border-border space-y-4 text-sm text-muted-foreground">
+            <p className="text-xs leading-relaxed max-w-4xl">
+              Общество с ограниченной ответственностью «Техно-Сиб Групп». Юридический адрес: 630005, г. Новосибирск, ул. Крылова, д. 36, этаж 8, офис 81. ИНН 5406804844, ОГРН 1205400012146, КПП 540601001.
+            </p>
+            <p className="text-xs">© 2026 ООО «Техно-Сиб Групп». Все права защищены.</p>
           </div>
         </div>
       </footer>

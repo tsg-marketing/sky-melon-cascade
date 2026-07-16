@@ -56,9 +56,14 @@ export default function SiteFooter({ onGetKp }: { onGetKp?: () => void }) {
             </div>
           </div>
         </div>
-        <div className="border-t border-border pt-6 flex flex-col md:flex-row items-center justify-end gap-6 text-xs text-muted-foreground">
-          <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Политика обработки данных</a>
-          <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Согласие на обработку</a>
+        <div className="border-t border-border pt-6 space-y-4">
+          <p className="text-xs text-muted-foreground leading-relaxed max-w-4xl">
+            Общество с ограниченной ответственностью «Техно-Сиб Групп». Юридический адрес: 630005, г. Новосибирск, ул. Крылова, д. 36, этаж 8, офис 81. ИНН 5406804844, ОГРН 1205400012146, КПП 540601001.
+          </p>
+          <div className="flex flex-col md:flex-row items-center justify-end gap-6 text-xs text-muted-foreground">
+            <a href="https://t-sib.ru/assets/politika_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Политика обработки данных</a>
+            <a href="https://t-sib.ru/assets/soglasie_t-sib16.05.25.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Согласие на обработку</a>
+          </div>
         </div>
       </div>
     </footer>
