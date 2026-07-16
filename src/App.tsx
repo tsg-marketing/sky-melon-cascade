@@ -16,6 +16,7 @@ import CalculatorMassager from "./pages/CalculatorMassager";
 import Contacts from "./pages/Contacts";
 import NotFoundPage from "./pages/NotFoundPage";
 import RouteMeta from "./components/site/RouteMeta";
+import ScrollToHash from "./components/site/ScrollToHash";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <RouteMeta />
+        <ScrollToHash />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/massagers" element={<Massagers />} />
