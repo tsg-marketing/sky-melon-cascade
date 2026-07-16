@@ -57,17 +57,19 @@ export default function SiteHeader({ onGetKp, current, subtitle = "Оборуд�
 
   const isCurrent = (href: string) => current === href;
 
+  const onHome = current === "/" || current === undefined;
+  const anchor = (id: string) => (onHome ? `#${id}` : `/#${id}`);
   const navLinks = [
-    { href: "#catalog", label: "Каталог" },
-    { href: "#technosib", label: "О компании" },
-    { href: "#advantages", label: "Преимущества" },
-    { href: "#delivery", label: "Доставка" },
+    { href: anchor("catalog"), label: "Каталог" },
+    { href: anchor("technosib"), label: "О компании" },
+    { href: anchor("advantages"), label: "Преимущества" },
+    { href: anchor("delivery"), label: "Доставка" },
     { href: "/contacts", label: "Контакты" },
   ];
 
   const kpBtn = onGetKp
     ? <button onClick={onGetKp} className="hidden sm:block px-5 py-2 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm whitespace-nowrap">Получить КП</button>
-    : <a href="#contacts" className="hidden sm:block px-5 py-2 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm whitespace-nowrap">Получить КП</a>;
+    : <a href={anchor("contacts")} className="hidden sm:block px-5 py-2 text-sm font-semibold bg-primary text-white rounded-full hover:bg-primary/90 transition-all shadow-sm whitespace-nowrap">Получить КП</a>;
 
   return (
     <header className="fixed top-0 w-full bg-white/90 backdrop-blur-xl border-b border-border z-50 shadow-sm">
