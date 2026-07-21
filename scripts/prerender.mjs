@@ -15,6 +15,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { generateSitemap } from "./sitemap.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = resolve(__dirname, "../dist");
@@ -309,6 +310,13 @@ async function main() {
   }
 
   console.log(`[prerender] готово. Страниц: ${count}.`);
+
+  // Карта сайта пересобирается при каждой сборке — пишем прямо в dist/.
+  try {
+    await generateSitemap(resolve(DIST, "sitemap.xml"));
+  } catch (e) {
+    console.error("[prerender] не удалось собрать sitemap:", e.message);
+  }
 }
 
 main();

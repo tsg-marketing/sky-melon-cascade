@@ -50,7 +50,13 @@ async function getJson(url) {
   return res.json();
 }
 
-async function main() {
+/**
+ * Собирает и записывает sitemap.xml.
+ * @param {string} outPath — куда писать файл (по умолчанию — константа OUT).
+ * @returns {Promise<number>} количество URL в карте.
+ * Экспортируется, чтобы вызываться из prerender.mjs при каждой сборке сайта.
+ */
+export async function generateSitemap(outPath = OUT) {
   const urls = [];
   const seen = new Set();
   const addUrl = (loc, priority, changefreq) => {
@@ -106,12 +112,16 @@ async function main() {
       .join("\n") +
     `\n</urlset>\n`;
 
-  mkdirSync(dirname(OUT), { recursive: true });
-  writeFileSync(OUT, xml, "utf8");
-  console.log(`[sitemap] готово. URL: ${urls.length}. Файл: ${OUT}`);
+  mkdirSync(dirname(outPath), { recursive: true });
+  writeFileSync(outPath, xml, "utf8");
+  console.log(`[sitemap] готово. URL: ${urls.length}. Файл: ${outPath}`);
+  return urls.length;
 }
 
-main().catch((e) => {
-  console.error("[sitemap] ошибка:", e.message);
-  process.exit(1);
-});
+// Прямой запуск скрипта (cron / вручную): node sitemap.mjs [путь]
+if (import.meta.url === `file://${process.argv[1]}`) {
+  generateSitemap().catch((e) => {
+    console.error("[sitemap] ошибка:", e.message);
+    process.exit(1);
+  });
+}
