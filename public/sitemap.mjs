@@ -91,9 +91,13 @@ async function main() {
     }
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  // Дата и время генерации карты (по Москве) — чтобы видеть, когда файл обновлялся.
+  const generatedAt = now.toLocaleString("ru-RU", { timeZone: "Europe/Moscow", hour12: false }) + " МСК";
   const xml =
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<!-- lastupdate: ${generatedAt} | URL: ${urls.length} -->\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     urls
       .map(
