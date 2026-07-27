@@ -33,6 +33,7 @@ def handler(event: dict, context) -> dict:
         name = body.get('name', 'Не указано')
         phone = body.get('phone', 'Не указан')
         message_text = body.get('message', 'Нет сообщения')
+        ya_client_id = body.get('yaClientId', '')
         
         bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
         chat_id = os.environ.get('TELEGRAM_CHAT_ID')
@@ -47,10 +48,11 @@ def handler(event: dict, context) -> dict:
                 'body': json.dumps({'error': 'Telegram credentials not configured'})
             }
         
+        client_id_line = f"\n🆔 <b>ClientID Метрики:</b> {ya_client_id}" if ya_client_id else ""
         telegram_message = f"""🔔 <b>Новая заявка с сайта Pacific Protech</b>
 
 👤 <b>Имя:</b> {name}
-📞 <b>Телефон:</b> {phone}
+📞 <b>Телефон:</b> {phone}{client_id_line}
 💬 <b>Сообщение:</b>
 {message_text}"""
         

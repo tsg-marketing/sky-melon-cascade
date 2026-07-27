@@ -12,6 +12,28 @@ import {
 } from "@/components/ui/select";
 import { useState, useEffect, useRef } from "react";
 
+// ClientID Яндекс.Метрики: сначала через getClientID, иначе из cookie _ym_uid.
+function getYaClientId(): Promise<string> {
+  return new Promise((resolve) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ym = (window as any).ym;
+    const fromCookie = () => {
+      const m = document.cookie.match(/(?:^|;\s*)_ym_uid=([^;]+)/);
+      return m ? decodeURIComponent(m[1]) : '';
+    };
+    if (typeof ym !== 'function') return resolve(fromCookie());
+    let done = false;
+    const finish = (v: string) => { if (!done) { done = true; resolve(v); } };
+    try {
+      ym(107258870, 'getClientID', (clientID: string) => finish(String(clientID || fromCookie())));
+    } catch (_e) {
+      finish(fromCookie());
+    }
+    // на случай если callback не вызовется — не блокируем отправку
+    setTimeout(() => finish(fromCookie()), 600);
+  });
+}
+
 const ContactFooter = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -50,6 +72,8 @@ const ContactFooter = () => {
     setSubmitStatus('idle');
     
     try {
+      const yaClientId = await getYaClientId();
+      const clientIdLine = yaClientId ? `\n\nClientID: ${yaClientId}` : '';
       const response = await fetch('https://functions.poehali.dev/2309ba17-4ede-49a6-b3d3-603168ba5fed', {
         method: 'POST',
         headers: {
@@ -58,7 +82,8 @@ const ContactFooter = () => {
         body: JSON.stringify({
           name: formData.name,
           phone: formData.phone,
-          message: `Тип мероприятия: ${formData.eventType || 'Не указан'}\n\n${formData.message || 'Нет дополнительных комментариев'}`
+          yaClientId,
+          message: `Тип мероприятия: ${formData.eventType || 'Не указан'}\n\n${formData.message || 'Нет дополнительных комментариев'}${clientIdLine}`
         }),
       });
       

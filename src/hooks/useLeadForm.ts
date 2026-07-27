@@ -1,7 +1,32 @@
 import { useState, useEffect } from 'react';
 
 const API_URL = '/api/b24-send-lead.php';
+const YM_COUNTER = 107258870;
 const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+
+// ClientID Яндекс.Метрики текущего посетителя. Запрашиваем один раз при загрузке.
+let yaClientId = '';
+
+function requestYaClientId() {
+  if (typeof window === 'undefined') return;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ym = (window as any).ym;
+  if (typeof ym !== 'function') return;
+  try {
+    ym(YM_COUNTER, 'getClientID', (clientID: string) => {
+      if (clientID) yaClientId = String(clientID);
+    });
+  } catch (_e) {
+    /* noop */
+  }
+}
+
+// Резервный способ: ClientID хранится Метрикой в cookie _ym_uid.
+function getYaClientIdFromCookie(): string {
+  if (typeof document === 'undefined') return '';
+  const m = document.cookie.match(/(?:^|;\s*)_ym_uid=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : '';
+}
 
 function saveUtmToCookies() {
   if (typeof window === 'undefined') return;
@@ -45,6 +70,7 @@ export function useLeadForm() {
 
   useEffect(() => {
     saveUtmToCookies();
+    requestYaClientId();
   }, []);
 
   async function sendLead(payload: LeadPayload) {
@@ -53,6 +79,7 @@ export function useLeadForm() {
     const utm = getUtmFromCookies();
     const body = {
       ...payload,
+      yaClientId: yaClientId || getYaClientIdFromCookie(),
       pageUrl: typeof window !== 'undefined' ? window.location.href : '',
       utmSource: utm['utm_source'] || '',
       utmMedium: utm['utm_medium'] || '',
