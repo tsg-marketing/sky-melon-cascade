@@ -12,6 +12,10 @@ import time
 FEED_URL = "https://t-sib.ru/upload/catalog.xml"
 TARGET_CATEGORIES = {"229", "223", "230", "459", "228"}
 
+# Каталог обновляется 3 раза в сутки (каждые 8 часов),
+# чтобы вовремя подхватывать новые ссылки на изображения из фида.
+CACHE_TTL = 8 * 60 * 60
+
 _cache = None
 _cache_ts = 0
 
@@ -105,10 +109,10 @@ def parse_offer(offer: ET.Element) -> dict:
     }
 
 
-def get_catalog():
+def get_catalog(force: bool = False):
     global _cache, _cache_ts
     now = time.time()
-    if _cache and now - _cache_ts < 86400:
+    if _cache and not force and now - _cache_ts < CACHE_TTL:
         return _cache
 
     req = urllib.request.Request(FEED_URL, headers={"User-Agent": "Mozilla/5.0"})
@@ -160,14 +164,16 @@ def handler(event: dict, context) -> dict:
     if event.get("httpMethod") == "OPTIONS":
         return {"statusCode": 200, "headers": cors, "body": ""}
 
-    result = get_catalog()
+    params = event.get("queryStringParameters") or {}
+    force = str(params.get("refresh", "")).lower() in ("1", "true", "yes")
+    result = get_catalog(force=force)
 
     return {
         "statusCode": 200,
         "headers": {
             **cors,
             "Content-Type": "application/json",
-            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+            "Cache-Control": "public, max-age=3600, stale-while-revalidate=28800",
         },
         "body": json.dumps(result, ensure_ascii=False),
     }
