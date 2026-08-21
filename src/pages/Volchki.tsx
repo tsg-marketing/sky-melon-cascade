@@ -244,10 +244,9 @@ const Volchki = () => {
         <div className="relative z-10 max-w-7xl mx-auto w-full">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div className={`transition-all duration-1000 ${vis("hero") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-              <span className="inline-block text-xs font-semibold tracking-widest text-primary uppercase border border-primary/30 rounded-full px-4 py-1.5 mb-4 bg-primary/5">Поставка и внедрение</span>
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-black leading-[1.05] tracking-tight mb-4 text-foreground">Промышленные мясорубки и <span className="text-primary">волчки</span></h1>
               <p className="text-lg sm:text-2xl font-semibold text-foreground leading-relaxed mb-6 max-w-xl">Прямые поставки от ведущих европейских и азиатских производителей</p>
-              <div className="space-y-3 mb-8">
+              <div className="space-y-5 mb-9">
                 {[
                   "От 300 до 10 000 кг/ч — модели для любых объёмов производства",
                   "Цена от производителя",
@@ -255,8 +254,8 @@ const Volchki = () => {
                   "Гарантия качества: ПНР, запчасти, техподдержка",
                 ].map((t, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"><Icon name="Check" size={14} className="text-primary" /></div>
-                    <span className="text-base text-muted-foreground leading-relaxed">{t}</span>
+                    <Icon name="CheckCircle2" fallback="Check" size={28} className="text-primary flex-shrink-0 mt-1" />
+                    <span className="text-lg sm:text-xl lg:text-2xl text-foreground font-medium leading-snug">{t}</span>
                   </div>
                 ))}
               </div>
