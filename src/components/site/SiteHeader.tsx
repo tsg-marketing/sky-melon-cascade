@@ -17,8 +17,12 @@ const MAIN_LINKS = [
 
 interface CatLink { slug: string; title: string; }
 
+// Категории из фида, которые дублируют разделы-лендинги выше по списку.
+// Показывать их второй раз в меню не нужно.
+const HIDDEN_CAT_SLUGS = new Set(["blokorezki", "volchki", "kotletnye-avtomaty"]);
+
 let _catCache: CatLink[] | null = null;
-const CATS_SS_KEY = "menu_cats_v2";
+const CATS_SS_KEY = "menu_cats_v3";
 
 function readCatsCache(): CatLink[] | null {
   if (_catCache) return _catCache;
@@ -51,7 +55,9 @@ export default function SiteHeader({ onGetKp, current, subtitle = "Оборуд�
     fetch(`${CATALOG_FN}?mode=categories`)
       .then((r) => r.json())
       .then((d) => {
-        const list: CatLink[] = (d.categories || []).map((c: { slug: string; title: string }) => ({ slug: c.slug, title: c.title }));
+        const list: CatLink[] = (d.categories || [])
+          .filter((c: { slug: string }) => !HIDDEN_CAT_SLUGS.has(c.slug))
+          .map((c: { slug: string; title: string }) => ({ slug: c.slug, title: c.title }));
         _catCache = list;
         try { sessionStorage.setItem(CATS_SS_KEY, JSON.stringify(list)); } catch { /* ignore */ }
         setCats(list);
