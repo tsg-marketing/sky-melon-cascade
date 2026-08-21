@@ -317,14 +317,6 @@ const KotletnyyAvtomat = () => {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader current="/kotletnyy-avtomat" onGetKp={() => { setModalProduct("Получить КП за 24 часа"); setModalOpen(true); }} />
 
-      <nav className="hidden lg:block sticky top-[72px] z-40 bg-white/95 backdrop-blur border-b border-border">
-        <div className="max-w-7xl mx-auto px-6 flex items-center gap-1 h-12 overflow-x-auto">
-          {[["catalog", "Каталог"], ["quiz", "Подбор"], ["howto", "Как подобрать"], ["videos", "Видео"], ["faq", "Вопросы"], ["contacts", "Контакты"]].map(([id, label]) => (
-            <button key={id} onClick={() => scrollTo(id)} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors whitespace-nowrap">{label}</button>
-          ))}
-        </div>
-      </nav>
-
       <section id="hero" className="relative pt-24 sm:pt-28 pb-14 sm:pb-20 px-4 sm:px-6 bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
         <div className="absolute top-24 right-0 w-[600px] h-[600px] bg-primary/6 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-7xl mx-auto w-full">
