@@ -157,13 +157,22 @@ export function pickListingParams<T extends { name: string; value: string }>(par
 
 // Версия в ключе: при добавлении новых разделов каталога (волчки, блокорезки)
 // её нужно поднять — иначе у посетителей останется старая копия без новых товаров.
-const CACHE_KEY = "mm_catalog_cache_v4";
-const CACHE_TTL = 60 * 60 * 1000; // 1 час
+const CACHE_KEY = "mm_catalog_cache_v5";
+
+// Каталог на ВСЕХ страницах обновляется одновременно — в фиксированные часы
+// (00:00, 08:00, 16:00 UTC), а не «через час после захода» у каждого раздела.
+// Так посетитель везде видит один и тот же срез данных.
+const REFRESH_INTERVAL = 8 * 60 * 60 * 1000;
+
+/** Момент последнего общего обновления каталога. */
+function currentWindow(): number {
+  return Math.floor(Date.now() / REFRESH_INTERVAL) * REFRESH_INTERVAL;
+}
 const ALL_SECTIONS: (keyof CatalogData)[] = [
   "massagers", "injectors", "slicers", "icemakers", "mincers", "blockcutters", "patty",
 ];
 
-let memoryCache: CatalogData = {};
+const memoryCache: CatalogData = {};
 const sectionPromises: Partial<Record<keyof CatalogData, Promise<CatalogData>>> = {};
 
 function storageKey(section: keyof CatalogData) {
@@ -177,7 +186,8 @@ function readSection(section: keyof CatalogData): CatalogItem[] | null {
       const raw = store.getItem(storageKey(section));
       if (!raw) continue;
       const parsed = JSON.parse(raw) as { ts: number; data: CatalogItem[] };
-      if (Date.now() - parsed.ts > CACHE_TTL) continue;
+      // Копия устарела, если сделана до последнего общего окна обновления.
+      if (parsed.ts < currentWindow()) continue;
       if (!parsed.data?.length) continue;
       memoryCache[section] = parsed.data;
       return parsed.data;

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import ThankYouModal from "@/components/ThankYouModal";
 import { useLeadForm } from "@/hooks/useLeadForm";
@@ -34,6 +34,7 @@ function formatPhone(prev: string, next: string): string {
 }
 
 const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
+  const navigate = useNavigate();
   const category = CATEGORIES[categorySlug];
   const { slug } = useParams();
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
@@ -147,6 +148,14 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
 
       <main className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
+          <button
+            onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(category.categoryLink))}
+            className="inline-flex items-center gap-2 mb-5 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-bold text-sm sm:text-base transition-all shadow-lg"
+          >
+            <Icon name="ArrowLeft" size={20} />
+            Вернуться назад
+          </button>
+
           <nav className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground mb-6">
             <a href="/" className="hover:text-primary transition-colors">Главная</a>
             <Icon name="ChevronRight" size={14} />

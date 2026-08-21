@@ -805,7 +805,7 @@ const Injector = () => {
         </div>
       )}
 
-      <QuizSideTrigger storageKey="quiz_auto_injector">
+      <QuizSideTrigger storageKey="quiz_auto_injector" topic="Инъекторы">
         {(close) => (
           <QuizBlock onSent={(name, phone, quizAnswers) => { sendLead({ name, phone, quizAnswers, topic: 'инъекторы для мяса', formType: 'quiz' }); close(); }} />
         )}

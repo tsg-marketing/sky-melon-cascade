@@ -769,7 +769,7 @@ const Volchki = () => {
         </div>
       </footer>
 
-      <QuizSideTrigger storageKey="quiz_auto_volchki">
+      <QuizSideTrigger storageKey="quiz_auto_volchki" topic="Волчки и промышленные мясорубки">
         {(close) => (
           <QuizBlock onSent={(name, phone, email, quizAnswers) => { sendLead({ name, phone, email, quizAnswers, product: "Получить подборку (квиз-попап)", topic: "волчки", formType: "quiz" }); close(); }} />
         )}

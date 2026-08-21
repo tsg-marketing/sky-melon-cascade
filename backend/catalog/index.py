@@ -13,9 +13,10 @@ import time
 FEED_URL = "https://t-sib.ru/upload/catalog.xml"
 TARGET_CATEGORIES = {"229", "223", "230", "459", "228", "221", "220", "225"}
 
-# Каталог обновляется 3 раза в сутки (каждые 8 часов),
-# чтобы вовремя подхватывать новые ссылки на изображения из фида.
-CACHE_TTL = 8 * 60 * 60
+# Каталог обновляется 3 раза в сутки в фиксированные часы (00:00, 08:00, 16:00 UTC),
+# а не «через 8 часов после первого запроса»: так все разделы сайта
+# обновляются одновременно и показывают один и тот же срез данных.
+REFRESH_INTERVAL = 8 * 60 * 60
 
 _cache = None
 _cache_ts = 0
@@ -120,7 +121,8 @@ def parse_offer(offer: ET.Element) -> dict:
 def get_catalog(force: bool = False):
     global _cache, _cache_ts
     now = time.time()
-    if _cache and not force and now - _cache_ts < CACHE_TTL:
+    window_start = (now // REFRESH_INTERVAL) * REFRESH_INTERVAL
+    if _cache and not force and _cache_ts >= window_start:
         return _cache
 
     req = urllib.request.Request(FEED_URL, headers={"User-Agent": "Mozilla/5.0"})

@@ -1515,7 +1515,7 @@ const Massagers = () => {
         </div>
       )}
 
-      <QuizSideTrigger storageKey="quiz_auto_main">
+      <QuizSideTrigger storageKey="quiz_auto_main" topic="Массажёры мяса">
         {(close) => (
           <QuizBlock onSent={(name, phone, quizAnswers) => { sendLead({ name, phone, quizAnswers, formType: 'quiz' }); close(); }} />
         )}

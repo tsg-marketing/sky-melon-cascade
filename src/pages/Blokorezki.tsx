@@ -768,7 +768,7 @@ const Blokorezki = () => {
         </div>
       </footer>
 
-      <QuizSideTrigger storageKey="quiz_auto_blokorezki">
+      <QuizSideTrigger storageKey="quiz_auto_blokorezki" topic="Блокорезки">
         {(close) => (
           <QuizBlock onSent={(name, phone, email, quizAnswers) => { sendLead({ name, phone, email, quizAnswers, product: "Получить подборку (квиз-попап)", topic: "блокорезки", formType: "quiz" }); close(); }} />
         )}

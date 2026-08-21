@@ -719,7 +719,7 @@ const Slicers = () => {
         </div>
       )}
 
-      <QuizSideTrigger storageKey="quiz_auto_slicers">
+      <QuizSideTrigger storageKey="quiz_auto_slicers" topic="Слайсеры">
         {(close) => (
           <QuizBlock onSent={(name, phone, quizAnswers) => { sendLead({ name, phone, quizAnswers, topic: 'слайсеры', formType: 'quiz' }); close(); }} />
         )}

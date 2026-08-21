@@ -829,7 +829,7 @@ const LDOGenerator = () => {
         </div>
       )}
 
-      <QuizSideTrigger storageKey="quiz_auto_ldogenerator">
+      <QuizSideTrigger storageKey="quiz_auto_ldogenerator" topic="Льдогенераторы">
         {(close) => (
           <QuizBlock onSent={(name, phone, quizAnswers) => { sendLead({ name, phone, quizAnswers, topic: 'льдогенераторы', formType: 'quiz' }); close(); }} />
         )}

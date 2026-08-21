@@ -7,6 +7,8 @@ interface QuizSideTriggerProps {
   storageKey?: string;
   label?: string;
   autoOpenMs?: number;
+  /** Раздел оборудования — показывается заголовком внутри окна квиза. */
+  topic?: string;
 }
 
 export default function QuizSideTrigger({
@@ -14,6 +16,7 @@ export default function QuizSideTrigger({
   storageKey = "quiz_auto_opened",
   label = "Подобрать оборудование",
   autoOpenMs = 30000,
+  topic,
 }: QuizSideTriggerProps) {
   const [open, setOpen] = useState(false);
   const [renderKey, setRenderKey] = useState(0);
@@ -60,6 +63,12 @@ export default function QuizSideTrigger({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
           <div className="pt-2" key={renderKey}>
+            {topic && (
+              <div className="mb-6 text-center">
+                <span className="text-xs font-semibold tracking-widest text-primary uppercase">Подбор оборудования</span>
+                <h2 className="text-2xl sm:text-3xl font-display font-black tracking-tight text-foreground mt-2">{topic}</h2>
+              </div>
+            )}
             {typeof children === "function" ? children(close) : children}
           </div>
         </DialogContent>

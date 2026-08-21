@@ -142,6 +142,15 @@ function productivityValue(item: CatalogItem): number {
   return Math.max(...m.map((x) => parseFloat(x.replace(",", "."))));
 }
 
+/** Минимальная цена по типу оборудования — для динамических текстов на странице. */
+function minPriceByType(items: CatalogItem[] | null, type: string): string | null {
+  const prices = (items || [])
+    .filter((i) => equipmentType(i.name) === type && typeof i.price === "number" && i.price! > 0)
+    .map((i) => i.price as number);
+  if (!prices.length) return null;
+  return `${Math.round(Math.min(...prices)).toLocaleString("ru-RU")} ₽`;
+}
+
 const KotletnyyAvtomat = () => {
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
   const navigate = useNavigate();
@@ -267,6 +276,21 @@ const KotletnyyAvtomat = () => {
 
   const videoItems = useCallback(() => (items || []).filter((i) => i.video).slice(0, 3), [items]);
 
+  const priceAnswer = useCallback(() => {
+    const meatballs = minPriceByType(items, "meatballs");
+    const patty = minPriceByType(items, "patty");
+    const industrial = minPriceByType(items, "industrial");
+    if (!meatballs && !patty && !industrial) {
+      return "Цена зависит от производительности, комплекта матриц и необходимости панировочной линии. Оставьте заявку — пришлём актуальный прайс.";
+    }
+    const parts: string[] = [];
+    if (meatballs) parts.push(`от ${meatballs} за формовщик фрикаделек`);
+    if (patty) parts.push(`от ${patty} за котлетоформовочный автомат`);
+    const head = parts.length ? `В нашем каталоге цены начинаются ${parts.join(" и ")}. ` : "";
+    const ind = industrial ? `Промышленные формующие машины — от ${industrial}. ` : "";
+    return `${head}${ind}Итоговая цена зависит от производительности, комплекта матриц и необходимости панировочной линии.`;
+  }, [items]);
+
   const openLightbox = (photos: string[], index: number) => { setLightboxPhotos(photos); setLightboxIndex(index); setLightboxOpen(true); };
 
   const copyEmail = () => {
@@ -309,36 +333,15 @@ const KotletnyyAvtomat = () => {
                   </div>
                 ))}
               </div>
-              <p className="text-sm text-muted-foreground mb-8 p-4 bg-primary/5 border border-primary/15 rounded-2xl">Цены в каталоге: от 174 000 ₽ за формовщик фрикаделек до 5 822 000 ₽ за промышленную линию</p>
-              <div className="flex flex-col sm:flex-row gap-4 mb-5">
-                <button onClick={() => scrollTo("quiz")} className="px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-bold text-lg transition-all shadow-lg text-center">Подобрать автомат за 2 минуты</button>
-                <button onClick={() => { setModalProduct("Получить прайс (первый экран)"); setModalOpen(true); }} className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all text-center">Получить прайс с ценами</button>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button onClick={() => { setModalProduct("Получить предложение (первый экран)"); setModalOpen(true); }} className="px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-bold text-lg transition-all shadow-lg text-center">Получить предложение</button>
+                <button onClick={() => scrollTo("catalog")} className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-lg hover:border-primary hover:bg-primary/5 transition-all text-center">Смотреть оборудование</button>
               </div>
-              <p className="text-sm text-muted-foreground">Работаем с 2001 года · Демозалы в Москве и Новосибирске · Гарантия 12 месяцев · Доставка по всей России</p>
             </div>
             <div className={`hidden lg:block transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
-              <img src="https://cdn.poehali.dev/projects/63874bed-e293-4b07-975b-a3b344891b91/files/b14be79d-c4ab-4de5-b6f9-f4378306ee14.jpg" alt="Котлетный автомат для мясного производства" className="w-full h-auto object-contain rounded-3xl" />
+              <img src="/features/hero-kotletnyy.webp" alt="Котлетный автомат F 2000 PLUS" className="w-full h-auto object-contain rounded-3xl" />
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="py-8 px-6 bg-primary">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { icon: "Boxes", num: "25+ моделей", text: "в одной категории каталога" },
-            { icon: "Gauge", num: "до 12 000 шт/час", text: "максимальная производительность в линейке" },
-            { icon: "Target", num: "±1%", text: "точность дозирования на промышленных моделях" },
-            { icon: "ShieldCheck", num: "12 месяцев", text: "официальная гарантия производителя" },
-          ].map((t, i) => (
-            <div key={i} className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0"><Icon name={t.icon} fallback="Star" size={24} className="text-white" /></div>
-              <div>
-                <p className="font-black text-xl text-white leading-tight">{t.num}</p>
-                <p className="text-sm text-white/80 leading-snug">{t.text}</p>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 
@@ -350,17 +353,22 @@ const KotletnyyAvtomat = () => {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: "Beef", title: "Котлеты и полуфабрикаты", desc: "Классические котлеты, шницели, зразы. Вес изделия от 20 до 500 г, толщина от 6 до 25 мм. Формовка идёт без предварительного подмораживания фарша." },
-              { icon: "Sandwich", title: "Бургеры и стейк-котлеты", desc: "Круглые и овальные заготовки диаметром до 135 мм. Ровный край, одинаковая толщина, стабильный вес — продукт не «плывёт» на гриле." },
-              { icon: "Drumstick", title: "Наггетсы и продукция в панировке", desc: "Формовка + льезон + панировочные сухари в одну линию. Панировщики работают синхронно с формовочной машиной через транспортёр." },
-              { icon: "Circle", title: "Фрикадельки и тефтели", desc: "Отдельные машины под шарики диаметром от 18 до 38 мм, производительность до 250 шт/мин." },
-              { icon: "Fish", title: "Рыба, птица, растительный фарш", desc: "Оборудование работает не только с говядиной и свининой: подходит для куриного фарша, рыбного фарша и растительных альтернатив." },
-              { icon: "Factory", title: "Запуск нового цеха с нуля", desc: "Рассчитаем весь участок — от формовки до упаковки — под заявленный объём смены и площадь помещения." },
+              { icon: "Beef", img: "uc-cutlets", title: "Котлеты и полуфабрикаты", desc: "Классические котлеты, шницели, зразы. Вес изделия от 20 до 500 г, толщина от 6 до 25 мм. Формовка идёт без предварительного подмораживания фарша." },
+              { icon: "Sandwich", img: "uc-burgers", title: "Бургеры и стейк-котлеты", desc: "Круглые и овальные заготовки диаметром до 135 мм. Ровный край, одинаковая толщина, стабильный вес — продукт не «плывёт» на гриле." },
+              { icon: "Drumstick", img: "uc-nuggets", title: "Наггетсы и продукция в панировке", desc: "Формовка + льезон + панировочные сухари в одну линию. Панировщики работают синхронно с формовочной машиной через транспортёр." },
+              { icon: "Circle", img: "uc-meatballs", title: "Фрикадельки и тефтели", desc: "Отдельные машины под шарики диаметром от 18 до 38 мм, производительность до 250 шт/мин." },
+              { icon: "Fish", img: "uc-fish", title: "Рыба, птица, растительный фарш", desc: "Оборудование работает не только с говядиной и свининой: подходит для куриного фарша, рыбного фарша и растительных альтернатив." },
+              { icon: "Factory", img: "uc-newshop", title: "Запуск нового цеха с нуля", desc: "Рассчитаем весь участок — от формовки до упаковки — под заявленный объём смены и площадь помещения." },
             ].map((c, i) => (
-              <div key={i} className={`p-7 bg-background border border-border rounded-2xl hover:border-primary/40 hover:shadow-lg transition-all ${vis("segments-usecases") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 80}ms`, transitionDuration: "700ms" }}>
-                <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4"><Icon name={c.icon} fallback="Star" size={28} className="text-primary" /></div>
-                <h3 className="font-bold text-xl text-foreground mb-2">{c.title}</h3>
-                <p className="text-muted-foreground text-base leading-relaxed">{c.desc}</p>
+              <div key={i} className={`bg-background border border-border rounded-2xl overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all ${vis("segments-usecases") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 80}ms`, transitionDuration: "700ms" }}>
+                <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+                  <img src={`/features/${c.img}.webp`} alt={c.title} loading="lazy" className="w-full h-full object-cover" />
+                  <div className="absolute top-3 left-3 w-11 h-11 bg-white/95 backdrop-blur rounded-xl flex items-center justify-center shadow-sm"><Icon name={c.icon} fallback="Star" size={22} className="text-primary" /></div>
+                </div>
+                <div className="p-6">
+                  <h3 className="font-bold text-xl text-foreground mb-2">{c.title}</h3>
+                  <p className="text-muted-foreground text-base leading-relaxed">{c.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -374,18 +382,21 @@ const KotletnyyAvtomat = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: "SlidersHorizontal", title: "Подбор под ваш фарш", desc: "Учитываем жирность, температуру и структуру сырья. Подбираем матрицу под нужный вес и форму изделия." },
-              { icon: "Target", title: "Точность и стабильный вес", desc: "Погрешность дозирования от ±1% до 5% в зависимости от модели — меньше перевеса, меньше потерь на смене." },
-              { icon: "Building2", title: "Демозал и тест на вашем сырье", desc: "Приезжайте с собственным фаршем и посмотрите результат формовки до покупки. Демозалы в Москве и Новосибирске." },
-              { icon: "Cookie", title: "Матрицы и оснастка", desc: "Подбираем и поставляем сменные формы под ваш ассортимент — круг, овал, произвольная форма." },
-              { icon: "GraduationCap", title: "Пусконаладка и обучение", desc: "Запускаем оборудование и обучаем операторов работе и мойке. Инструктаж входит в поставку." },
-              { icon: "Wrench", title: "Сервис и запчасти", desc: "Собственная сервисная служба, склад расходников и ЗИП. Не оставляем клиента после отгрузки." },
-              { icon: "FileCheck", title: "Документы для тендера", desc: "Полный комплект: КП, спецификации, сертификаты, паспорта. Готовим пакет под 44-ФЗ и 223-ФЗ." },
-              { icon: "Truck", title: "Доставка по всей России", desc: "Отгрузка со складов в Москве и Новосибирске, отлаженная логистика в любой регион." },
+              { icon: "SlidersHorizontal", img: "co-select", title: "Подбор под ваш фарш", desc: "Учитываем жирность, температуру и структуру сырья. Подбираем матрицу под нужный вес и форму изделия." },
+              { icon: "Target", img: "adv-precision", title: "Точность и стабильный вес", desc: "Погрешность дозирования от ±1% до 5% в зависимости от модели — меньше перевеса, меньше потерь на смене." },
+              { icon: "Building2", img: "co-demo", title: "Демозал и тест на вашем сырье", desc: "Приезжайте с собственным фаршем и посмотрите результат формовки до покупки. Демозалы в Москве и Новосибирске." },
+              { icon: "Cookie", img: "adv-molds", title: "Матрицы и оснастка", desc: "Подбираем и поставляем сменные формы под ваш ассортимент — круг, овал, произвольная форма." },
+              { icon: "GraduationCap", img: "adv-simple", title: "Пусконаладка и обучение", desc: "Запускаем оборудование и обучаем операторов работе и мойке. Инструктаж входит в поставку." },
+              { icon: "Wrench", img: "co-service", title: "Сервис и запчасти", desc: "Собственная сервисная служба, склад расходников и ЗИП. Не оставляем клиента после отгрузки." },
+              { icon: "FileCheck", img: "adv-docs", title: "Документы для тендера", desc: "Полный комплект: КП, спецификации, сертификаты, паспорта. Готовим пакет под 44-ФЗ и 223-ФЗ." },
+              { icon: "Truck", img: "adv-delivery", title: "Доставка по всей России", desc: "Отгрузка со складов в Москве и Новосибирске, отлаженная логистика в любой регион." },
             ].map((feat, i) => (
-              <div key={i} className={`p-7 bg-white border border-border rounded-2xl hover:border-primary/40 hover:shadow-lg transition-all flex flex-col gap-4 ${vis("advantages") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 80}ms`, transitionDuration: "700ms" }}>
-                <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center"><Icon name={feat.icon} fallback="Star" size={28} className="text-primary" /></div>
-                <div><h3 className="font-bold text-lg text-foreground mb-2">{feat.title}</h3><p className="text-muted-foreground text-sm leading-relaxed">{feat.desc}</p></div>
+              <div key={i} className={`bg-white border border-border rounded-2xl overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all flex flex-col ${vis("advantages") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 80}ms`, transitionDuration: "700ms" }}>
+                <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+                  <img src={`/features/${feat.img}.webp`} alt={feat.title} loading="lazy" className="w-full h-full object-cover" />
+                  <div className="absolute top-3 left-3 w-11 h-11 bg-white/95 backdrop-blur rounded-xl flex items-center justify-center shadow-sm"><Icon name={feat.icon} fallback="Star" size={22} className="text-primary" /></div>
+                </div>
+                <div className="p-6"><h3 className="font-bold text-lg text-foreground mb-2">{feat.title}</h3><p className="text-muted-foreground text-sm leading-relaxed">{feat.desc}</p></div>
               </div>
             ))}
           </div>
@@ -526,52 +537,30 @@ const KotletnyyAvtomat = () => {
         <div className="max-w-6xl mx-auto">
           <div className={`text-center mb-12 transition-all duration-1000 ${vis("howto") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
             <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground leading-tight">Как подобрать котлетный автомат под свой объём</h2>
-            <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">Ориентировочная таблица. Точную модель технолог подберёт после уточнения веса изделия, типа фарша и графика работы цеха.</p>
+            <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">Ориентировочные сценарии. Точную модель технолог подберёт после уточнения веса изделия, типа фарша и графика работы цеха.</p>
           </div>
 
-          <div className="hidden md:block bg-white border border-border rounded-3xl overflow-hidden shadow-sm mb-8">
-            <table className="w-full text-left">
-              <thead className="bg-primary text-white">
-                <tr>
-                  <th className="px-6 py-4 font-bold text-base">Объём производства</th>
-                  <th className="px-6 py-4 font-bold text-base">Что обычно берут</th>
-                  <th className="px-6 py-4 font-bold text-base whitespace-nowrap">Ориентир по цене</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  ["Небольшой цех, до 500 кг/смену", "Компактные формовочные машины и формовщики фрикаделек", "от 174 000 ₽"],
-                  ["Средний цех, 500–2 000 кг/смену", "Котлетоформовочные автоматы производительностью 1 600–4 000 шт/час", "от 293 000 ₽"],
-                  ["Крупный цех, 2 000–5 000 кг/смену", "Автоматы 4 000 шт/час + панировочная линия", "от 1 100 000 ₽"],
-                  ["Промышленное производство, свыше 5 000 кг/смену", "Барабанные формующие машины 100–800 кг/ч с точностью ±1% и линией льезон/панировка", "от 2 300 000 ₽"],
-                ].map((row, i) => (
-                  <tr key={i} className="border-t border-border hover:bg-primary/5 transition-colors">
-                    <td className="px-6 py-5 font-semibold text-foreground align-top">{row[0]}</td>
-                    <td className="px-6 py-5 text-muted-foreground align-top">{row[1]}</td>
-                    <td className="px-6 py-5 font-black text-primary whitespace-nowrap align-top">{row[2]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="md:hidden space-y-4 mb-8">
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
             {[
-              ["Небольшой цех, до 500 кг/смену", "Компактные формовочные машины и формовщики фрикаделек", "от 174 000 ₽"],
-              ["Средний цех, 500–2 000 кг/смену", "Котлетоформовочные автоматы производительностью 1 600–4 000 шт/час", "от 293 000 ₽"],
-              ["Крупный цех, 2 000–5 000 кг/смену", "Автоматы 4 000 шт/час + панировочная линия", "от 1 100 000 ₽"],
-              ["Промышленное производство, свыше 5 000 кг/смену", "Барабанные формующие машины 100–800 кг/ч с точностью ±1% и линией льезон/панировка", "от 2 300 000 ₽"],
-            ].map((row, i) => (
-              <div key={i} className="p-5 bg-white border border-border rounded-2xl">
-                <p className="font-bold text-base text-foreground mb-2">{row[0]}</p>
-                <p className="text-sm text-muted-foreground mb-3">{row[1]}</p>
-                <p className="font-black text-lg text-primary">{row[2]}</p>
+              { icon: "Store", volume: "Небольшой цех", scale: "до 500 кг/смену", pick: "Компактные формовочные машины и формовщики фрикаделек", type: "meatballs" },
+              { icon: "Factory", volume: "Средний цех", scale: "500–2 000 кг/смену", pick: "Котлетоформовочные автоматы производительностью 1 600–4 000 шт/час", type: "patty" },
+              { icon: "Building2", volume: "Крупный цех", scale: "2 000–5 000 кг/смену", pick: "Автоматы 4 000 шт/час в связке с панировочной линией", type: "breading" },
+              { icon: "Warehouse", volume: "Промышленное производство", scale: "свыше 5 000 кг/смену", pick: "Барабанные формующие машины 100–800 кг/ч с точностью ±1% и линией льезон/панировка", type: "industrial" },
+            ].map((r, i) => (
+              <div key={i} className={`p-7 bg-white border border-border rounded-2xl hover:border-primary/40 hover:shadow-lg transition-all flex gap-5 ${vis("howto") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 90}ms`, transitionDuration: "700ms" }}>
+                <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0"><Icon name={r.icon} fallback="Factory" size={28} className="text-primary" /></div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-xl text-foreground leading-snug">{r.volume}</h3>
+                  <p className="text-sm font-semibold text-primary mb-3">{r.scale}</p>
+                  <p className="text-muted-foreground text-base leading-relaxed mb-4">{r.pick}</p>
+                  <button onClick={() => { setTypeFilter(r.type); setCatalogExpanded(false); scrollTo("catalog"); }} className="text-sm font-semibold text-primary hover:underline">Смотреть модели →</button>
+                </div>
               </div>
             ))}
           </div>
 
           <div className="p-6 sm:p-8 bg-white border-2 border-primary/20 rounded-3xl flex flex-col sm:flex-row items-center gap-6 justify-between">
-            <p className="text-base text-foreground leading-relaxed">Не попадаете ни в одну строку? Так бывает почти всегда — реальный подбор зависит от фарша и веса изделия.</p>
+            <p className="text-base text-foreground leading-relaxed">Не подходит ни один сценарий? Так бывает почти всегда — реальный подбор зависит от фарша и веса изделия.</p>
             <button onClick={() => scrollTo("quiz")} className="px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-bold text-base transition-all shadow-sm whitespace-nowrap flex-shrink-0">Рассчитать под мой цех</button>
           </div>
         </div>
@@ -735,7 +724,7 @@ const KotletnyyAvtomat = () => {
                 icon: "Briefcase",
                 img: "faq-director",
                 items: [
-                  { q: "Сколько стоит котлетный автомат?", a: "В нашем каталоге цены начинаются от 174 000 ₽ за формовщик фрикаделек и от 293 000 ₽ за котлетоформовочный автомат. Промышленные формующие машины — от 2 300 000 ₽. Итоговая цена зависит от производительности, комплекта матриц и необходимости панировочной линии." },
+                  { q: "Сколько стоит котлетный автомат?", a: priceAnswer() },
                   { q: "Как быстро окупится автомат?", a: "Основная экономия — на фонде оплаты труда и на перевесе. Автомат заменяет ручную формовку и держит стабильный вес изделия, поэтому уходят потери от «щедрых» котлет. При загрузке от 1 000 кг в смену оборудование окупается в среднем за 6–12 месяцев." },
                   { q: "Даёте документы для тендера?", a: "Да. Готовим полный комплект: коммерческое предложение, спецификацию, технические характеристики, сертификаты и паспорта. Работаем по 44-ФЗ и 223-ФЗ." },
                 ],
@@ -794,40 +783,38 @@ const KotletnyyAvtomat = () => {
         </div>
       </section>
 
-      <section id="contacts" className="py-16 px-6 bg-primary">
+      <section id="contacts" className="py-12 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className={`text-center mb-14 transition-all duration-1000 ${vis("contacts") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-white leading-tight">Обсудим ваш проект</h2>
-            <p className="text-lg text-white/80 mt-4 max-w-3xl mx-auto">Опишите задачу — технолог перезвонит, задаст уточняющие вопросы и подберёт 2–3 модели с ценами.</p>
+            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground leading-tight">Обсудим ваш проект</h2>
+            <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">Опишите задачу — технолог перезвонит, задаст уточняющие вопросы и подберёт 2–3 модели с ценами.</p>
           </div>
           <div className="grid lg:grid-cols-2 gap-14 items-start">
             <div className={`transition-all duration-1000 ${vis("contacts") ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}>
-              <div className="space-y-4">
-                <a
-                  href="tel:88005057684"
-                  onClick={() => { try { (window as unknown as { ym?: (...a: unknown[]) => void }).ym?.(107258870, "reachGoal", "phone_click"); } catch { /* noop */ } }}
-                  className="flex items-center gap-4 p-5 bg-white/10 border border-white/20 rounded-2xl hover:bg-white/15 transition-colors"
-                >
-                  <div className="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0"><Icon name="Phone" size={22} className="text-white" /></div>
-                  <div><p className="text-xs text-white/70">Телефон</p><p className="font-bold text-lg text-white">8-800-505-76-84</p></div>
-                </a>
-                <button onClick={copyEmail} className="w-full flex items-center gap-4 p-5 bg-white/10 border border-white/20 rounded-2xl hover:bg-white/15 transition-colors text-left">
-                  <div className="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0"><Icon name={emailCopied ? "Check" : "Mail"} size={22} className="text-white" /></div>
-                  <div><p className="text-xs text-white/70">Почта</p><p className="font-bold text-lg text-white">{emailCopied ? "Скопировано!" : "massagers@t-sib.ru"}</p></div>
-                </button>
-                <div className="p-5 bg-white/10 border border-white/20 rounded-2xl">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0"><Icon name="MapPin" size={22} className="text-white" /></div>
-                    <div>
-                      <p className="font-bold text-base text-white mb-1">Демозалы: Москва и Новосибирск</p>
-                      <p className="text-sm text-white/80 leading-relaxed">Работаем по всей России, отгрузка со складов в Москве и Новосибирске</p>
-                    </div>
+              <div className="flex justify-center">
+                <div className="p-8 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-3xl shadow-xl w-full max-w-sm">
+                  <div className="flex justify-center mb-6"><div className="w-28 h-28 bg-primary/10 rounded-2xl flex items-center justify-center"><Icon name="Factory" size={56} className="text-primary" /></div></div>
+                  <p className="text-center text-sm font-medium text-muted-foreground mb-6">Демозалы: Москва и Новосибирск</p>
+                  <div className="space-y-4">
+                    <a
+                      href="tel:88005057684"
+                      onClick={() => { try { (window as unknown as { ym?: (...a: unknown[]) => void }).ym?.(107258870, "reachGoal", "phone_click"); } catch { /* noop */ } }}
+                      className="flex items-center gap-4 p-4 bg-white border border-primary/10 rounded-xl hover:border-primary/30 transition-colors"
+                    >
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0"><Icon name="Phone" size={18} className="text-primary" /></div>
+                      <div><p className="text-xs text-muted-foreground">Телефон</p><p className="font-bold text-base text-foreground">8 800 505-76-84</p></div>
+                    </a>
+                    <button onClick={copyEmail} className="w-full flex items-center gap-4 p-4 bg-white border border-primary/10 rounded-xl hover:border-primary/30 transition-colors text-left">
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0"><Icon name={emailCopied ? "Check" : "Mail"} size={18} className="text-primary" /></div>
+                      <div><p className="text-xs text-muted-foreground">Почта</p><p className="font-bold text-base text-foreground">{emailCopied ? "Скопировано!" : "massagers@t-sib.ru"}</p></div>
+                    </button>
                   </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed mt-6 text-center">Работаем по всей России, отгрузка со складов в Москве и Новосибирске</p>
                 </div>
               </div>
             </div>
             <div className={`transition-all duration-1000 delay-300 ${vis("contacts") ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}>
-              <div className="p-8 bg-white rounded-3xl shadow-xl">
+              <div className="p-8 bg-background border-2 border-primary/15 rounded-3xl shadow-sm">
                 <h3 className="font-display font-bold text-2xl mb-2 text-foreground">Оставить заявку</h3>
                 <p className="text-muted-foreground mb-6 text-sm">Технолог ответит в течение 2 часов</p>
                 <div className="space-y-4">
@@ -955,7 +942,7 @@ const KotletnyyAvtomat = () => {
         </div>
       )}
 
-      <QuizSideTrigger storageKey="quiz_auto_kotletnyy">
+      <QuizSideTrigger storageKey="quiz_auto_kotletnyy" topic="Котлетные автоматы">
         {(close) => (
           <QuizBlock onSent={(name, phone, email, quizAnswers) => { sendLead({ name, phone, email, quizAnswers, product: "Получить подборку (квиз-попап)", topic: "котлетные автоматы", formType: "quiz" }); close(); }} />
         )}
