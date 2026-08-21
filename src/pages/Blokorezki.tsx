@@ -278,7 +278,7 @@ const Blokorezki = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: "Gauge", img: "adv-performance", title: "Производительность", desc: "До 6000 кг/ч — работа с замороженными блоками без дефростации" },
+              { icon: "Gauge", img: "adv-performance-blokorezki", title: "Производительность", desc: "До 6000 кг/ч — работа с замороженными блоками без дефростации" },
               { icon: "Scissors", img: "adv-cut", title: "Высокое качество реза", desc: "Чистый срез без замятия и нагрева продукта" },
               { icon: "Wrench", img: "adv-clean", title: "Лёгкая разборка и мойка", desc: "Быстрая санитарная обработка без инструмента" },
               { icon: "MousePointerClick", img: "adv-simple", title: "Простота в эксплуатации", desc: "Понятное управление, минимум обучения" },
@@ -289,7 +289,7 @@ const Blokorezki = () => {
             ].map((feat, i) => (
               <div key={i} className={`bg-white border border-border rounded-2xl overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all flex flex-col ${vis("advantages") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 80}ms`, transitionDuration: "700ms" }}>
                 <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
-                  <img src={`/blokorezki/${feat.img}.webp`} alt={feat.title} loading="lazy" className="w-full h-full object-cover" />
+                  <img src={`/features/${feat.img}.webp`} alt={feat.title} loading="lazy" className="w-full h-full object-cover" />
                   <div className="absolute top-3 left-3 w-11 h-11 bg-white/95 backdrop-blur rounded-xl flex items-center justify-center shadow-sm"><Icon name={feat.icon} fallback="Star" size={22} className="text-primary" /></div>
                 </div>
                 <div className="p-6"><h3 className="font-bold text-lg text-foreground mb-2">{feat.title}</h3><p className="text-muted-foreground text-sm leading-relaxed">{feat.desc}</p></div>
@@ -453,7 +453,7 @@ const Blokorezki = () => {
             ].map((f, i) => (
               <div key={i} className={`bg-white border border-border rounded-2xl overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all ${vis("why-us") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 80}ms`, transitionDuration: "700ms" }}>
                 <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
-                  <img src={`/blokorezki/${f.img}.webp`} alt={f.title} loading="lazy" className="w-full h-full object-cover" />
+                  <img src={`/features/${f.img}.webp`} alt={f.title} loading="lazy" className="w-full h-full object-cover" />
                   <div className="absolute top-3 left-3 w-11 h-11 bg-white/95 backdrop-blur rounded-xl flex items-center justify-center shadow-sm"><Icon name={f.icon} fallback="Star" size={22} className="text-primary" /></div>
                 </div>
                 <div className="p-6"><h3 className="font-bold text-lg text-foreground mb-2">{f.title}</h3><p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p></div>
@@ -583,7 +583,7 @@ const Blokorezki = () => {
             ].map((col, ci) => (
               <div key={ci} className={`bg-white border border-border rounded-2xl overflow-hidden shadow-sm transition-all duration-700 ${vis("faq") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`} style={{ transitionDelay: `${ci * 100}ms` }}>
                 <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
-                  <img src={`/blokorezki/${col.img}.webp`} alt={col.role} loading="lazy" className="w-full h-full object-cover" />
+                  <img src={`/features/${col.img}.webp`} alt={col.role} loading="lazy" className="w-full h-full object-cover" />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-5 pt-10 pb-4 flex items-center gap-3">
                     <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
                       <Icon name={col.icon} fallback="User" size={20} className="text-primary" />

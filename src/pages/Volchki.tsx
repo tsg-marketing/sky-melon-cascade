@@ -194,7 +194,7 @@ const Volchki = () => {
   }, []);
 
   useEffect(() => {
-    const ids = ["hero", "advantages", "catalog", "process", "videos", "segments", "about", "faq", "contacts"];
+    const ids = ["hero", "advantages", "catalog", "process", "why-us", "videos", "segments", "about", "faq", "contacts"];
     setVisibleSections((prev) => ({ ...prev, hero: true }));
     const observers: Record<string, IntersectionObserver> = {};
     ids.forEach((id) => {
@@ -279,18 +279,21 @@ const Volchki = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: "Gauge", title: "Производительность", desc: "От 300 до 10 000 кг/ч — модели для любых объёмов производства" },
-              { icon: "Scissors", title: "Высокое качество реза", desc: "Чистый срез без замятия и нагрева продукта" },
-              { icon: "Wrench", title: "Лёгкая разборка и мойка", desc: "Быстрая санитарная обработка без инструмента" },
-              { icon: "MousePointerClick", title: "Простота в эксплуатации", desc: "Понятное управление, минимум обучения" },
-              { icon: "FileCheck", title: "Пакет документов под тендер", desc: "Полный комплект для торгов и госзакупок" },
-              { icon: "Boxes", title: "Подбор комплекта для новых цехов", desc: "Рассчитаем линию под задачу" },
-              { icon: "ShieldCheck", title: "Гарантия 12 месяцев", desc: "Официальная гарантия производителя" },
-              { icon: "Truck", title: "Доставка по всей России", desc: "Собственная логистика" },
+              { icon: "Gauge", img: "adv-performance-volchki", title: "Производительность", desc: "От 300 до 10 000 кг/ч — модели для любых объёмов производства" },
+              { icon: "Scissors", img: "adv-cut", title: "Высокое качество реза", desc: "Чистый срез без замятия и нагрева продукта" },
+              { icon: "Wrench", img: "adv-clean", title: "Лёгкая разборка и мойка", desc: "Быстрая санитарная обработка без инструмента" },
+              { icon: "MousePointerClick", img: "adv-simple", title: "Простота в эксплуатации", desc: "Понятное управление, минимум обучения" },
+              { icon: "FileCheck", img: "adv-docs", title: "Пакет документов под тендер", desc: "Полный комплект для торгов и госзакупок" },
+              { icon: "Boxes", img: "adv-complect", title: "Подбор комплекта для новых цехов", desc: "Рассчитаем линию под задачу" },
+              { icon: "ShieldCheck", img: "adv-warranty", title: "Гарантия 12 месяцев", desc: "Официальная гарантия производителя" },
+              { icon: "Truck", img: "adv-delivery", title: "Доставка по всей России", desc: "Собственная логистика" },
             ].map((feat, i) => (
-              <div key={i} className={`p-7 bg-white border border-border rounded-2xl hover:border-primary/40 hover:shadow-lg transition-all flex flex-col gap-4 ${vis("advantages") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 80}ms`, transitionDuration: "700ms" }}>
-                <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center"><Icon name={feat.icon} fallback="Star" size={28} className="text-primary" /></div>
-                <div><h3 className="font-bold text-xl text-foreground mb-2">{feat.title}</h3><p className="text-muted-foreground text-base">{feat.desc}</p></div>
+              <div key={i} className={`bg-white border border-border rounded-2xl overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all flex flex-col ${vis("advantages") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 80}ms`, transitionDuration: "700ms" }}>
+                <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+                  <img src={`/features/${feat.img}.webp`} alt={feat.title} loading="lazy" className="w-full h-full object-cover" />
+                  <div className="absolute top-3 left-3 w-11 h-11 bg-white/95 backdrop-blur rounded-xl flex items-center justify-center shadow-sm"><Icon name={feat.icon} fallback="Star" size={22} className="text-primary" /></div>
+                </div>
+                <div className="p-6"><h3 className="font-bold text-lg text-foreground mb-2">{feat.title}</h3><p className="text-muted-foreground text-sm leading-relaxed">{feat.desc}</p></div>
               </div>
             ))}
           </div>
@@ -425,6 +428,32 @@ const Volchki = () => {
         </div>
       </section>
 
+      <section id="why-us" className="py-12 px-6 bg-secondary">
+        <div className="max-w-7xl mx-auto">
+          <div className={`text-center mb-14 transition-all duration-1000 ${vis("why-us") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+            <span className="text-xs font-semibold tracking-widest text-primary uppercase">Почему мы</span>
+            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Преимущества компании</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { img: "co-supply", icon: "Factory", title: "Прямые поставки с заводов", desc: "Фиксируем комплектацию и сроки в договоре" },
+              { img: "co-select", icon: "SlidersHorizontal", title: "Подбор под продукт", desc: "Ножи, решётки и режимы под вашу рецептуру" },
+              { img: "co-demo", icon: "Building2", title: "Демозалы в МСК и НСК", desc: "Покажем узлы и обслуживание, привозите своё сырьё" },
+              { img: "co-speed", icon: "Timer", title: "Быстрые сроки", desc: "Подстроимся под ваш дедлайн запуска" },
+              { img: "co-service", icon: "Wrench", title: "Сервис", desc: "Пусконаладка, гарантия и запчасти на складе" },
+            ].map((f, i) => (
+              <div key={i} className={`bg-white border border-border rounded-2xl overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all ${vis("why-us") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${i * 80}ms`, transitionDuration: "700ms" }}>
+                <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+                  <img src={`/features/${f.img}.webp`} alt={f.title} loading="lazy" className="w-full h-full object-cover" />
+                  <div className="absolute top-3 left-3 w-11 h-11 bg-white/95 backdrop-blur rounded-xl flex items-center justify-center shadow-sm"><Icon name={f.icon} fallback="Star" size={22} className="text-primary" /></div>
+                </div>
+                <div className="p-6"><h3 className="font-bold text-lg text-foreground mb-2">{f.title}</h3><p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="videos" className="py-12 px-6 bg-background">
         <div className="max-w-6xl mx-auto">
           <div className={`text-center mb-10 transition-all duration-1000 ${vis("videos") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
@@ -510,11 +539,12 @@ const Volchki = () => {
             <span className="text-xs font-semibold tracking-widest text-primary uppercase">FAQ</span>
             <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Частые вопросы</h2>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 role: "Директор",
                 icon: "Briefcase",
+                img: "faq-director",
                 items: [
                   { q: "Как быстро окупится новый волчок?", a: "Окупаемость зависит от объёмов производства. При загрузке 2000+ кг/смену современное оборудование окупается за 8-12 месяцев за счёт снижения брака и увеличения производительности." },
                   { q: "Какие гарантии качества?", a: "Предоставляем официальную гарантию производителя 12-24 месяца, сервисное обслуживание, запчасти на складе. Всё оборудование сертифицировано для пищевого производства." },
@@ -524,6 +554,7 @@ const Volchki = () => {
               {
                 role: "Инженер",
                 icon: "HardHat",
+                img: "faq-engineer",
                 items: [
                   { q: "Какие требования к электрике?", a: "Зависит от модели: от 380В 16А для малых волчков до 380В 63А для промышленных куттеров. Предоставляем полную техническую документацию и схемы подключения." },
                   { q: "Сложно ли обслуживать?", a: "Современные модели рассчитаны на простое обслуживание. Проводим обучение персонала, предоставляем инструкции по эксплуатации и техническому обслуживанию." },
@@ -533,19 +564,33 @@ const Volchki = () => {
               {
                 role: "Технолог",
                 icon: "FlaskConical",
+                img: "faq-tech",
                 items: [
                   { q: "Как подобрать решётку под продукт?", a: "Зависит от рецептуры: 3-5 мм для варёных колбас, 8-12 мм для рубленых полуфабрикатов. Можем провести тестовое измельчение вашего сырья в демозале." },
                   { q: "Можно ли перерабатывать замороженное сырьё?", a: "Да, есть модели для работы с подмороженным блоком. Подберём волчок с нужной мощностью и конструкцией шнека под ваше сырьё." },
                   { q: "Как избежать нагрева фарша?", a: "Правильно подобранная режущая пара и производительность исключают перегрев. Мы рассчитываем режим под вашу рецептуру и объём." },
                 ],
               },
+              {
+                role: "Закупщик",
+                icon: "ShoppingCart",
+                img: "faq-buyer",
+                items: [
+                  { q: "Какие сроки поставки?", a: "Модели со склада в Москве и Новосибирске отгружаем за 1-3 дня. Поставка под заказ с завода — от 30 до 90 дней в зависимости от модели." },
+                  { q: "Какие условия оплаты?", a: "Работаем по договору с отсрочкой, предоплатой или через лизинг. Все документы для бухгалтерии и торгов предоставляем полным пакетом." },
+                  { q: "Входит ли доставка и монтаж в цену?", a: "Считаем отдельно и фиксируем в КП. Доставляем собственной логистикой по России и СНГ, выполняем пусконаладку и обучение персонала." },
+                ],
+              },
             ].map((col, ci) => (
               <div key={ci} className={`bg-white border border-border rounded-2xl overflow-hidden shadow-sm transition-all duration-700 ${vis("faq") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`} style={{ transitionDelay: `${ci * 100}ms` }}>
-                <div className="flex items-center gap-4 px-5 pt-6 pb-5 bg-gradient-to-br from-primary/10 to-primary/5 border-b border-border">
-                  <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm flex-shrink-0">
-                    <Icon name={col.icon} fallback="User" size={28} className="text-primary" />
+                <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+                  <img src={`/features/${col.img}.webp`} alt={col.role} loading="lazy" className="w-full h-full object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-5 pt-10 pb-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
+                      <Icon name={col.icon} fallback="User" size={20} className="text-primary" />
+                    </div>
+                    <p className="font-display font-black text-lg text-white uppercase tracking-wide">{col.role}</p>
                   </div>
-                  <p className="font-display font-black text-xl text-primary uppercase tracking-wide">{col.role}</p>
                 </div>
                 <div className="p-5">
                   <div className="space-y-2">
@@ -699,6 +744,7 @@ const Volchki = () => {
                 <a href="/injector" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Инъекторы</a>
                 <a href="/slicers" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Слайсеры</a>
                 <a href="/ldogenerator" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Льдогенераторы</a>
+                <a href="/blokorezki" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Блокорезки</a>
               </div>
             </div>
             <div>
