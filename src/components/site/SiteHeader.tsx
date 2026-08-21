@@ -10,6 +10,7 @@ const MAIN_LINKS = [
   { href: "/injector", label: "Инъекторы" },
   { href: "/slicers", label: "Слайсеры" },
   { href: "/ldogenerator", label: "Льдогенераторы" },
+  { href: "/volchki", label: "Волчки" },
 ];
 
 interface CatLink { slug: string; title: string; }

@@ -20,6 +20,7 @@ export interface CatalogData {
   injectors?: CatalogItem[];
   slicers?: CatalogItem[];
   icemakers?: CatalogItem[];
+  mincers?: CatalogItem[];
 }
 
 export const CATALOG_URL =
@@ -71,6 +72,15 @@ export const CATEGORIES: Record<string, CategoryMeta> = {
     title: "Льдогенераторы",
     singular: "льдогенератор",
     topic: "льдогенераторы",
+  },
+  volchki: {
+    slug: "volchki",
+    path: "/volchki",
+    categoryLink: "/volchki",
+    dataKey: "mincers",
+    title: "Волчки (мясорубки промышленные)",
+    singular: "волчок",
+    topic: "волчки",
   },
 };
 
