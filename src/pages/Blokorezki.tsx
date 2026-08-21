@@ -210,7 +210,7 @@ const Blokorezki = () => {
 
   useEffect(() => {
     setCatalogLoading(true);
-    fetchCatalog()
+    fetchCatalog("blockcutters")
       .then((d) => setItems(d.blockcutters || []))
       .catch(() => setItems([]))
       .finally(() => setCatalogLoading(false));
@@ -347,7 +347,17 @@ const Blokorezki = () => {
 
           {!catalogLoading && items && (
             filteredItems().length === 0 ? (
-              <div className="text-center py-20 text-muted-foreground"><Icon name="SearchX" size={48} className="mx-auto mb-4 opacity-30" /><p className="text-lg">Ничего не найдено</p></div>
+              <div className="text-center py-20 text-muted-foreground">
+                <Icon name="SearchX" size={48} className="mx-auto mb-4 opacity-30" />
+                {items.length === 0 ? (
+                  <>
+                    <p className="text-lg mb-4">Не удалось загрузить каталог</p>
+                    <button onClick={() => window.location.reload()} className="px-6 py-3 border-2 border-primary/30 text-primary rounded-full font-semibold text-sm hover:border-primary hover:bg-primary/5 transition-all">Обновить страницу</button>
+                  </>
+                ) : (
+                  <p className="text-lg">Ничего не найдено по вашему запросу</p>
+                )}
+              </div>
             ) : (
               <div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

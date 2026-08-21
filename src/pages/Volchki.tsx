@@ -210,7 +210,7 @@ const Volchki = () => {
 
   useEffect(() => {
     setCatalogLoading(true);
-    fetchCatalog()
+    fetchCatalog("mincers")
       // Показываем только промышленные модели: бытовые дешевле 100 000 ₽ скрываем.
       .then((d) => setItems((d.mincers || []).filter((i) => (i.price || 0) >= MIN_PRICE)))
       .catch(() => setItems([]))

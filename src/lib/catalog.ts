@@ -145,7 +145,9 @@ export function pickListingParams<T extends { name: string; value: string }>(par
   return [...priority, ...rest].slice(0, limit);
 }
 
-const CACHE_KEY = "mm_catalog_cache";
+// Версия в ключе: при добавлении новых разделов каталога (волчки, блокорезки)
+// её нужно поднять — иначе у посетителей останется старая копия без новых товаров.
+const CACHE_KEY = "mm_catalog_cache_v3";
 const CACHE_TTL = 60 * 60 * 1000; // 1 час
 let memoryCache: CatalogData | null = null;
 let catalogPromise: Promise<CatalogData> | null = null;
@@ -172,9 +174,13 @@ function readCache(): CatalogData | null {
  * Загружает каталог с кэшированием: повторные вызовы (переходы между листингами
  * и товарами) отдают данные мгновенно из памяти/хранилища, без сетевого запроса.
  */
-export function fetchCatalog(): Promise<CatalogData> {
+export function fetchCatalog(requiredKey?: keyof CatalogData): Promise<CatalogData> {
   const cached = readCache();
-  if (cached) return Promise.resolve(cached);
+  // Если в сохранённой копии нет нужного раздела (например, он появился позже),
+  // игнорируем её и запрашиваем свежие данные.
+  const cacheUsable = cached && (!requiredKey || (cached[requiredKey]?.length ?? 0) > 0);
+  if (cached && cacheUsable) return Promise.resolve(cached);
+  if (cached && !cacheUsable) memoryCache = null;
   if (catalogPromise) return catalogPromise;
   catalogPromise = fetch(CATALOG_URL)
     .then((r) => r.json())
