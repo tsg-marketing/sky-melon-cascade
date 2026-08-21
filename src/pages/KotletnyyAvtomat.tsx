@@ -186,6 +186,7 @@ const KotletnyyAvtomat = () => {
   const [lightboxPhotos, setLightboxPhotos] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+  const [videoModal, setVideoModal] = useState<CatalogItem | null>(null);
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
@@ -291,6 +292,17 @@ const KotletnyyAvtomat = () => {
     return `${head}${ind}Итоговая цена зависит от производительности, комплекта матриц и необходимости панировочной линии.`;
   }, [items]);
 
+  useEffect(() => {
+    if (!videoModal && !lightboxOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setVideoModal(null);
+      setLightboxOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [videoModal, lightboxOpen]);
+
   const openLightbox = (photos: string[], index: number) => { setLightboxPhotos(photos); setLightboxIndex(index); setLightboxOpen(true); };
 
   const copyEmail = () => {
@@ -382,7 +394,7 @@ const KotletnyyAvtomat = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: "SlidersHorizontal", img: "co-select", title: "Подбор под ваш фарш", desc: "Учитываем жирность, температуру и структуру сырья. Подбираем матрицу под нужный вес и форму изделия." },
+              { icon: "SlidersHorizontal", img: "adv-select-kotletnyy", title: "Подбор под ваш фарш", desc: "Учитываем жирность, температуру и структуру сырья. Подбираем матрицу под нужный вес и форму изделия." },
               { icon: "Target", img: "adv-precision", title: "Точность и стабильный вес", desc: "Погрешность дозирования от ±1% до 5% в зависимости от модели — меньше перевеса, меньше потерь на смене." },
               { icon: "Building2", img: "co-demo", title: "Демозал и тест на вашем сырье", desc: "Приезжайте с собственным фаршем и посмотрите результат формовки до покупки. Демозалы в Москве и Новосибирске." },
               { icon: "Cookie", img: "adv-molds", title: "Матрицы и оснастка", desc: "Подбираем и поставляем сменные формы под ваш ассортимент — круг, овал, произвольная форма." },
@@ -405,14 +417,11 @@ const KotletnyyAvtomat = () => {
 
       <section id="catalog" className="py-20 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
-          <div className={`text-center mb-10 transition-all duration-1000 ${vis("catalog") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground leading-tight">Каталог котлетных автоматов</h2>
-            <p className="text-lg text-muted-foreground mt-4">Актуальные цены и характеристики. Данные обновляются из каталога сайта ежедневно.</p>
-          </div>
-
-          <div className="p-6 sm:p-8 bg-white border-2 border-primary/20 rounded-3xl shadow-sm mb-10">
-            <h3 className="font-display font-bold text-2xl mb-1 text-foreground text-center">Подобрать оборудование с технологом</h3>
-            <p className="text-muted-foreground text-sm mb-6 text-center">Оставьте контакты — подберём модель и пришлём КП</p>
+          <div className="relative p-6 sm:p-10 bg-gradient-to-br from-primary to-primary/85 rounded-3xl shadow-2xl mb-12 overflow-hidden">
+            <div className="absolute -top-16 -right-16 w-64 h-64 bg-white/10 rounded-full pointer-events-none" />
+            <div className="relative z-10">
+            <h3 className="font-display font-black text-2xl sm:text-3xl mb-2 text-white text-center">Подобрать оборудование с менеджером</h3>
+            <p className="text-white/85 text-base mb-7 text-center">Оставьте контакты — подберём модель и пришлём КП</p>
             <div className="grid sm:grid-cols-3 gap-4 mb-4">
               <input type="text" placeholder="Ваше имя" value={quickName} onChange={e => setQuickName(e.target.value)} className={inputCls} />
               <div>
@@ -421,19 +430,25 @@ const KotletnyyAvtomat = () => {
               </div>
               <input type="email" placeholder="Email" value={quickEmail} onChange={e => setQuickEmail(e.target.value)} className={quickEmail.trim() && !isValidEmail(quickEmail) ? inputError : inputCls} />
             </div>
-            <div className="mb-4"><ConsentCheckbox checked={quickConsent} onChange={setQuickConsent} /></div>
+            <div className="mb-5 [&_a]:text-white [&_a]:font-semibold [&_a]:underline [&_span]:text-white"><ConsentCheckbox checked={quickConsent} onChange={setQuickConsent} /></div>
             <button
               onClick={() => {
                 if (!isValidPhone(quickPhone) || !quickConsent || sending) return;
                 if (quickEmail.trim() && !isValidEmail(quickEmail)) return;
-                sendLead({ name: quickName, phone: quickPhone, email: quickEmail, product: "Подобрать оборудование с технологом", topic: "котлетные автоматы", formType: "inquiry" });
+                sendLead({ name: quickName, phone: quickPhone, email: quickEmail, product: "Подобрать оборудование с менеджером", topic: "котлетные автоматы", formType: "inquiry" });
                 setQuickName(""); setQuickPhone(""); setQuickEmail(""); setQuickPhoneTouched(false); setQuickConsent(false);
               }}
               disabled={!isValidPhone(quickPhone) || !quickConsent || sending}
-              className="w-full sm:w-auto sm:mx-auto sm:block px-10 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-base transition-all shadow-sm disabled:opacity-40"
+              className="w-full sm:w-auto sm:mx-auto sm:block px-12 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-lg transition-all shadow-xl disabled:opacity-40"
             >
               {sending ? "Отправляем..." : "Оставить заявку"}
             </button>
+          </div>
+          </div>
+
+          <div className={`text-center mb-10 transition-all duration-1000 ${vis("catalog") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground leading-tight">Каталог котлетных автоматов</h2>
+            <p className="text-lg text-muted-foreground mt-4">Актуальные цены и характеристики. Данные обновляются из каталога сайта ежедневно.</p>
           </div>
 
           <div className="flex flex-wrap gap-2 justify-center mb-6">
@@ -514,6 +529,11 @@ const KotletnyyAvtomat = () => {
                           <div className="space-y-2">
                             <button onClick={() => { setModalProduct(item.name); setModalOpen(true); }} className="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-base font-bold transition-all shadow-sm">Получить консультацию</button>
                             <button onClick={() => navigate(productPath("kotletnyy-avtomat", item))} className="w-full py-3.5 border-2 border-primary/30 text-primary rounded-xl text-base font-semibold hover:border-primary hover:bg-primary/5 transition-all">Смотреть подробнее</button>
+                            {item.video && (
+                              <button onClick={() => setVideoModal(item)} className="w-full py-3.5 flex items-center justify-center gap-2 bg-primary/10 border-2 border-primary/20 text-primary rounded-xl text-base font-semibold hover:bg-primary/15 transition-all">
+                                <Icon name="Play" size={18} /> Смотреть видео
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -921,6 +941,21 @@ const KotletnyyAvtomat = () => {
                 {sending ? "Отправляем..." : "Отправить"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {videoModal && (
+        <div className="fixed inset-0 z-[105] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setVideoModal(null)}>
+          <div className="w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <p className="font-display font-bold text-lg sm:text-xl text-white leading-snug">{videoModal.name}</p>
+              <button onClick={() => setVideoModal(null)} className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition-colors"><Icon name="X" size={20} className="text-white" /></button>
+            </div>
+            <div className="bg-black rounded-2xl overflow-hidden shadow-2xl aspect-video">
+              <video src={videoModal.video || ""} controls autoPlay playsInline className="w-full h-full object-contain" />
+            </div>
+            <button onClick={() => { const it = videoModal; setVideoModal(null); setModalProduct(it.name); setModalOpen(true); }} className="w-full sm:w-auto sm:mx-auto sm:block mt-5 px-10 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-base transition-all shadow-lg">Получить консультацию</button>
           </div>
         </div>
       )}
