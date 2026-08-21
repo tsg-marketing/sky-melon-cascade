@@ -34,6 +34,9 @@ function isValidEmail(v: string): boolean {
 
 const btnPrimary = "px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20";
 
+// Сколько моделей показываем до нажатия «Показать все» (кратно 3 колонкам).
+const VISIBLE_COUNT = 15;
+
 const ConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
   <label className="flex items-start gap-2 cursor-pointer select-none">
     <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-0.5 w-4 h-4 flex-shrink-0 accent-orange-500 cursor-pointer" />
@@ -348,7 +351,7 @@ const Blokorezki = () => {
             ) : (
               <div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {(catalogExpanded ? filteredItems() : filteredItems().slice(0, 12)).map((item) => {
+                  {(catalogExpanded ? filteredItems() : filteredItems().slice(0, VISIBLE_COUNT)).map((item) => {
                     const slide = cardSlides[item.id] || 0;
                     const pics = item.pictures && item.pictures.length ? item.pictures : [];
                     return (
@@ -386,7 +389,7 @@ const Blokorezki = () => {
                     );
                   })}
                 </div>
-                {filteredItems().length > 12 && (
+                {filteredItems().length > VISIBLE_COUNT && (
                   <div className="text-center">
                     <button onClick={() => setCatalogExpanded(!catalogExpanded)} className="px-8 py-4 border-2 border-primary/30 text-primary rounded-full font-semibold text-base hover:border-primary hover:bg-primary/5 transition-all">
                       {catalogExpanded ? "Свернуть каталог" : `Показать все модели (${filteredItems().length})`}
