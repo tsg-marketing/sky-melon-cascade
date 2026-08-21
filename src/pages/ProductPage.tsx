@@ -144,7 +144,7 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader current={category.path} hasOwnCatalog={false} />
+      <SiteHeader current={category.path} catalogHref={`${category.categoryLink}#catalog`} />
 
       <main className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">

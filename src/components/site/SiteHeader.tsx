@@ -43,8 +43,10 @@ function readCatsCache(): CatLink[] | null {
  * onGetKp — открыть форму КП (если задан), иначе ведёт на #contacts.
  * current — путь текущей страницы (её пункт в меню показывается без ссылки).
  * hasOwnCatalog — есть ли на странице своя секция #catalog (по умолчанию да).
+ * catalogHref — куда ведёт пункт «Каталог». Нужен на карточке товара:
+ * оттуда возвращаемся в каталог той группы, к которой относится товар.
  */
-export default function SiteHeader({ onGetKp, current, subtitle = "Оборудование для мясо и рыбопереработки", hasOwnCatalog = true }: { onGetKp?: () => void; current?: string; subtitle?: string; hasOwnCatalog?: boolean }) {
+export default function SiteHeader({ onGetKp, current, subtitle = "Оборудование для мясо и рыбопереработки", hasOwnCatalog = true, catalogHref: catalogHrefProp }: { onGetKp?: () => void; current?: string; subtitle?: string; hasOwnCatalog?: boolean; catalogHref?: string }) {
   const navigate = useNavigate();
   const { totalCount } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -73,7 +75,7 @@ export default function SiteHeader({ onGetKp, current, subtitle = "Оборуд�
   // «Каталог» ведёт в каталог ТЕКУЩЕГО лендинга (у каждого раздела своя секция
   // #catalog), а не на главную. hasOwnCatalog отключается на страницах без неё
   // (карточка товара, контакты) — там ссылка по-прежнему ведёт на главную.
-  const catalogHref = hasOwnCatalog ? "#catalog" : anchor("catalog");
+  const catalogHref = catalogHrefProp || (hasOwnCatalog ? "#catalog" : anchor("catalog"));
 
   const navLinks = [
     { href: catalogHref, label: "Каталог" },
