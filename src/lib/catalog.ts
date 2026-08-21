@@ -137,12 +137,29 @@ export function productPath(categorySlug: string, item: CatalogItem): string {
 const PRIORITY_PARAM_WORDS = ["бренд", "производительн", "мощност", "объем", "объём"];
 
 /**
+ * Убирает повторы характеристик: в фиде одна и та же строка иногда приходит
+ * дважды («Мощность (кВт): 5,5» подряд). Сравниваем по названию без регистра,
+ * лишних пробелов и хвостовых знаков препинания.
+ */
+export function dedupeParams<T extends { name: string; value: string }>(params: T[]): T[] {
+  const seen = new Set<string>();
+  const result: T[] = [];
+  for (const p of params || []) {
+    const key = String(p.name).toLowerCase().replace(/\s+/g, " ").replace(/[:\s.]+$/, "").trim();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(p);
+  }
+  return result;
+}
+
+/**
  * Отбирает параметры для карточки в листинге:
- * исключает GUID и видео. Сначала берёт приоритетные (бренд, производительность,
- * мощность, объём), затем добирает любые оставшиеся параметры до `limit` штук.
+ * исключает GUID, видео и повторы. Сначала берёт приоритетные (бренд,
+ * производительность, мощность, объём), затем добирает оставшиеся до `limit` штук.
  */
 export function pickListingParams<T extends { name: string; value: string }>(params: T[], limit = 5): T[] {
-  const cleaned = (params || []).filter((p) => {
+  const cleaned = dedupeParams(params || []).filter((p) => {
     const n = p.name.toLowerCase();
     return p.name !== "GUID" && !n.includes("видео") && !n.includes("video");
   });

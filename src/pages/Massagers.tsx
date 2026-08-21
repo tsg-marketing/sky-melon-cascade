@@ -5,7 +5,7 @@ import ThankYouModal from "@/components/ThankYouModal";
 import QuizSideTrigger from "@/components/QuizSideTrigger";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
-import { productPath, fetchCatalog, pickListingParams } from "@/lib/catalog";
+import { productPath, fetchCatalog, pickListingParams, dedupeParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 import { breadcrumbGraph } from "@/lib/jsonld";
 import { setPageMeta } from "@/lib/seo";
@@ -822,7 +822,7 @@ const Massagers = () => {
                   <div className="pt-4">
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Характеристики</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                      {selectedItem.all_params.filter((p) => p.name !== "GUID").map((p, pi) => (
+                      {dedupeParams(selectedItem.all_params).filter((p) => p.name !== "GUID").map((p, pi) => (
                         <div key={pi} className="flex justify-between gap-4 py-1.5 border-b border-border/40 text-sm">
                           <span className="text-muted-foreground">{p.name}</span>
                           <span className="font-medium text-foreground text-right">{p.value}</span>

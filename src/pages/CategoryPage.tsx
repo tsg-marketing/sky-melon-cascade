@@ -4,7 +4,7 @@ import Icon from "@/components/ui/icon";
 import ThankYouModal from "@/components/ThankYouModal";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
-import { pickListingParams } from "@/lib/catalog";
+import { pickListingParams, dedupeParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import HomeSections from "@/components/site/HomeSections";
@@ -310,7 +310,7 @@ const CategoryPage = () => {
                           <span className="text-2xl font-display font-black text-primary text-right">{product.price_display}</span>
                         ) : (<span className="text-base font-bold text-foreground text-right">По запросу</span>)}
                       </div>
-                      {product.params.map((p, pi) => (
+                      {dedupeParams(product.params).map((p, pi) => (
                         <div key={pi} className="flex items-start gap-3 py-3.5 border-b border-border/60 last:border-0">
                           <span className="text-base text-muted-foreground flex-1">{p.name}</span>
                           <span className="text-base font-bold text-foreground text-right">{p.value}</span>

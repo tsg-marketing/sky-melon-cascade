@@ -3,7 +3,7 @@ import Icon from "@/components/ui/icon";
 import ThankYouModal from "@/components/ThankYouModal";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
-import { pickListingParams } from "@/lib/catalog";
+import { pickListingParams, dedupeParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import HomeSections from "@/components/site/HomeSections";
@@ -307,11 +307,11 @@ const Index = () => {
                 ) : (
                   <p className="text-xl font-bold text-muted-foreground mb-5">Цена по запросу</p>
                 )}
-                {detailItem.params.length > 0 && (
+                {dedupeParams(detailItem.params).length > 0 && (
                   <div className="mb-5">
                     <h4 className="font-bold text-sm text-foreground mb-2 uppercase tracking-wider">Характеристики</h4>
                     <div className="space-y-0.5">
-                      {detailItem.params.map((p, pi) => (
+                      {dedupeParams(detailItem.params).map((p, pi) => (
                         <div key={pi} className="flex items-start gap-3 py-2 border-b border-border/50 last:border-0">
                           <span className="text-sm text-muted-foreground flex-1">{p.name}</span>
                           <span className="text-sm font-semibold text-foreground text-right">{p.value}</span>

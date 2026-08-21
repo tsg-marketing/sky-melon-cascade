@@ -11,6 +11,7 @@ import {
   itemSlug,
   productPath,
   pickListingParams,
+  dedupeParams,
 } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 import NotFoundPage from "@/pages/NotFoundPage";
@@ -211,7 +212,7 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
                         <span className="text-base font-bold text-foreground text-right">По запросу</span>
                       )}
                     </div>
-                    {item.all_params.filter((p) => p.name !== "GUID").map((p, pi) => (
+                    {dedupeParams(item.all_params).filter((p) => p.name !== "GUID").map((p, pi) => (
                       <div key={pi} className="flex items-start gap-3 py-3.5 border-b border-border/60 last:border-0">
                         <span className="text-base text-muted-foreground flex-1">{p.name}</span>
                         <span className="text-base font-bold text-foreground text-right">{p.value}</span>

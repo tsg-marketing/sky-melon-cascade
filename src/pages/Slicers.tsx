@@ -5,7 +5,7 @@ import ThankYouModal from "@/components/ThankYouModal";
 import QuizSideTrigger from "@/components/QuizSideTrigger";
 import { useLeadForm } from "@/hooks/useLeadForm";
 import { useCart } from "@/hooks/useCart";
-import { productPath, fetchCatalog, pickListingParams } from "@/lib/catalog";
+import { productPath, fetchCatalog, pickListingParams, dedupeParams } from "@/lib/catalog";
 import SiteHeader from "@/components/site/SiteHeader";
 
 interface CatalogItem {
@@ -447,7 +447,7 @@ const Slicers = () => {
                     <div className="mb-6">
                       <h4 className="font-bold text-sm text-foreground mb-3 uppercase tracking-wider">Характеристики</h4>
                       <div className="space-y-2">
-                        {selectedItem.all_params.filter((p) => p.name !== "GUID").map((p, pi) => (<div key={pi} className="flex items-start gap-3 py-2 border-b border-border/50 last:border-0"><span className="text-sm text-muted-foreground min-w-[140px] flex-shrink-0">{p.name}</span><span className="text-sm font-medium text-foreground">{p.value}</span></div>))}
+                        {dedupeParams(selectedItem.all_params).filter((p) => p.name !== "GUID").map((p, pi) => (<div key={pi} className="flex items-start gap-3 py-2 border-b border-border/50 last:border-0"><span className="text-sm text-muted-foreground min-w-[140px] flex-shrink-0">{p.name}</span><span className="text-sm font-medium text-foreground">{p.value}</span></div>))}
                       </div>
                     </div>
                   )}
