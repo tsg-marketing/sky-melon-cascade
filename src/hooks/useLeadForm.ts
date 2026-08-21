@@ -53,6 +53,43 @@ function getUtmFromCookies(): Record<string, string> {
   return result;
 }
 
+/**
+ * Человекопонятное название страницы, с которой пришла заявка.
+ * Уходит в CRM вместе с адресом страницы, чтобы менеджер сразу видел раздел.
+ */
+const PAGE_TITLES: Record<string, string> = {
+  '/': 'Главная',
+  '/massagers': 'Массажёры мяса',
+  '/injector': 'Инъекторы',
+  '/slicers': 'Слайсеры',
+  '/ldogenerator': 'Льдогенераторы',
+  '/volchki': 'Волчки (мясорубки промышленные)',
+  '/blokorezki': 'Блокорезки',
+  '/kotletnyy-avtomat': 'Котлетные автоматы',
+  '/contacts': 'Контакты',
+  '/cart': 'Корзина',
+};
+
+function getPageSource(): string {
+  if (typeof window === 'undefined') return '';
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  const known = PAGE_TITLES[path];
+  if (known) return known;
+
+  // Карточка товара лендинга: /slicers/tovar → «Слайсеры — карточка товара».
+  const parts = path.split('/').filter(Boolean);
+  const parent = PAGE_TITLES[`/${parts[0]}`];
+  if (parent) return `${parent} — карточка товара`;
+
+  // Категории из фида (/kuttery): русское название берём из заголовка страницы.
+  const fromTitle = (typeof document !== 'undefined' ? document.title : '')
+    .split(/[|—–]|\s-\s/)[0]
+    .trim()
+    .slice(0, 80);
+  if (fromTitle) return parts.length > 1 ? `${fromTitle} — карточка товара` : fromTitle;
+  return path;
+}
+
 export interface LeadPayload {
   name: string;
   phone: string;
@@ -81,6 +118,8 @@ export function useLeadForm() {
       ...payload,
       yaClientId: yaClientId || getYaClientIdFromCookie(),
       pageUrl: typeof window !== 'undefined' ? window.location.href : '',
+      pageSource: getPageSource(),
+      pageTitle: typeof document !== 'undefined' ? document.title : '',
       utmSource: utm['utm_source'] || '',
       utmMedium: utm['utm_medium'] || '',
       utmCampaign: utm['utm_campaign'] || '',
