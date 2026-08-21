@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 import time
 
 FEED_URL = "https://t-sib.ru/upload/catalog.xml"
-TARGET_CATEGORIES = {"229", "223", "230", "459", "228"}
+TARGET_CATEGORIES = {"229", "223", "230", "459", "228", "221", "220", "225"}
 SITE_URL = "https://meatmassagers.ru"
 
 # Несколько исходных категорий слайсеров (230, 459) объединяем в одну (230),
@@ -23,6 +23,9 @@ CATEGORY_NAMES = {
     "223": "Инъекторы",
     "230": "Слайсеры",
     "228": "Льдогенераторы",
+    "221": "Волчки (мясорубки промышленные)",
+    "220": "Блокорезки",
+    "225": "Котлетные автоматы",
 }
 
 # Путь лендинга категории для формирования URL товара (совпадает с фронтом).
@@ -31,6 +34,9 @@ CATEGORY_PATHS = {
     "223": "/injector",
     "230": "/slicers",
     "228": "/ldogenerator",
+    "221": "/volchki",
+    "220": "/blokorezki",
+    "225": "/kotletnyy-avtomat",
 }
 
 TRANSLIT = {

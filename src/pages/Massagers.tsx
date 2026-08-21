@@ -339,7 +339,7 @@ const Massagers = () => {
 
   useEffect(() => {
     setCatalogLoading(true);
-    fetchCatalog()
+    fetchCatalog("massagers")
       .then((d: any) => {
         setCatalogData(d);
         // Открываем товар по хэшу URL после загрузки каталога

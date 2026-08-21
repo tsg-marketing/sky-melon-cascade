@@ -1,6 +1,7 @@
 """
 Каталог оборудования: парсит XML-фид t-sib.ru и возвращает товары
-из категорий 229 (массажеры), 223 (инъекторы), 230 и 459 (слайсеры).
+из категорий 229 (массажеры), 223 (инъекторы), 230 и 459 (слайсеры),
+225 (котлетные автоматы).
 Сортировка по цене по возрастанию, товары без цены — в конце.
 Товары без тега picture не включаются.
 """
@@ -10,7 +11,7 @@ import json
 import time
 
 FEED_URL = "https://t-sib.ru/upload/catalog.xml"
-TARGET_CATEGORIES = {"229", "223", "230", "459", "228", "221", "220"}
+TARGET_CATEGORIES = {"229", "223", "230", "459", "228", "221", "220", "225"}
 
 # Каталог обновляется 3 раза в сутки (каждые 8 часов),
 # чтобы вовремя подхватывать новые ссылки на изображения из фида.
@@ -58,11 +59,17 @@ def parse_offer(offer: ET.Element) -> dict:
 
     hidden_param_names = {"guid", "видео (ссылка)", "видео(ссылка)", "видео ссылка"}
     params = {}
+    video = None
     for p in offer.findall("param"):
         name = (p.get("name") or "").strip()
         val = (p.text or "").strip()
-        if name and val and name.lower() not in hidden_param_names:
-            params[name] = val
+        if not name or not val:
+            continue
+        if name.lower() in hidden_param_names:
+            if "видео" in name.lower() and not video:
+                video = val
+            continue
+        params[name] = val
 
     brand = None
     for key in params:
@@ -106,6 +113,7 @@ def parse_offer(offer: ET.Element) -> dict:
         "extra_params": extra_params,
         "all_params": [{"name": k, "value": v} for k, v in params.items()],
         "category_id": text("categoryId"),
+        "video": video,
     }
 
 
@@ -122,7 +130,7 @@ def get_catalog(force: bool = False):
     root = ET.fromstring(xml_data)
     offers_el = root.find(".//offers")
 
-    result = {"massagers": [], "injectors": [], "slicers": [], "icemakers": [], "mincers": [], "blockcutters": []}
+    result = {"massagers": [], "injectors": [], "slicers": [], "icemakers": [], "mincers": [], "blockcutters": [], "patty": []}
 
     for offer in (offers_el or []):
         cat_id = (offer.findtext("categoryId") or "").strip()
@@ -143,6 +151,8 @@ def get_catalog(force: bool = False):
             result["mincers"].append(parsed)
         elif cat_id == "220":
             result["blockcutters"].append(parsed)
+        elif cat_id == "225":
+            result["patty"].append(parsed)
 
     def sort_key(item):
         return (0 if item["price"] is not None else 1, item["price"] or 0)
@@ -153,6 +163,7 @@ def get_catalog(force: bool = False):
     result["icemakers"].sort(key=sort_key)
     result["mincers"].sort(key=sort_key)
     result["blockcutters"].sort(key=sort_key)
+    result["patty"].sort(key=sort_key)
 
     _cache = result
     _cache_ts = now
@@ -173,6 +184,14 @@ def handler(event: dict, context) -> dict:
     params = event.get("queryStringParameters") or {}
     force = str(params.get("refresh", "")).lower() in ("1", "true", "yes")
     result = get_catalog(force=force)
+
+    # Полный каталог перестал влезать в лимит ответа, поэтому страница
+    # запрашивает только свой раздел: ?section=patty
+    section = (params.get("section") or "").strip()
+    if section:
+        keys = [k.strip() for k in section.split(",") if k.strip() in result]
+        if keys:
+            result = {k: result[k] for k in keys}
 
     return {
         "statusCode": 200,

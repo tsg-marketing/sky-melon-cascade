@@ -1,9 +1,17 @@
 {
   "tests": [
     {
-      "name": "Get catalog",
+      "name": "Get patty section",
       "method": "GET",
-      "path": "/",
+      "path": "/?section=patty",
+      "expectedStatus": 200,
+      "expectedBody": {},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get blockcutters section",
+      "method": "GET",
+      "path": "/?section=blockcutters",
       "expectedStatus": 200,
       "expectedBody": {},
       "bodyMatcher": "partial"

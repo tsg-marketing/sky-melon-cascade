@@ -22,6 +22,7 @@ export interface CatalogData {
   icemakers?: CatalogItem[];
   mincers?: CatalogItem[];
   blockcutters?: CatalogItem[];
+  patty?: CatalogItem[];
 }
 
 export const CATALOG_URL =
@@ -82,6 +83,15 @@ export const CATEGORIES: Record<string, CategoryMeta> = {
     title: "Волчки (мясорубки промышленные)",
     singular: "волчок",
     topic: "волчки",
+  },
+  "kotletnyy-avtomat": {
+    slug: "kotletnyy-avtomat",
+    path: "/kotletnyy-avtomat",
+    categoryLink: "/kotletnyy-avtomat",
+    dataKey: "patty",
+    title: "Котлетные автоматы",
+    singular: "котлетный автомат",
+    topic: "котлетные автоматы",
   },
   blokorezki: {
     slug: "blokorezki",
@@ -147,21 +157,29 @@ export function pickListingParams<T extends { name: string; value: string }>(par
 
 // Версия в ключе: при добавлении новых разделов каталога (волчки, блокорезки)
 // её нужно поднять — иначе у посетителей останется старая копия без новых товаров.
-const CACHE_KEY = "mm_catalog_cache_v3";
+const CACHE_KEY = "mm_catalog_cache_v4";
 const CACHE_TTL = 60 * 60 * 1000; // 1 час
-let memoryCache: CatalogData | null = null;
-let catalogPromise: Promise<CatalogData> | null = null;
+const ALL_SECTIONS: (keyof CatalogData)[] = [
+  "massagers", "injectors", "slicers", "icemakers", "mincers", "blockcutters", "patty",
+];
 
-function readCache(): CatalogData | null {
-  if (memoryCache) return memoryCache;
-  // Читаем из localStorage — переживает закрытие вкладки, ускоряет повторные визиты.
+let memoryCache: CatalogData = {};
+const sectionPromises: Partial<Record<keyof CatalogData, Promise<CatalogData>>> = {};
+
+function storageKey(section: keyof CatalogData) {
+  return `${CACHE_KEY}_${section}`;
+}
+
+function readSection(section: keyof CatalogData): CatalogItem[] | null {
+  if (memoryCache[section]?.length) return memoryCache[section]!;
   for (const store of [sessionStorage, localStorage]) {
     try {
-      const raw = store.getItem(CACHE_KEY);
+      const raw = store.getItem(storageKey(section));
       if (!raw) continue;
-      const parsed = JSON.parse(raw) as { ts: number; data: CatalogData };
+      const parsed = JSON.parse(raw) as { ts: number; data: CatalogItem[] };
       if (Date.now() - parsed.ts > CACHE_TTL) continue;
-      memoryCache = parsed.data;
+      if (!parsed.data?.length) continue;
+      memoryCache[section] = parsed.data;
       return parsed.data;
     } catch {
       /* ignore */
@@ -170,30 +188,50 @@ function readCache(): CatalogData | null {
   return null;
 }
 
+function writeSection(section: keyof CatalogData, items: CatalogItem[]) {
+  memoryCache[section] = items;
+  const payload = JSON.stringify({ ts: Date.now(), data: items });
+  try { sessionStorage.setItem(storageKey(section), payload); } catch { /* лимит storage */ }
+  try { localStorage.setItem(storageKey(section), payload); } catch { /* лимит storage */ }
+}
+
 /**
- * Загружает каталог с кэшированием: повторные вызовы (переходы между листингами
- * и товарами) отдают данные мгновенно из памяти/хранилища, без сетевого запроса.
+ * Загружает каталог по разделам: страница тянет только свою категорию,
+ * поэтому ответ остаётся небольшим, а повторные визиты берут данные из кэша.
+ * Без указания раздела (карточка товара) грузятся все разделы параллельно.
  */
 export function fetchCatalog(requiredKey?: keyof CatalogData): Promise<CatalogData> {
-  const cached = readCache();
-  // Если в сохранённой копии нет нужного раздела (например, он появился позже),
-  // игнорируем её и запрашиваем свежие данные.
-  const cacheUsable = cached && (!requiredKey || (cached[requiredKey]?.length ?? 0) > 0);
-  if (cached && cacheUsable) return Promise.resolve(cached);
-  if (cached && !cacheUsable) memoryCache = null;
-  if (catalogPromise) return catalogPromise;
-  catalogPromise = fetch(CATALOG_URL)
-    .then((r) => r.json())
-    .then((d: CatalogData) => {
-      memoryCache = d;
-      const payload = JSON.stringify({ ts: Date.now(), data: d });
-      try { sessionStorage.setItem(CACHE_KEY, payload); } catch { /* лимит storage */ }
-      try { localStorage.setItem(CACHE_KEY, payload); } catch { /* лимит storage */ }
-      return d;
-    })
-    .catch((e) => {
-      catalogPromise = null;
-      throw e;
-    });
-  return catalogPromise;
+  const sections = requiredKey ? [requiredKey] : ALL_SECTIONS;
+
+  const jobs = sections.map((section) => {
+    const cached = readSection(section);
+    if (cached) return Promise.resolve({ [section]: cached } as CatalogData);
+    if (sectionPromises[section]) return sectionPromises[section]!;
+
+    const job = fetch(`${CATALOG_URL}?section=${section}`)
+      .then((r) => r.json())
+      .then((d: CatalogData) => {
+        const items = d[section] || [];
+        if (items.length) writeSection(section, items);
+        return { [section]: items } as CatalogData;
+      })
+      .catch((e) => {
+        delete sectionPromises[section];
+        throw e;
+      });
+
+    sectionPromises[section] = job;
+    return job;
+  });
+
+  // Для карточки товара часть разделов может не ответить — это не должно ломать страницу.
+  return Promise.allSettled(jobs).then((results) => {
+    const merged: CatalogData = {};
+    let ok = false;
+    for (const r of results) {
+      if (r.status === "fulfilled") { Object.assign(merged, r.value); ok = true; }
+    }
+    if (!ok) throw new Error("catalog unavailable");
+    return merged;
+  });
 }

@@ -295,7 +295,7 @@ const Injector = () => {
 
   useEffect(() => {
     setCatalogLoading(true);
-    fetchCatalog().then((d: any) => {
+    fetchCatalog("injectors").then((d: any) => {
       setCatalogData(d);
       const hash = window.location.hash;
       if (hash.startsWith("#product-")) {

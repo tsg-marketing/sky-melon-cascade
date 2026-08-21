@@ -53,11 +53,11 @@ const ProductPage = ({ categorySlug }: { categorySlug: string }) => {
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    fetchCatalog()
+    fetchCatalog(category.dataKey)
       .then((d) => { if (alive) { setData(d); setLoading(false); } })
       .catch(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
-  }, []);
+  }, [category.dataKey]);
 
   const items: CatalogItem[] = useMemo(
     () => (data ? (data[category.dataKey] as CatalogItem[]) || [] : []),

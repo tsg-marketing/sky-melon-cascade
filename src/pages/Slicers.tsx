@@ -287,7 +287,7 @@ const Slicers = () => {
 
   useEffect(() => {
     setCatalogLoading(true);
-    fetchCatalog().then((d: any) => {
+    fetchCatalog("slicers").then((d: any) => {
       setCatalogData(d);
       const hash = window.location.hash;
       if (hash.startsWith("#product-")) {
