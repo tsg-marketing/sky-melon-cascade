@@ -28,7 +28,7 @@ export default function Contacts() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader current="/contacts" />
+      <SiteHeader current="/contacts" hasOwnCatalog={false} />
 
       <main className="pt-24 sm:pt-28 pb-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
