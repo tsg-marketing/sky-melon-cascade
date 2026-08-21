@@ -29,8 +29,18 @@ const STATIC = {
   "/injector": ["0.9", "weekly"],
   "/slicers": ["0.9", "weekly"],
   "/ldogenerator": ["0.9", "weekly"],
+  "/volchki": ["0.9", "weekly"],
+  "/blokorezki": ["0.9", "weekly"],
   "/contacts": ["0.5", "monthly"],
 };
+
+// Лендинги на данных функции catalog: путь -> ключ в ответе.
+// Товары этих разделов живут по адресу /{путь}/{slug}.
+const CATALOG_FN2 = "https://functions.poehali.dev/7093349e-12b4-4025-a465-82ce3b87b0b2";
+const CATALOG_LANDINGS = [
+  { path: "volchki", key: "mincers", minPrice: 100000 },
+  { path: "blokorezki", key: "blockcutters", minPrice: 0 },
+];
 
 // Куда писать sitemap: аргумент CLI > переменная окружения > dist/sitemap.xml.
 const OUT = process.argv[2] || process.env.SITEMAP_OUT || resolve(__dirname, "../dist/sitemap.xml");
@@ -94,6 +104,21 @@ export async function generateSitemap(outPath = OUT) {
       if (!it.slug) continue;
       addUrl(`${catUrl}/${it.slug}`, "0.6", "weekly");
     }
+  }
+
+  // 3) Товары лендингов на данных функции catalog (волчки, блокорезки).
+  // Повторы отсекаются автоматически — addUrl пропускает уже добавленные адреса.
+  try {
+    const cat2 = await getJson(CATALOG_FN2);
+    for (const { path, key, minPrice } of CATALOG_LANDINGS) {
+      const list = (cat2[key] || []).filter((it) => (it.price || 0) >= minPrice);
+      for (const it of list) {
+        if (!it.slug) continue;
+        addUrl(`${SITE}/${path}/${it.slug}`, "0.6", "weekly");
+      }
+    }
+  } catch (e) {
+    console.warn(`[sitemap] не удалось получить товары лендингов: ${e.message}`);
   }
 
   const now = new Date();

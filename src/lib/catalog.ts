@@ -21,6 +21,7 @@ export interface CatalogData {
   slicers?: CatalogItem[];
   icemakers?: CatalogItem[];
   mincers?: CatalogItem[];
+  blockcutters?: CatalogItem[];
 }
 
 export const CATALOG_URL =
@@ -81,6 +82,15 @@ export const CATEGORIES: Record<string, CategoryMeta> = {
     title: "Волчки (мясорубки промышленные)",
     singular: "волчок",
     topic: "волчки",
+  },
+  blokorezki: {
+    slug: "blokorezki",
+    path: "/blokorezki",
+    categoryLink: "/blokorezki",
+    dataKey: "blockcutters",
+    title: "Блокорезки",
+    singular: "блокорезка",
+    topic: "блокорезки",
   },
 };
 

@@ -10,6 +10,7 @@ import Injector from "./pages/Injector";
 import Slicers from "./pages/Slicers";
 import LDOGenerator from "./pages/LDOGenerator";
 import Volchki from "./pages/Volchki";
+import Blokorezki from "./pages/Blokorezki";
 import ProductPage from "./pages/ProductPage";
 import CategoryPage from "./pages/CategoryPage";
 import Cart from "./pages/Cart";
@@ -37,6 +38,8 @@ const App = () => (
           <Route path="/ldogenerator" element={<LDOGenerator />} />
           <Route path="/volchki" element={<Volchki />} />
           <Route path="/volchki/:slug" element={<ProductPage categorySlug="volchki" />} />
+          <Route path="/blokorezki" element={<Blokorezki />} />
+          <Route path="/blokorezki/:slug" element={<ProductPage categorySlug="blokorezki" />} />
           <Route path="/massagers/:slug" element={<ProductPage categorySlug="massagers" />} />
           <Route path="/injector/:slug" element={<ProductPage categorySlug="injector" />} />
           <Route path="/slicers/:slug" element={<ProductPage categorySlug="slicers" />} />

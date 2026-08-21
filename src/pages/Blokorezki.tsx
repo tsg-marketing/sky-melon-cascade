@@ -34,9 +34,6 @@ function isValidEmail(v: string): boolean {
 
 const btnPrimary = "px-8 py-4 bg-primary text-white rounded-full font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20";
 
-// Минимальная цена товара в каталоге — отсекаем бытовые мясорубки.
-const MIN_PRICE = 100000;
-
 const ConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
   <label className="flex items-start gap-2 cursor-pointer select-none">
     <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-0.5 w-4 h-4 flex-shrink-0 accent-orange-500 cursor-pointer" />
@@ -94,7 +91,7 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, email: st
       ) : (
         <div className="p-8 bg-white border-2 border-primary/20 rounded-3xl shadow-sm">
           <h3 className="font-display font-bold text-3xl mb-2 text-foreground text-center">Осталось совсем немного!</h3>
-          <p className="text-muted-foreground text-base mb-8 text-center">Оставьте контакты — технолог подберёт волчок и пришлёт КП</p>
+          <p className="text-muted-foreground text-base mb-8 text-center">Оставьте контакты — технолог подберёт блокорезку и пришлёт КП</p>
           <div className="space-y-4">
             <input type="text" placeholder="Ваше имя" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
             <div>
@@ -112,7 +109,7 @@ const QuizBlock = ({ onSent }: { onSent: (name: string, phone: string, email: st
   );
 };
 
-const Volchki = () => {
+const Blokorezki = () => {
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
   const navigate = useNavigate();
   const [visibleSections, setVisibleSections] = useState<Record<string, boolean>>({});
@@ -144,51 +141,51 @@ const Volchki = () => {
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
-    document.title = "Промышленные волчки и мясорубки — купить от производителя";
+    document.title = "Промышленные блокорезки — купить от производителя";
     const setMeta = (name: string, content: string, property?: boolean) => {
       const attr = property ? "property" : "name";
       let el = document.querySelector(`meta[${attr}="${name}"]`);
       if (!el) { el = document.createElement("meta"); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.setAttribute("content", content);
     };
-    setMeta("description", "Промышленные волчки и мясорубки от 300 до 10 000 кг/ч. Купить от производителя с гарантией 12 месяцев. Демозалы в Москве и Новосибирске, доставка по всей России.");
-    setMeta("keywords", "волчок промышленный, мясорубка промышленная, купить волчок, волчок для мяса, оборудование для измельчения мяса");
-    setMeta("og:title", "Промышленные волчки и мясорубки — оборудование для мясопереработки | Техно-Сиб", true);
-    setMeta("og:description", "Прямые поставки волчков от ведущих европейских и азиатских производителей. Подбор модели под ваш продукт, демонстрация работы, сервис.", true);
-    setMeta("og:url", "https://meatmassagers.ru/volchki", true);
+    setMeta("description", "Промышленные блокорезки роторного и гильотинного типа до 6000 кг/ч. Работа с замороженными блоками без дефростации. Купить от производителя с гарантией.");
+    setMeta("keywords", "блокорезка, блокорезка промышленная, купить блокорезку, роторная блокорезка, гильотинная блокорезка, оборудование для замороженного мяса");
+    setMeta("og:title", "Промышленные блокорезки — оборудование для мясопереработки | Техно-Сиб", true);
+    setMeta("og:description", "Прямые поставки блокорезок от ведущих европейских и азиатских производителей. Подбор модели под ваш продукт, демонстрация работы, сервис.", true);
+    setMeta("og:url", "https://meatmassagers.ru/blokorezki", true);
     setMeta("og:type", "website", true);
     const link = document.querySelector("link[rel='canonical']") || document.createElement("link");
     link.setAttribute("rel", "canonical");
-    link.setAttribute("href", "https://meatmassagers.ru/volchki");
+    link.setAttribute("href", "https://meatmassagers.ru/blokorezki");
     if (!link.parentNode) document.head.appendChild(link);
 
     const schema = {
       "@context": "https://schema.org",
       "@graph": [
-        { "@type": "WebPage", "@id": "https://meatmassagers.ru/volchki", "url": "https://meatmassagers.ru/volchki", "name": "Промышленные волчки и мясорубки", "description": "Промышленные волчки от 300 до 10 000 кг/ч для мясного производства.", "isPartOf": { "@id": "https://meatmassagers.ru/#website" } },
+        { "@type": "WebPage", "@id": "https://meatmassagers.ru/blokorezki", "url": "https://meatmassagers.ru/blokorezki", "name": "Промышленные блокорезки", "description": "Промышленные блокорезки до 6000 кг/ч для работы с замороженными блоками.", "isPartOf": { "@id": "https://meatmassagers.ru/#website" } },
         { "@type": "WebSite", "@id": "https://meatmassagers.ru/#website", "url": "https://meatmassagers.ru", "name": "Техно-Сиб — оборудование для мясопереработки", "publisher": { "@id": "https://meatmassagers.ru/#org" } },
         { "@type": "Organization", "@id": "https://meatmassagers.ru/#org", "name": "Техно-Сиб", "url": "https://meatmassagers.ru", "telephone": "+7-800-505-91-24", "email": "massagers@t-sib.ru", "address": { "@type": "PostalAddress", "addressCountry": "RU", "addressLocality": "Новосибирск" }, "foundingDate": "2001" },
         { "@type": "BreadcrumbList", "itemListElement": [
           { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://meatmassagers.ru/" },
-          { "@type": "ListItem", "position": 2, "name": "Волчки (мясорубки промышленные)", "item": "https://meatmassagers.ru/volchki" }
+          { "@type": "ListItem", "position": 2, "name": "Блокорезки", "item": "https://meatmassagers.ru/blokorezki" }
         ]},
         { "@type": "FAQPage", "mainEntity": [
-          { "@type": "Question", "name": "Как быстро окупится новый волчок?", "acceptedAnswer": { "@type": "Answer", "text": "Окупаемость зависит от объёмов производства. При загрузке 2000+ кг/смену современное оборудование окупается за 8-12 месяцев за счёт снижения брака и увеличения производительности." }},
+          { "@type": "Question", "name": "Как быстро окупится новая блокорезка?", "acceptedAnswer": { "@type": "Answer", "text": "Окупаемость зависит от объёмов производства. При загрузке 2000+ кг/смену современное оборудование окупается за 8-12 месяцев за счёт снижения брака и увеличения производительности." }},
           { "@type": "Question", "name": "Какие гарантии качества?", "acceptedAnswer": { "@type": "Answer", "text": "Предоставляем официальную гарантию производителя 12-24 месяца, сервисное обслуживание, запчасти на складе. Всё оборудование сертифицировано для пищевого производства." }},
-          { "@type": "Question", "name": "Какие требования к электрике?", "acceptedAnswer": { "@type": "Answer", "text": "Зависит от модели: от 380В 16А для малых волчков до 380В 63А для промышленных. Предоставляем полную техническую документацию и схемы подключения." }},
+          { "@type": "Question", "name": "Какие требования к электрике?", "acceptedAnswer": { "@type": "Answer", "text": "Зависит от модели: от 380В 16А для малых моделей до 380В 63А для промышленных блокорезок. Предоставляем полную техническую документацию и схемы подключения." }},
           { "@type": "Question", "name": "Как подобрать решётку под продукт?", "acceptedAnswer": { "@type": "Answer", "text": "Зависит от рецептуры: 3-5 мм для варёных колбас, 8-12 мм для рубленых полуфабрикатов. Можем провести тестовое измельчение вашего сырья в демозале." }}
         ]}
       ]
     };
-    let scriptEl = document.getElementById("schema-volchki");
-    if (!scriptEl) { scriptEl = document.createElement("script"); scriptEl.id = "schema-volchki"; scriptEl.setAttribute("type", "application/ld+json"); document.head.appendChild(scriptEl); }
+    let scriptEl = document.getElementById("schema-blokorezki");
+    if (!scriptEl) { scriptEl = document.createElement("script"); scriptEl.id = "schema-blokorezki"; scriptEl.setAttribute("type", "application/ld+json"); document.head.appendChild(scriptEl); }
     scriptEl.textContent = JSON.stringify(schema);
 
     return () => {
       document.title = "Массажеры и инъекторы от Техносиб";
       const canonical = document.querySelector("link[rel='canonical']");
       if (canonical) canonical.remove();
-      const schemaEl = document.getElementById("schema-volchki");
+      const schemaEl = document.getElementById("schema-blokorezki");
       if (schemaEl) schemaEl.remove();
     };
   }, []);
@@ -211,8 +208,7 @@ const Volchki = () => {
   useEffect(() => {
     setCatalogLoading(true);
     fetchCatalog()
-      // Показываем только промышленные модели: бытовые дешевле 100 000 ₽ скрываем.
-      .then((d) => setItems((d.mincers || []).filter((i) => (i.price || 0) >= MIN_PRICE)))
+      .then((d) => setItems(d.blockcutters || []))
       .catch(() => setItems([]))
       .finally(() => setCatalogLoading(false));
   }, []);
@@ -237,7 +233,7 @@ const Volchki = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader current="/volchki" onGetKp={() => { setModalProduct(""); setModalOpen(true); }} />
+      <SiteHeader current="/blokorezki" onGetKp={() => { setModalProduct(""); setModalOpen(true); }} />
 
       <section id="hero" className="relative pt-24 sm:pt-28 pb-14 sm:pb-20 px-4 sm:px-6 bg-gradient-to-br from-primary/5 via-background to-background overflow-hidden">
         <div className="absolute top-24 right-0 w-[600px] h-[600px] bg-primary/6 rounded-full blur-3xl pointer-events-none" />
@@ -245,14 +241,14 @@ const Volchki = () => {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div className={`transition-all duration-1000 ${vis("hero") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
               <span className="inline-block text-xs font-semibold tracking-widest text-primary uppercase border border-primary/30 rounded-full px-4 py-1.5 mb-4 bg-primary/5">Поставка и внедрение</span>
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-black leading-[1.05] tracking-tight mb-4 text-foreground">Промышленные мясорубки и <span className="text-primary">волчки</span></h1>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-black leading-[1.05] tracking-tight mb-4 text-foreground">Промышленные <span className="text-primary">блокорезки</span></h1>
               <p className="text-lg sm:text-2xl font-semibold text-foreground leading-relaxed mb-6 max-w-xl">Прямые поставки от ведущих европейских и азиатских производителей</p>
               <div className="space-y-3 mb-8">
                 {[
-                  "От 300 до 10 000 кг/ч — модели для любых объёмов производства",
-                  "Цена от производителя",
-                  "Проверяем перед покупкой: демонстрация работы в МСК и НСК",
-                  "Гарантия качества: ПНР, запчасти, техподдержка",
+                  "Работа без предварительной дефростации",
+                  "Производительность до 6000 кг/час, чистый срез",
+                  "Роторные и гильотинные типы блокорезок",
+                  "Нержавеющая сталь — соответствие требованиям гигиены",
                 ].map((t, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"><Icon name="Check" size={14} className="text-primary" /></div>
@@ -266,7 +262,7 @@ const Volchki = () => {
               </div>
             </div>
             <div className={`hidden lg:block transition-all duration-1000 delay-300 ${vis("hero") ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
-              <img src="https://cdn.poehali.dev/files/f35072b8-8eec-4add-854f-6f13b9409465.jpg" alt="Промышленный волчок для измельчения мяса" className="w-full h-auto object-contain rounded-3xl" />
+              <img src="https://cdn.poehali.dev/files/daa3ea59-75d1-4975-b588-58e4e7333392.jpg" alt="Промышленная блокорезка" className="w-full h-auto object-contain rounded-3xl" />
             </div>
           </div>
         </div>
@@ -279,7 +275,7 @@ const Volchki = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: "Gauge", title: "Производительность", desc: "От 300 до 10 000 кг/ч — модели для любых объёмов производства" },
+              { icon: "Gauge", title: "Производительность", desc: "До 6000 кг/ч — работа с замороженными блоками без дефростации" },
               { icon: "Scissors", title: "Высокое качество реза", desc: "Чистый срез без замятия и нагрева продукта" },
               { icon: "Wrench", title: "Лёгкая разборка и мойка", desc: "Быстрая санитарная обработка без инструмента" },
               { icon: "MousePointerClick", title: "Простота в эксплуатации", desc: "Понятное управление, минимум обучения" },
@@ -300,7 +296,7 @@ const Volchki = () => {
       <section id="catalog" className="py-12 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className={`text-center mb-10 transition-all duration-1000 ${vis("catalog") ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground leading-tight">Каталог оборудования</h2>
+            <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground leading-tight">Каталог блокорезок</h2>
           </div>
 
           <div className="p-6 sm:p-8 bg-white border-2 border-primary/20 rounded-3xl shadow-sm mb-10">
@@ -319,7 +315,7 @@ const Volchki = () => {
               onClick={() => {
                 if (!isValidPhone(quickPhone) || !quickConsent || sending) return;
                 if (quickEmail.trim() && !isValidEmail(quickEmail)) return;
-                sendLead({ name: quickName, phone: quickPhone, email: quickEmail, product: "Подобрать оборудование с технологом", topic: "волчки", formType: "inquiry" });
+                sendLead({ name: quickName, phone: quickPhone, email: quickEmail, product: "Подобрать оборудование с технологом", topic: "блокорезки", formType: "inquiry" });
                 setQuickName(""); setQuickPhone(""); setQuickEmail(""); setQuickPhoneTouched(false); setQuickConsent(false);
               }}
               disabled={!isValidPhone(quickPhone) || !quickConsent || sending}
@@ -371,7 +367,7 @@ const Volchki = () => {
                           {item.brand && (<div className="absolute top-3 left-3 bg-white/95 text-primary text-xs font-bold px-3 py-1 rounded-full shadow-sm border border-primary/20 uppercase tracking-wide">{item.brand}</div>)}
                         </div>
                         <div className="p-5 flex flex-col flex-1">
-                          <h3 className="font-bold text-xl text-foreground mb-2 leading-snug cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(productPath("volchki", item))}>{item.name}</h3>
+                          <h3 className="font-bold text-xl text-foreground mb-2 leading-snug cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(productPath("blokorezki", item))}>{item.name}</h3>
                           {item.price_display ? (<p className="text-xl font-black text-primary mb-3">от {item.price_display}</p>) : (<p className="text-base font-semibold text-muted-foreground mb-3">Цена по запросу</p>)}
                           <div className="mb-4 flex-1 space-y-1">
                             {pickListingParams(item.all_params).map((p, pi) => (
@@ -383,7 +379,7 @@ const Volchki = () => {
                           </div>
                           <div className="space-y-2">
                             <button onClick={() => { setModalProduct(item.name); setModalOpen(true); }} className="w-full py-3.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-base font-bold transition-all shadow-sm">Получить консультацию</button>
-                            <button onClick={() => navigate(productPath("volchki", item))} className="w-full py-3.5 border-2 border-primary/30 text-primary rounded-xl text-base font-semibold hover:border-primary hover:bg-primary/5 transition-all">Смотреть подробнее</button>
+                            <button onClick={() => navigate(productPath("blokorezki", item))} className="w-full py-3.5 border-2 border-primary/30 text-primary rounded-xl text-base font-semibold hover:border-primary hover:bg-primary/5 transition-all">Смотреть подробнее</button>
                           </div>
                         </div>
                       </div>
@@ -431,18 +427,8 @@ const Volchki = () => {
             <span className="text-xs font-semibold tracking-widest text-primary uppercase">Смотрите в деле</span>
             <h2 className="text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground">Видео работы оборудования</h2>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {[
-              { id: "e9f5748185b428a295be966c7cbb4e1e", title: "Волчок Daribo JR-120" },
-              { id: "9066f6b113d8967fa0176f717094c6d1", title: "Волчок для измельчения мяса двухшнековый JR 130" },
-            ].map((v) => (
-              <div key={v.id}>
-                <div className="rounded-3xl overflow-hidden shadow-xl border border-border aspect-video">
-                  <iframe src={`https://rutube.ru/play/embed/${v.id}/`} className="w-full h-full" allowFullScreen allow="autoplay; fullscreen" title={v.title} />
-                </div>
-                <p className="text-center text-sm font-semibold text-foreground mt-3">{v.title}</p>
-              </div>
-            ))}
+          <div className="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-xl border border-border aspect-video">
+            <iframe src="https://rutube.ru/play/embed/0ec91fd62dfaaa041ecd49ad41c83501/" className="w-full h-full" allowFullScreen allow="autoplay; fullscreen" title="Работа промышленной блокорезки" />
           </div>
         </div>
       </section>
@@ -454,7 +440,7 @@ const Volchki = () => {
             <h2 className="text-3xl sm:text-5xl font-display font-black tracking-tight mt-4 text-foreground leading-tight">Подобрать оборудование под ваши потребности</h2>
             <p className="text-lg text-muted-foreground mt-4">Ответьте на 5 вопросов — получите 3 модели с ценами</p>
           </div>
-          <QuizBlock onSent={(name, phone, email, quizAnswers) => sendLead({ name, phone, email, quizAnswers, product: "Получить подборку (квиз)", topic: "волчки", formType: "quiz" })} />
+          <QuizBlock onSent={(name, phone, email, quizAnswers) => sendLead({ name, phone, email, quizAnswers, product: "Получить подборку (квиз)", topic: "блокорезки", formType: "quiz" })} />
         </div>
       </section>
 
@@ -516,7 +502,7 @@ const Volchki = () => {
                 role: "Директор",
                 icon: "Briefcase",
                 items: [
-                  { q: "Как быстро окупится новый волчок?", a: "Окупаемость зависит от объёмов производства. При загрузке 2000+ кг/смену современное оборудование окупается за 8-12 месяцев за счёт снижения брака и увеличения производительности." },
+                  { q: "Как быстро окупится новая блокорезка?", a: "Окупаемость зависит от объёмов производства. При загрузке 2000+ кг/смену современное оборудование окупается за 8-12 месяцев за счёт снижения брака и увеличения производительности." },
                   { q: "Какие гарантии качества?", a: "Предоставляем официальную гарантию производителя 12-24 месяца, сервисное обслуживание, запчасти на складе. Всё оборудование сертифицировано для пищевого производства." },
                   { q: "Можно ли взять в лизинг?", a: "Да, работаем с ведущими лизинговыми компаниями. Поможем подготовить документы и подобрать оптимальные условия." },
                 ],
@@ -525,7 +511,7 @@ const Volchki = () => {
                 role: "Инженер",
                 icon: "HardHat",
                 items: [
-                  { q: "Какие требования к электрике?", a: "Зависит от модели: от 380В 16А для малых волчков до 380В 63А для промышленных куттеров. Предоставляем полную техническую документацию и схемы подключения." },
+                  { q: "Какие требования к электрике?", a: "Зависит от модели: от 380В 16А для малых моделей до 380В 63А для промышленных блокорезок. Предоставляем полную техническую документацию и схемы подключения." },
                   { q: "Сложно ли обслуживать?", a: "Современные модели рассчитаны на простое обслуживание. Проводим обучение персонала, предоставляем инструкции по эксплуатации и техническому обслуживанию." },
                   { q: "Где брать запчасти?", a: "Основные запчасти всегда на нашем складе в Москве и Новосибирске. Редкие позиции доставляем от производителя за 7-14 дней." },
                 ],
@@ -534,9 +520,9 @@ const Volchki = () => {
                 role: "Технолог",
                 icon: "FlaskConical",
                 items: [
-                  { q: "Как подобрать решётку под продукт?", a: "Зависит от рецептуры: 3-5 мм для варёных колбас, 8-12 мм для рубленых полуфабрикатов. Можем провести тестовое измельчение вашего сырья в демозале." },
-                  { q: "Можно ли перерабатывать замороженное сырьё?", a: "Да, есть модели для работы с подмороженным блоком. Подберём волчок с нужной мощностью и конструкцией шнека под ваше сырьё." },
-                  { q: "Как избежать нагрева фарша?", a: "Правильно подобранная режущая пара и производительность исключают перегрев. Мы рассчитываем режим под вашу рецептуру и объём." },
+                  { q: "Нужна ли дефростация блока перед резкой?", a: "Нет. Блокорезка работает с замороженным блоком напрямую — это экономит время смены и сохраняет качество сырья." },
+                  { q: "Чем отличается роторная блокорезка от гильотинной?", a: "Роторная даёт высокую производительность и равномерный кусок для дальнейшего измельчения. Гильотинная режет блок на пласты и удобна при переработке разного формата сырья." },
+                  { q: "Какой размер куска можно получить?", a: "Размер задаётся конструкцией режущего узла и настройками. Подберём модель под вашу рецептуру — от крупного куска до полосы под волчок или куттер." },
                 ],
               },
             ].map((col, ci) => (
@@ -611,7 +597,7 @@ const Volchki = () => {
                   <button
                     onClick={() => {
                       if (isValidPhone(contactsPhone) && contactsConsent && !sending) {
-                        sendLead({ name: contactsName, phone: contactsPhone, comment: contactsComment, topic: "волчки", formType: "contacts" });
+                        sendLead({ name: contactsName, phone: contactsPhone, comment: contactsComment, topic: "блокорезки", formType: "contacts" });
                         setContactsName(""); setContactsPhone(""); setContactsComment(""); setContactsPhoneTouched(false); setContactsConsent(false);
                       }
                     }}
@@ -647,7 +633,7 @@ const Volchki = () => {
               <button
                 onClick={() => {
                   if (isValidPhone(modalPhone) && modalConsent && !sending) {
-                    sendLead({ name: modalName, phone: modalPhone, product: modalProduct || "Получить КП за 24 часа", topic: "волчки", formType: "modal" });
+                    sendLead({ name: modalName, phone: modalPhone, product: modalProduct || "Получить КП за 24 часа", topic: "блокорезки", formType: "modal" });
                     setModalOpen(false); setModalName(""); setModalPhone(""); setModalPhoneTouched(false); setModalConsent(false);
                   }
                 }}
@@ -699,12 +685,13 @@ const Volchki = () => {
                 <a href="/injector" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Инъекторы</a>
                 <a href="/slicers" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Слайсеры</a>
                 <a href="/ldogenerator" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Льдогенераторы</a>
+                <a href="/volchki" className="block text-sm text-muted-foreground hover:text-primary transition-colors">Волчки</a>
               </div>
             </div>
             <div>
               <p className="font-semibold text-sm text-foreground mb-3">Разделы</p>
               <div className="space-y-2">
-                {[["#advantages", "Преимущества"], ["#catalog", "Каталог волчков"], ["#videos", "Видео"], ["#segments", "Подбор"], ["#faq", "Частые вопросы"]].map(([href, label]) => (
+                {[["#advantages", "Преимущества"], ["#catalog", "Каталог блокорезок"], ["#videos", "Видео"], ["#segments", "Подбор"], ["#faq", "Частые вопросы"]].map(([href, label]) => (
                   <a key={href} href={href} className="block text-sm text-muted-foreground hover:text-primary transition-colors">{label}</a>
                 ))}
               </div>
@@ -724,9 +711,9 @@ const Volchki = () => {
         </div>
       </footer>
 
-      <QuizSideTrigger storageKey="quiz_auto_volchki">
+      <QuizSideTrigger storageKey="quiz_auto_blokorezki">
         {(close) => (
-          <QuizBlock onSent={(name, phone, email, quizAnswers) => { sendLead({ name, phone, email, quizAnswers, product: "Получить подборку (квиз-попап)", topic: "волчки", formType: "quiz" }); close(); }} />
+          <QuizBlock onSent={(name, phone, email, quizAnswers) => { sendLead({ name, phone, email, quizAnswers, product: "Получить подборку (квиз-попап)", topic: "блокорезки", formType: "quiz" }); close(); }} />
         )}
       </QuizSideTrigger>
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
@@ -734,4 +721,4 @@ const Volchki = () => {
   );
 };
 
-export default Volchki;
+export default Blokorezki;

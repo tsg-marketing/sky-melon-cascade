@@ -10,7 +10,7 @@ import json
 import time
 
 FEED_URL = "https://t-sib.ru/upload/catalog.xml"
-TARGET_CATEGORIES = {"229", "223", "230", "459", "228", "221"}
+TARGET_CATEGORIES = {"229", "223", "230", "459", "228", "221", "220"}
 
 # Каталог обновляется 3 раза в сутки (каждые 8 часов),
 # чтобы вовремя подхватывать новые ссылки на изображения из фида.
@@ -122,7 +122,7 @@ def get_catalog(force: bool = False):
     root = ET.fromstring(xml_data)
     offers_el = root.find(".//offers")
 
-    result = {"massagers": [], "injectors": [], "slicers": [], "icemakers": [], "mincers": []}
+    result = {"massagers": [], "injectors": [], "slicers": [], "icemakers": [], "mincers": [], "blockcutters": []}
 
     for offer in (offers_el or []):
         cat_id = (offer.findtext("categoryId") or "").strip()
@@ -141,6 +141,8 @@ def get_catalog(force: bool = False):
             result["icemakers"].append(parsed)
         elif cat_id == "221":
             result["mincers"].append(parsed)
+        elif cat_id == "220":
+            result["blockcutters"].append(parsed)
 
     def sort_key(item):
         return (0 if item["price"] is not None else 1, item["price"] or 0)
@@ -150,6 +152,7 @@ def get_catalog(force: bool = False):
     result["slicers"].sort(key=sort_key)
     result["icemakers"].sort(key=sort_key)
     result["mincers"].sort(key=sort_key)
+    result["blockcutters"].sort(key=sort_key)
 
     _cache = result
     _cache_ts = now
