@@ -13,13 +13,14 @@ const MAIN_LINKS = [
   { href: "/volchki", label: "Волчки" },
   { href: "/blokorezki", label: "Блокорезки" },
   { href: "/kotletnyy-avtomat", label: "Котлетные автоматы" },
+  { href: "/pelmennye-avtomaty", label: "Пельменные автоматы" },
 ];
 
 interface CatLink { slug: string; title: string; }
 
 // Категории из фида, которые дублируют разделы-лендинги выше по списку.
 // Показывать их второй раз в меню не нужно.
-const HIDDEN_CAT_SLUGS = new Set(["blokorezki", "volchki", "kotletnye-avtomaty"]);
+const HIDDEN_CAT_SLUGS = new Set(["blokorezki", "volchki", "kotletnye-avtomaty", "pelmennye-avtomaty"]);
 
 let _catCache: CatLink[] | null = null;
 const CATS_SS_KEY = "menu_cats_v3";

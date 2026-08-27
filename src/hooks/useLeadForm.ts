@@ -66,6 +66,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/volchki': 'Волчки (мясорубки промышленные)',
   '/blokorezki': 'Блокорезки',
   '/kotletnyy-avtomat': 'Котлетные автоматы',
+  '/pelmennye-avtomaty': 'Пельменные автоматы',
   '/contacts': 'Контакты',
   '/cart': 'Корзина',
 };
