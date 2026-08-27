@@ -9,6 +9,9 @@ import { sectionAnim } from "./shared";
  */
 const RUTUBE_VIDEOS: { id: string; title: string }[] = [];
 
+/** Единая обложка роликов в фирменном оформлении. */
+const VIDEO_COVER = "/features/pel-video-cover.webp";
+
 interface Props {
   visible: boolean;
   items: CatalogItem[];
@@ -21,6 +24,9 @@ export default function PelmeniVideos({ visible, items }: Props) {
   const withVideo = items.filter((i) => i.video).slice(0, 4);
   if (!withVideo.length && !RUTUBE_VIDEOS.length) return null;
 
+  // Единственный ролик показываем по центру, а не прижатым к левому краю.
+  const single = withVideo.length + RUTUBE_VIDEOS.length === 1;
+
   return (
     <section id="videos" className="py-12 px-6 bg-white scroll-mt-32">
       <div className="max-w-7xl mx-auto">
@@ -30,20 +36,18 @@ export default function PelmeniVideos({ visible, items }: Props) {
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className={`grid gap-6 mx-auto ${single ? "max-w-3xl" : "md:grid-cols-2"}`}>
           {withVideo.map((v) => (
             <div key={v.id} className="bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
               <div className="relative bg-black aspect-video">
                 {playing === v.id ? (
-                  <video src={v.video || ""} controls autoPlay playsInline preload="metadata" className="w-full h-full object-contain" />
+                  <video src={v.video || ""} controls autoPlay playsInline preload="metadata" poster={VIDEO_COVER} className="w-full h-full object-contain" />
                 ) : (
                   <button onClick={() => setPlaying(v.id)} aria-label={`Смотреть видео: ${v.name}`} className="absolute inset-0 w-full h-full group">
-                    {v.pictures[0] && (
-                      <img src={v.pictures[0]} alt={`${v.name} — пельменный аппарат`} referrerPolicy="no-referrer" loading="lazy" className="w-full h-full object-contain opacity-70 group-hover:opacity-90 transition-opacity" />
-                    )}
-                    <span className="absolute inset-0 flex items-center justify-center">
-                      <span className="w-16 h-16 bg-white/95 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                        <Icon name="Play" size={28} className="text-primary ml-1" />
+                    <img src={VIDEO_COVER} alt={`${v.name} — пельменный аппарат`} loading="lazy" className="w-full h-full object-cover" />
+                    <span className="absolute inset-0 flex items-end justify-end p-6 sm:p-8 bg-black/10 group-hover:bg-black/20 transition-colors">
+                      <span className="w-20 h-20 bg-white/95 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <Icon name="Play" size={32} className="text-primary ml-1" />
                       </span>
                     </span>
                   </button>
@@ -71,9 +75,12 @@ export default function PelmeniVideos({ visible, items }: Props) {
                     className="w-full h-full"
                   />
                 ) : (
-                  <button onClick={() => setEmbedded(r.id)} aria-label={`Смотреть видео: ${r.title}`} className="absolute inset-0 w-full h-full flex items-center justify-center group bg-black/80">
-                    <span className="w-16 h-16 bg-white/95 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <Icon name="Play" size={28} className="text-primary ml-1" />
+                  <button onClick={() => setEmbedded(r.id)} aria-label={`Смотреть видео: ${r.title}`} className="absolute inset-0 w-full h-full group">
+                    <img src={VIDEO_COVER} alt={r.title} loading="lazy" className="w-full h-full object-cover" />
+                    <span className="absolute inset-0 flex items-end justify-end p-6 sm:p-8 bg-black/10 group-hover:bg-black/20 transition-colors">
+                      <span className="w-20 h-20 bg-white/95 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <Icon name="Play" size={32} className="text-primary ml-1" />
+                      </span>
                     </span>
                   </button>
                 )}
