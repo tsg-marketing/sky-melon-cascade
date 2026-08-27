@@ -8,6 +8,11 @@ import PelmeniHero from "@/components/pelmeni/PelmeniHero";
 import PelmeniCatalog from "@/components/pelmeni/PelmeniCatalog";
 import PelmeniProductModal from "@/components/pelmeni/PelmeniProductModal";
 import PelmeniLightbox from "@/components/pelmeni/PelmeniLightbox";
+import PelmeniQuiz from "@/components/pelmeni/PelmeniQuiz";
+import PelmeniVideos from "@/components/pelmeni/PelmeniVideos";
+import QuizSideTrigger from "@/components/QuizSideTrigger";
+import { PELMENI_FAQ } from "@/components/pelmeni/faqData";
+import { sectionAnim } from "@/components/pelmeni/shared";
 import PelmeniProducts from "@/components/pelmeni/PelmeniProducts";
 import PelmeniAdvantages from "@/components/pelmeni/PelmeniAdvantages";
 import PelmeniChoose from "@/components/pelmeni/PelmeniChoose";
@@ -71,6 +76,36 @@ export default function PelmennyeAvtomaty() {
           { "@type": "ListItem", position: 1, name: "Главная", item: "https://meatmassagers.ru/" },
           { "@type": "ListItem", position: 2, name: "Пельменные автоматы", item: PAGE_URL },
         ] },
+        {
+          "@type": "Organization",
+          "@id": "https://meatmassagers.ru/#org",
+          name: "Общество с ограниченной ответственностью «Техно-Сиб Групп»",
+          alternateName: "Техно-Сиб",
+          url: "https://meatmassagers.ru",
+          telephone: "+7-800-505-76-84",
+          email: "massagers@t-sib.ru",
+          foundingDate: "2001",
+          taxID: "5406804844",
+          vatID: "540601001",
+          identifier: "ОГРН 1205400012146",
+          address: {
+            "@type": "PostalAddress",
+            addressCountry: "RU",
+            postalCode: "630005",
+            addressLocality: "Новосибирск",
+            streetAddress: "ул. Крылова, д. 36, этаж 8, офис 81",
+          },
+        },
+        {
+          "@type": "FAQPage",
+          mainEntity: PELMENI_FAQ.flatMap((col) =>
+            col.items.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            }))
+          ),
+        },
       ],
     };
     let scriptEl = document.getElementById("schema-pelmeni");
@@ -131,6 +166,16 @@ export default function PelmennyeAvtomaty() {
 
   const openModal = (title: string) => { setModalTitle(title); setModalOpen(true); };
 
+  /** После любой заявки помечаем посетителя, чтобы попап больше не мешал. */
+  const markLeadSent = () => {
+    try { localStorage.setItem("lead_sent_232", "1"); } catch { /* noop */ }
+  };
+
+  const sendQuizLead = (name: string, phone: string, email: string, quizAnswers: Record<string, string>, product: string) => {
+    sendLead({ name, phone, email, quizAnswers, product, topic: TOPIC, formType: "quiz" });
+    markLeadSent();
+  };
+
   const vis = (id: string) => !!visible[id];
 
   return (
@@ -143,6 +188,27 @@ export default function PelmennyeAvtomaty() {
         onDemo={() => openModal("Записаться на демонстрацию (пельмени)")}
       />
 
+      <nav aria-label="Разделы страницы" className="sticky top-[68px] z-30 bg-white/95 backdrop-blur border-y border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 overflow-x-auto no-scrollbar">
+          {[
+            ["#catalog", "Модели"],
+            ["#advantages", "Преимущества"],
+            ["#videos", "Видео"],
+            ["#quiz", "Подбор"],
+            ["#faq", "Вопросы"],
+            ["#contact-us", "Контакты"],
+          ].map(([href, label]) => (
+            <a
+              key={href}
+              href={href}
+              className="px-4 py-3 text-sm font-semibold text-muted-foreground hover:text-primary whitespace-nowrap transition-colors"
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
       <PelmeniProducts visible={vis("products")} />
       <PelmeniAdvantages visible={vis("advantages")} />
 
@@ -151,7 +217,7 @@ export default function PelmennyeAvtomaty() {
         items={items}
         loading={catalogLoading}
         sending={sending}
-        onQuickLead={(name, phone, email) => sendLead({ name, phone, email, product: "Подобрать пельменный автомат с технологом", topic: TOPIC, formType: "inquiry" })}
+        onQuickLead={(name, phone, email) => { sendLead({ name, phone, email, product: "Подобрать пельменный автомат с технологом", topic: TOPIC, formType: "inquiry" }); markLeadSent(); }}
         onCardLead={(item) => openModal(`Оставить заявку на ${item.name}`)}
         onDetails={(item) => setDetailsItem(item)}
         onEmptyLead={() => openModal("Заявка при недоступном каталоге")}
@@ -161,10 +227,25 @@ export default function PelmennyeAvtomaty() {
       <PelmeniChoose visible={vis("choose")} onPick={(segment) => openModal(`Подбор оборудования: ${segment}`)} />
       <PelmeniProcess visible={vis("process")} />
 
-      {/* Видео работы оборудования — наполняется в части 3 */}
-      <section id="videos" className="scroll-mt-32" />
-      {/* Квиз-подбор — наполняется в части 3 */}
-      <section id="quiz" className="scroll-mt-32" />
+      <PelmeniVideos visible={vis("videos")} items={items} />
+
+      <section id="quiz" className="py-12 px-6 bg-secondary scroll-mt-32">
+        <div className="max-w-4xl mx-auto">
+          <div className={`text-center mb-12 ${sectionAnim(vis("quiz"))}`}>
+            <span className="text-xs font-semibold tracking-widest text-primary uppercase">Подбор оборудования</span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground leading-tight">
+              Подобрать пельменный автомат под вашу задачу
+            </h2>
+            <p className="text-lg text-muted-foreground mt-4">
+              Ответьте на 5 вопросов — технолог пришлёт 2–3 подходящие модели с ценами.
+            </p>
+          </div>
+          <PelmeniQuiz
+            sending={sending}
+            onSent={(name, phone, email, quizAnswers) => sendQuizLead(name, phone, email, quizAnswers, "Получить подборку (квиз)")}
+          />
+        </div>
+      </section>
 
       <PelmeniAbout visible={vis("about")} />
       <PelmeniFaq visible={vis("faq")} />
@@ -172,7 +253,7 @@ export default function PelmennyeAvtomaty() {
       <PelmeniContacts
         visible={vis("contact-us")}
         sending={sending}
-        onSubmit={(name, phone, email) => sendLead({ name, phone, email, product: "Оставить заявку (страница пельменных автоматов)", topic: TOPIC, formType: "contacts" })}
+        onSubmit={(name, phone, email) => { sendLead({ name, phone, email, product: "Оставить заявку (страница пельменных автоматов)", topic: TOPIC, formType: "contacts" }); markLeadSent(); }}
       />
 
       <SiteFooter onGetKp={() => openModal("Получить КП за 24 часа")} />
@@ -197,8 +278,26 @@ export default function PelmennyeAvtomaty() {
         title={modalTitle}
         sending={sending}
         onClose={() => setModalOpen(false)}
-        onSubmit={(name, phone, email) => sendLead({ name, phone, email, product: modalTitle || "Получить КП за 24 часа", topic: TOPIC, formType: "modal" })}
+        onSubmit={(name, phone, email) => { sendLead({ name, phone, email, product: modalTitle || "Получить КП за 24 часа", topic: TOPIC, formType: "modal" }); markLeadSent(); }}
       />
+
+      <QuizSideTrigger
+        storageKey="quiz_auto_pelmeni"
+        topic="Пельменные автоматы"
+        autoOpenMs={45000}
+        autoOpenScroll={0.4}
+        skipIfLeadKey="lead_sent_232"
+      >
+        {(close) => (
+          <PelmeniQuiz
+            sending={sending}
+            onSent={(name, phone, email, quizAnswers) => {
+              sendQuizLead(name, phone, email, quizAnswers, "Получить подборку (квиз-попап)");
+              close();
+            }}
+          />
+        )}
+      </QuizSideTrigger>
 
       <ThankYouModal open={thankYouOpen} onClose={() => setThankYouOpen(false)} />
     </div>

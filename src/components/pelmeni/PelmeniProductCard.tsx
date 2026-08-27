@@ -1,6 +1,6 @@
 import Icon from "@/components/ui/icon";
 import { CatalogItem } from "@/lib/catalog";
-import { cardParams, inStock, formatPrice } from "@/lib/pelmeni";
+import { cardParams, formatPrice } from "@/lib/pelmeni";
 
 interface Props {
   item: CatalogItem;
@@ -34,12 +34,6 @@ export default function PelmeniProductCard({ item, slide, onSlide, onZoom, onLea
             onClick={() => onZoom(pics, slide)}
             className="w-full h-full object-contain cursor-zoom-in"
           />
-        )}
-
-        {inStock(item) && (
-          <span className="absolute top-3 left-3 px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg shadow-sm">
-            В наличии
-          </span>
         )}
 
         {pics.length > 1 && (

@@ -32,6 +32,8 @@ const STATIC = {
   "/ldogenerator": ["0.9", "weekly"],
   "/volchki": ["0.9", "weekly"],
   "/blokorezki": ["0.9", "weekly"],
+  "/kotletnyy-avtomat": ["0.9", "weekly"],
+  "/pelmennye-avtomaty": ["0.9", "weekly"],
   "/contacts": ["0.5", "monthly"],
 };
 
@@ -41,6 +43,8 @@ const CATALOG_FN2 = "https://functions.poehali.dev/7093349e-12b4-4025-a465-82ce3
 const CATALOG_LANDINGS = [
   { path: "volchki", key: "mincers", minPrice: 100000 },
   { path: "blokorezki", key: "blockcutters", minPrice: 0 },
+  { path: "kotletnyy-avtomat", key: "patty", minPrice: 0 },
+  { path: "pelmennye-avtomaty", key: "dumplings", minPrice: 0 },
 ];
 
 // Куда писать sitemap: аргумент CLI > переменная окружения > dist/sitemap.xml.

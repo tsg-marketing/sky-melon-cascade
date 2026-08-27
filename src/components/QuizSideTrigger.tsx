@@ -9,6 +9,13 @@ interface QuizSideTriggerProps {
   autoOpenMs?: number;
   /** Раздел оборудования — показывается заголовком внутри окна квиза. */
   topic?: string;
+  /**
+   * Ключ в localStorage: если посетитель уже отправлял заявку,
+   * автопоказ квиза не срабатывает (кнопка сбоку остаётся).
+   */
+  skipIfLeadKey?: string;
+  /** Доля прокрутки страницы (0–1), при которой квиз открывается раньше таймера. */
+  autoOpenScroll?: number;
 }
 
 export default function QuizSideTrigger({
@@ -17,6 +24,8 @@ export default function QuizSideTrigger({
   label = "Подобрать оборудование",
   autoOpenMs = 30000,
   topic,
+  skipIfLeadKey,
+  autoOpenScroll,
 }: QuizSideTriggerProps) {
   const [open, setOpen] = useState(false);
   const [renderKey, setRenderKey] = useState(0);
@@ -34,16 +43,46 @@ export default function QuizSideTrigger({
       already = false;
     }
     if (already) return;
-    const t = setTimeout(() => {
+
+    // Посетитель уже оставил заявку — второй раз квиз не навязываем.
+    if (skipIfLeadKey) {
+      try {
+        if (localStorage.getItem(skipIfLeadKey) === "1") return;
+      } catch {
+        /* noop */
+      }
+    }
+
+    const show = () => {
       try {
         sessionStorage.setItem(storageKey, "1");
       } catch {
         /* noop */
       }
       setOpen(true);
-    }, autoOpenMs);
-    return () => clearTimeout(t);
-  }, [storageKey, autoOpenMs]);
+    };
+
+    const t = setTimeout(show, autoOpenMs);
+
+    let onScroll: (() => void) | undefined;
+    if (autoOpenScroll) {
+      onScroll = () => {
+        const height = document.documentElement.scrollHeight - window.innerHeight;
+        if (height <= 0) return;
+        if (window.scrollY / height >= autoOpenScroll) {
+          window.removeEventListener("scroll", onScroll!);
+          clearTimeout(t);
+          show();
+        }
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+    }
+
+    return () => {
+      clearTimeout(t);
+      if (onScroll) window.removeEventListener("scroll", onScroll);
+    };
+  }, [storageKey, autoOpenMs, skipIfLeadKey, autoOpenScroll]);
 
   return (
     <>
