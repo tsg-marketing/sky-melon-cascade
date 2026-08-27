@@ -18,6 +18,7 @@ import Cart from "./pages/Cart";
 import CalculatorMassager from "./pages/CalculatorMassager";
 import Contacts from "./pages/Contacts";
 import NotFoundPage from "./pages/NotFoundPage";
+import TzPelmeni from "./pages/TzPelmeni";
 import RouteMeta from "./components/site/RouteMeta";
 import ScrollToHash from "./components/site/ScrollToHash";
 
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/cart" element={<Cart />} />
           <Route path="/calculator_massager" element={<CalculatorMassager />} />
           <Route path="/contacts" element={<Contacts />} />
+          <Route path="/tz-pelmeni-2026" element={<TzPelmeni />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           {/* Динамические категории — держим НИЖЕ всех статических маршрутов */}
           <Route path="/:slug" element={<CategoryPage />} />
