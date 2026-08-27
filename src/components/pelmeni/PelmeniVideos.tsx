@@ -25,8 +25,7 @@ export default function PelmeniVideos({ visible, items }: Props) {
     <section id="videos" className="py-12 px-6 bg-white scroll-mt-32">
       <div className="max-w-7xl mx-auto">
         <div className={`text-center mb-10 ${sectionAnim(visible)}`}>
-          <span className="text-xs font-semibold tracking-widest text-primary uppercase">Смотрите в деле</span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground">
             Видео работы пельменных автоматов
           </h2>
         </div>

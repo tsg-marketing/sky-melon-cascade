@@ -36,8 +36,7 @@ export default function PelmeniChoose({ visible, onPick }: { visible: boolean; o
     <section id="choose" className="py-12 px-6 bg-background">
       <div className="max-w-7xl mx-auto">
         <div className={`text-center mb-12 ${sectionAnim(visible)}`}>
-          <span className="text-xs font-semibold tracking-widest text-primary uppercase">Ориентир по объёму</span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground leading-tight">
             Как выбрать пельменный автомат под свой объём
           </h2>
           <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">

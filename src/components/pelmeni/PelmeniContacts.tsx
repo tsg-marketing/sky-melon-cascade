@@ -74,7 +74,7 @@ export default function PelmeniContacts({ visible, sending, onSubmit }: Props) {
               </button>
 
               <div className="p-4 bg-white/10 border border-white/20 rounded-xl space-y-2">
-                <p className="text-white text-base font-semibold">Демозалы: Москва · Новосибирск · Челябинск</p>
+                <p className="text-white text-base font-semibold">Демозалы: Москва · Новосибирск</p>
                 <p className="text-white/80 text-sm">Работаем по России и СНГ</p>
               </div>
             </div>

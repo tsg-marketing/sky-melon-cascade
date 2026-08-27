@@ -4,7 +4,7 @@ import { sectionAnim } from "./shared";
 const BENEFITS = [
   "От 3 600 до 13 200 шт/ч — модели под цех любого масштаба",
   "Пельмени, хинкали, манты, вареники, чебуреки, самса — на одном автомате",
-  "Смотрите работу до покупки: демозалы в Москве, Новосибирске, Челябинске",
+  "Смотрите работу до покупки: демозалы в Москве и Новосибирске",
   "Пусконаладка, обучение персонала, запчасти и сервис",
 ];
 
@@ -16,7 +16,7 @@ export default function PelmeniHero({ visible, onPick, onDemo }: { visible: bool
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className={sectionAnim(visible)}>
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-black leading-[1.05] tracking-tight mb-4 text-foreground">
-              Пельменные автоматы <span className="text-primary">и аппараты</span>
+              Пельменные автоматы <span className="text-primary">в наличии под заказ</span>
             </h1>
             <p className="text-lg sm:text-2xl font-semibold text-foreground leading-relaxed mb-6 max-w-xl">
               Оборудование для производства пельменей, хинкали, мантов и вареников. От настольных моделей до промышленных линий 350 кг/ч.
@@ -37,7 +37,6 @@ export default function PelmeniHero({ visible, onPick, onDemo }: { visible: bool
                 Записаться на демонстрацию
               </button>
             </div>
-            <p className="text-sm text-muted-foreground mt-5">Более 30 моделей в наличии и под заказ. Цены от 155 000 ₽.</p>
           </div>
 
           <div className={`hidden lg:block ${sectionAnim(visible)}`}>

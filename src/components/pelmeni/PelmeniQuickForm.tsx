@@ -24,7 +24,7 @@ export default function PelmeniQuickForm({ sending, onSubmit }: Props) {
   };
 
   return (
-    <div className="relative p-6 sm:p-10 bg-gradient-to-br from-primary to-primary/85 rounded-3xl shadow-2xl mb-12 overflow-hidden">
+    <div className="relative p-6 sm:p-10 bg-gradient-to-br from-primary to-primary/85 rounded-3xl shadow-2xl overflow-hidden">
       <div className="absolute -top-16 -right-16 w-64 h-64 bg-white/10 rounded-full pointer-events-none" />
       <div className="relative z-10">
         <h3 className="font-display font-black text-2xl sm:text-3xl mb-2 text-white text-center">Не знаете, какая модель нужна?</h3>

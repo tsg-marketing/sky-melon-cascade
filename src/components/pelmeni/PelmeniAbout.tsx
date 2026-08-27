@@ -19,8 +19,7 @@ export default function PelmeniAbout({ visible }: { visible: boolean }) {
     <section id="about" className="py-12 px-6 bg-gradient-to-b from-secondary to-white">
       <div className="max-w-7xl mx-auto">
         <div className={`text-center mb-12 ${sectionAnim(visible)}`}>
-          <span className="text-xs font-semibold tracking-widest text-primary uppercase">О компании</span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground">О компании ТЕХНО-СИБ</h2>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground">О компании ТЕХНО-СИБ</h2>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-6 mb-12">

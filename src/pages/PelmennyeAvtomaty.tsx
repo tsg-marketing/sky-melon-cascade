@@ -59,7 +59,7 @@ export default function PelmennyeAvtomaty() {
       el.setAttribute("content", content);
     };
 
-    const description = "Пельменные автоматы и аппараты производительностью от 3 600 до 13 200 шт/ч. Пельмени, хинкали, манты, вареники, чебуреки. Демонстрация в Москве, Новосибирске и Челябинске. Пусконаладка, гарантия, сервис. Цены от 155 000 ₽.";
+    const description = "Пельменные автоматы и аппараты производительностью от 3 600 до 13 200 шт/ч. Пельмени, хинкали, манты, вареники, чебуреки. Демонстрация в Москве и Новосибирске. Пусконаладка, гарантия, сервис. Цены от 155 000 ₽.";
     setMeta("description", description);
     setMeta("keywords", "пельменный автомат, пельменный аппарат, оборудование для пельменей, аппарат для хинкали, машина для мантов, автомат для вареников, пельменная линия");
     setMeta("og:title", "Пельменные автоматы и аппараты | Техно-Сиб", true);
@@ -188,29 +188,7 @@ export default function PelmennyeAvtomaty() {
         onDemo={() => openModal("Записаться на демонстрацию (пельмени)")}
       />
 
-      <nav aria-label="Разделы страницы" className="sticky top-[68px] z-30 bg-white/95 backdrop-blur border-y border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 overflow-x-auto no-scrollbar">
-          {[
-            ["#catalog", "Модели"],
-            ["#advantages", "Преимущества"],
-            ["#videos", "Видео"],
-            ["#quiz", "Подбор"],
-            ["#faq", "Вопросы"],
-            ["#contact-us", "Контакты"],
-          ].map(([href, label]) => (
-            <a
-              key={href}
-              href={href}
-              className="px-4 py-3 text-sm font-semibold text-muted-foreground hover:text-primary whitespace-nowrap transition-colors"
-            >
-              {label}
-            </a>
-          ))}
-        </div>
-      </nav>
-
       <PelmeniProducts visible={vis("products")} />
-      <PelmeniAdvantages visible={vis("advantages")} />
 
       <PelmeniCatalog
         visible={vis("catalog")}
@@ -224,6 +202,8 @@ export default function PelmennyeAvtomaty() {
         onZoom={(photos, index) => setLightbox({ photos, index })}
       />
 
+      <PelmeniAdvantages visible={vis("advantages")} />
+
       <PelmeniChoose visible={vis("choose")} onPick={(segment) => openModal(`Подбор оборудования: ${segment}`)} />
       <PelmeniProcess visible={vis("process")} />
 
@@ -232,8 +212,7 @@ export default function PelmennyeAvtomaty() {
       <section id="quiz" className="py-12 px-6 bg-secondary scroll-mt-32">
         <div className="max-w-4xl mx-auto">
           <div className={`text-center mb-12 ${sectionAnim(vis("quiz"))}`}>
-            <span className="text-xs font-semibold tracking-widest text-primary uppercase">Подбор оборудования</span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground leading-tight">
               Подобрать пельменный автомат под вашу задачу
             </h2>
             <p className="text-lg text-muted-foreground mt-4">

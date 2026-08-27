@@ -10,8 +10,7 @@ export default function PelmeniFaq({ visible }: { visible: boolean }) {
     <section id="faq" className="py-12 px-6 bg-secondary">
       <div className="max-w-7xl mx-auto">
         <div className={`text-center mb-12 ${sectionAnim(visible)}`}>
-          <span className="text-xs font-semibold tracking-widest text-primary uppercase">FAQ</span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight mt-3 text-foreground leading-tight">Частые вопросы</h2>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-black tracking-tight text-foreground leading-tight">Частые вопросы</h2>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

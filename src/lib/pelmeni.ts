@@ -86,15 +86,6 @@ export function cardParams(item: CatalogItem, limit = 5): Param[] {
   return out;
 }
 
-/** Товар есть хотя бы на одном складе — показываем бейдж, но не сами числа. */
-export function inStock(item: CatalogItem): boolean {
-  return (item.all_params || []).some((p) => {
-    if (!/наличие/i.test(p.name || "")) return false;
-    const n = parseFloat(String(p.value).replace(",", "."));
-    return Number.isFinite(n) && n > 0;
-  });
-}
-
 /**
  * Производительность в шт/ч — для фильтра и сортировки.
  * В фиде встречаются диапазоны («2000-3600», «12000-20000») —
@@ -132,39 +123,6 @@ export function matchSpeed(item: CatalogItem, key: SpeedKey): boolean {
   if (key === "low") return v < 4000;
   if (key === "mid") return v >= 4000 && v <= 8000;
   return v > 8000;
-}
-
-export type KindKey = "all" | "pelmeni" | "hinkali" | "manty" | "cheburek" | "universal";
-
-export const KIND_FILTERS: { key: KindKey; label: string }[] = [
-  { key: "all", label: "Все изделия" },
-  { key: "pelmeni", label: "Пельмени" },
-  { key: "hinkali", label: "Хинкали" },
-  { key: "manty", label: "Манты" },
-  { key: "cheburek", label: "Чебуреки" },
-  { key: "universal", label: "Универсальные" },
-];
-
-function itemHaystack(item: CatalogItem): string {
-  const params = (item.all_params || []).map((p) => `${p.name} ${p.value}`).join(" ");
-  return `${item.name} ${params}`.toLowerCase();
-}
-
-export function matchKind(item: CatalogItem, key: KindKey): boolean {
-  if (key === "all") return true;
-  const h = itemHaystack(item);
-  if (key === "hinkali") return h.includes("хинкал");
-  if (key === "manty") return h.includes("мант") || h.includes("позы");
-  if (key === "cheburek") return h.includes("чебурек") || h.includes("самса");
-  if (key === "universal") return h.includes("с начинкой") || h.includes("универсал") || h.includes("равиол");
-  return h.includes("пельмен");
-}
-
-/** Виды изделий, которые реально встречаются в загруженных товарах. */
-export function availableKinds(items: CatalogItem[]): KindKey[] {
-  return KIND_FILTERS
-    .filter((k) => k.key === "all" || items.some((i) => matchKind(i, k.key)))
-    .map((k) => k.key);
 }
 
 export function formatPrice(item: CatalogItem): string {
