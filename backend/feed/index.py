@@ -4,12 +4,18 @@ YML-фид товаров для meatmassagers.ru.
 с URL товаров, ведущими на страницу карточки товара:
 {SITE_URL}/{категория}/{slug-товара}.
 """
+import re
 import urllib.request
 import xml.etree.ElementTree as ET
 import time
 
 FEED_URL = "https://t-sib.ru/upload/catalog.xml"
-TARGET_CATEGORIES = {"229", "223", "230", "459", "228", "221", "220", "225"}
+
+# Описания в исходном фиде содержат HTML и достигают 7 тысяч знаков.
+# Отдаём их очищенными и подрезанными: маркетплейсы всё равно показывают
+# первые абзацы, а ответ функции обязан укладываться в лимит платформы.
+DESCRIPTION_LIMIT = 1200
+TARGET_CATEGORIES = {"229", "223", "230", "459", "228", "221", "220", "225", "232"}
 SITE_URL = "https://meatmassagers.ru"
 
 # Несколько исходных категорий слайсеров (230, 459) объединяем в одну (230),
@@ -26,6 +32,7 @@ CATEGORY_NAMES = {
     "221": "Волчки (мясорубки промышленные)",
     "220": "Блокорезки",
     "225": "Котлетные автоматы",
+    "232": "Пельменные автоматы",
 }
 
 # Путь лендинга категории для формирования URL товара (совпадает с фронтом).
@@ -37,6 +44,7 @@ CATEGORY_PATHS = {
     "221": "/volchki",
     "220": "/blokorezki",
     "225": "/kotletnyy-avtomat",
+    "232": "/pelmennye-avtomaty",
 }
 
 TRANSLIT = {
@@ -92,6 +100,25 @@ def escape_xml(s: str) -> str:
         .replace("'", "&apos;"))
 
 
+def shorten_description(raw: str) -> str:
+    """Убирает HTML-разметку и подрезает описание до DESCRIPTION_LIMIT знаков."""
+    if not raw:
+        return ""
+    text = re.sub(r"(?is)<(script|style).*?</\1>", " ", raw)
+    text = re.sub(r"(?is)<br\s*/?>|</p>|</li>", "\n", text)
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = text.replace("&nbsp;", " ").replace("&amp;", "&")
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\n\s*\n+", "\n", text).strip()
+    if len(text) <= DESCRIPTION_LIMIT:
+        return text
+    cut = text[:DESCRIPTION_LIMIT]
+    stop = max(cut.rfind(". "), cut.rfind("\n"))
+    if stop > DESCRIPTION_LIMIT // 2:
+        cut = cut[:stop + 1]
+    return cut.strip()
+
+
 def build_yml(xml_data: bytes) -> str:
     root = ET.fromstring(xml_data)
     offers_el = root.find(".//offers")
@@ -125,7 +152,7 @@ def build_yml(xml_data: bytes) -> str:
 
         name = offer.findtext("name") or ""
         price_str = offer.findtext("price") or ""
-        description = offer.findtext("description") or ""
+        description = shorten_description(offer.findtext("description") or "")
 
         # Собираем параметры
         params = []

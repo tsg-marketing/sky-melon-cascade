@@ -1,7 +1,7 @@
 """
 Каталог оборудования: парсит XML-фид t-sib.ru и возвращает товары
 из категорий 229 (массажеры), 223 (инъекторы), 230 и 459 (слайсеры),
-225 (котлетные автоматы).
+225 (котлетные автоматы), 232 (пельменные автоматы).
 Сортировка по цене по возрастанию, товары без цены — в конце.
 Товары без тега picture не включаются.
 """
@@ -11,7 +11,7 @@ import json
 import time
 
 FEED_URL = "https://t-sib.ru/upload/catalog.xml"
-TARGET_CATEGORIES = {"229", "223", "230", "459", "228", "221", "220", "225"}
+TARGET_CATEGORIES = {"229", "223", "230", "459", "228", "221", "220", "225", "232"}
 
 # Каталог обновляется 3 раза в сутки в фиксированные часы (00:00, 08:00, 16:00 UTC),
 # а не «через 8 часов после первого запроса»: так все разделы сайта
@@ -132,7 +132,7 @@ def get_catalog(force: bool = False):
     root = ET.fromstring(xml_data)
     offers_el = root.find(".//offers")
 
-    result = {"massagers": [], "injectors": [], "slicers": [], "icemakers": [], "mincers": [], "blockcutters": [], "patty": []}
+    result = {"massagers": [], "injectors": [], "slicers": [], "icemakers": [], "mincers": [], "blockcutters": [], "patty": [], "dumplings": []}
 
     for offer in (offers_el or []):
         cat_id = (offer.findtext("categoryId") or "").strip()
@@ -155,6 +155,8 @@ def get_catalog(force: bool = False):
             result["blockcutters"].append(parsed)
         elif cat_id == "225":
             result["patty"].append(parsed)
+        elif cat_id == "232":
+            result["dumplings"].append(parsed)
 
     def sort_key(item):
         return (0 if item["price"] is not None else 1, item["price"] or 0)
@@ -166,6 +168,7 @@ def get_catalog(force: bool = False):
     result["mincers"].sort(key=sort_key)
     result["blockcutters"].sort(key=sort_key)
     result["patty"].sort(key=sort_key)
+    result["dumplings"].sort(key=sort_key)
 
     _cache = result
     _cache_ts = now

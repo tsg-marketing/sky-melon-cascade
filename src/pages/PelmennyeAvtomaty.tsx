@@ -3,7 +3,11 @@ import SiteHeader from "@/components/site/SiteHeader";
 import SiteFooter from "@/components/site/SiteFooter";
 import ThankYouModal from "@/components/ThankYouModal";
 import { useLeadForm } from "@/hooks/useLeadForm";
+import { fetchCatalog, CatalogItem } from "@/lib/catalog";
 import PelmeniHero from "@/components/pelmeni/PelmeniHero";
+import PelmeniCatalog from "@/components/pelmeni/PelmeniCatalog";
+import PelmeniProductModal from "@/components/pelmeni/PelmeniProductModal";
+import PelmeniLightbox from "@/components/pelmeni/PelmeniLightbox";
 import PelmeniProducts from "@/components/pelmeni/PelmeniProducts";
 import PelmeniAdvantages from "@/components/pelmeni/PelmeniAdvantages";
 import PelmeniChoose from "@/components/pelmeni/PelmeniChoose";
@@ -23,6 +27,18 @@ export default function PelmennyeAvtomaty() {
   const [visible, setVisible] = useState<Record<string, boolean>>({ top: true });
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
+  const [items, setItems] = useState<CatalogItem[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+  const [detailsItem, setDetailsItem] = useState<CatalogItem | null>(null);
+  const [lightbox, setLightbox] = useState<{ photos: string[]; index: number } | null>(null);
+
+  useEffect(() => {
+    setCatalogLoading(true);
+    fetchCatalog("dumplings")
+      .then((d) => setItems(d.dumplings || []))
+      .catch(() => setItems([]))
+      .finally(() => setCatalogLoading(false));
+  }, []);
 
   useEffect(() => {
     document.title = "Пельменные автоматы и аппараты — купить оборудование для пельменей | Техно-Сиб";
@@ -68,6 +84,36 @@ export default function PelmennyeAvtomaty() {
   }, []);
 
   useEffect(() => {
+    if (!items.length) return;
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "Пельменные автоматы и аппараты",
+      numberOfItems: items.length,
+      itemListElement: items.map((item, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: {
+          "@type": "Product",
+          name: item.name,
+          image: item.pictures?.[0] || undefined,
+          ...(item.price
+            ? { offers: { "@type": "Offer", price: Math.round(item.price), priceCurrency: "RUB", availability: "https://schema.org/InStock", url: PAGE_URL } }
+            : {}),
+        },
+      })),
+    };
+    let el = document.getElementById("schema-pelmeni-items");
+    if (!el) {
+      el = document.createElement("script");
+      el.id = "schema-pelmeni-items";
+      el.setAttribute("type", "application/ld+json");
+      document.head.appendChild(el);
+    }
+    el.textContent = JSON.stringify(schema);
+  }, [items]);
+
+  useEffect(() => {
     const observers: Record<string, IntersectionObserver> = {};
     SECTION_IDS.forEach((id) => {
       const el = document.getElementById(id);
@@ -81,7 +127,7 @@ export default function PelmennyeAvtomaty() {
       observers[id].observe(el);
     });
     return () => Object.values(observers).forEach((o) => o.disconnect());
-  }, []);
+  }, [items]);
 
   const openModal = (title: string) => { setModalTitle(title); setModalOpen(true); };
 
@@ -100,8 +146,17 @@ export default function PelmennyeAvtomaty() {
       <PelmeniProducts visible={vis("products")} />
       <PelmeniAdvantages visible={vis("advantages")} />
 
-      {/* Каталог моделей — наполняется в части 2 */}
-      <section id="catalog" className="scroll-mt-32" />
+      <PelmeniCatalog
+        visible={vis("catalog")}
+        items={items}
+        loading={catalogLoading}
+        sending={sending}
+        onQuickLead={(name, phone, email) => sendLead({ name, phone, email, product: "Подобрать пельменный автомат с технологом", topic: TOPIC, formType: "inquiry" })}
+        onCardLead={(item) => openModal(`Оставить заявку на ${item.name}`)}
+        onDetails={(item) => setDetailsItem(item)}
+        onEmptyLead={() => openModal("Заявка при недоступном каталоге")}
+        onZoom={(photos, index) => setLightbox({ photos, index })}
+      />
 
       <PelmeniChoose visible={vis("choose")} onPick={(segment) => openModal(`Подбор оборудования: ${segment}`)} />
       <PelmeniProcess visible={vis("process")} />
@@ -121,6 +176,21 @@ export default function PelmennyeAvtomaty() {
       />
 
       <SiteFooter onGetKp={() => openModal("Получить КП за 24 часа")} />
+
+      <PelmeniProductModal
+        item={detailsItem}
+        onClose={() => setDetailsItem(null)}
+        onLead={(item) => { setDetailsItem(null); openModal(`Оставить заявку на ${item.name}`); }}
+      />
+
+      {lightbox && (
+        <PelmeniLightbox
+          photos={lightbox.photos}
+          index={lightbox.index}
+          onIndex={(i) => setLightbox({ ...lightbox, index: i })}
+          onClose={() => setLightbox(null)}
+        />
+      )}
 
       <PelmeniLeadModal
         open={modalOpen}

@@ -23,6 +23,7 @@ export interface CatalogData {
   mincers?: CatalogItem[];
   blockcutters?: CatalogItem[];
   patty?: CatalogItem[];
+  dumplings?: CatalogItem[];
 }
 
 export const CATALOG_URL =
@@ -92,6 +93,15 @@ export const CATEGORIES: Record<string, CategoryMeta> = {
     title: "Котлетные автоматы",
     singular: "котлетный автомат",
     topic: "котлетные автоматы",
+  },
+  "pelmennye-avtomaty": {
+    slug: "pelmennye-avtomaty",
+    path: "/pelmennye-avtomaty",
+    categoryLink: "/pelmennye-avtomaty",
+    dataKey: "dumplings",
+    title: "Пельменные автоматы",
+    singular: "пельменный автомат",
+    topic: "пельменные автоматы",
   },
   blokorezki: {
     slug: "blokorezki",
@@ -186,7 +196,7 @@ function currentWindow(): number {
   return Math.floor(Date.now() / REFRESH_INTERVAL) * REFRESH_INTERVAL;
 }
 const ALL_SECTIONS: (keyof CatalogData)[] = [
-  "massagers", "injectors", "slicers", "icemakers", "mincers", "blockcutters", "patty",
+  "massagers", "injectors", "slicers", "icemakers", "mincers", "blockcutters", "patty", "dumplings",
 ];
 
 const memoryCache: CatalogData = {};
