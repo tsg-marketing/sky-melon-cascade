@@ -1,9 +1,8 @@
-import { CatalogItem } from "@/lib/catalog";
+import { CatalogItem, isStockParam } from "@/lib/catalog";
 
 /** Параметры фида, которые не показываем на странице ни в карточке, ни в модалке. */
 const HIDDEN_PARAMS = [
   "guid",
-  "наличие",
   "видео",
   "объем (м3)",
   "объём (м3)",
@@ -11,7 +10,7 @@ const HIDDEN_PARAMS = [
 
 export function isHiddenParam(name: string): boolean {
   const n = (name || "").toLowerCase().trim();
-  return HIDDEN_PARAMS.some((h) => n.includes(h));
+  return isStockParam(name) || HIDDEN_PARAMS.some((h) => n.includes(h));
 }
 
 /** Порядок вывода характеристик в карточке товара (по ТЗ). */

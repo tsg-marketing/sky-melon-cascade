@@ -155,6 +155,7 @@ export function dedupeParams<T extends { name: string; value: string }>(params: 
   const seen = new Set<string>();
   const result: T[] = [];
   for (const p of params || []) {
+    if (isStockParam(p.name)) continue;
     const key = String(p.name).toLowerCase().replace(/\s+/g, " ").replace(/[:\s.]+$/, "").trim();
     if (seen.has(key)) continue;
     seen.add(key);
@@ -180,6 +181,26 @@ export function pickListingParams<T extends { name: string; value: string }>(par
   const priority = cleaned.filter(isPriority);
   const rest = cleaned.filter((p) => !isPriority(p));
   return [...priority, ...rest].slice(0, limit);
+}
+
+/**
+ * Служебные остатки по складам («Наличие МОСКВА», «Наличие Новосибирск» и т.п.)
+ * на сайте не показываем нигде — вырезаем их сразу при загрузке каталога.
+ */
+const STOCK_CITIES = ["москва", "новосибирск", "челябинск", "склад"];
+
+export function isStockParam(name: string): boolean {
+  const n = (name || "").toLowerCase().trim();
+  return n.startsWith("наличие") && STOCK_CITIES.some((c) => n.includes(c));
+}
+
+function stripStockParams(items: CatalogItem[]): CatalogItem[] {
+  return items.map((it) => ({
+    ...it,
+    extra_params: (it.extra_params || []).filter((p) => !isStockParam(p.name)),
+    all_params: (it.all_params || []).filter((p) => !isStockParam(p.name)),
+    productivity: it.productivity && isStockParam(it.productivity.name) ? null : it.productivity,
+  }));
 }
 
 // Версия в ключе: при добавлении новых разделов каталога (волчки, блокорезки)
@@ -216,8 +237,9 @@ function readSection(section: keyof CatalogData): CatalogItem[] | null {
       // Копия устарела, если сделана до последнего общего окна обновления.
       if (parsed.ts < currentWindow()) continue;
       if (!parsed.data?.length) continue;
-      memoryCache[section] = parsed.data;
-      return parsed.data;
+      const clean = stripStockParams(parsed.data);
+      memoryCache[section] = clean;
+      return clean;
     } catch {
       /* ignore */
     }
@@ -248,7 +270,7 @@ export function fetchCatalog(requiredKey?: keyof CatalogData): Promise<CatalogDa
     const job = fetch(`${CATALOG_URL}?section=${section}`)
       .then((r) => r.json())
       .then((d: CatalogData) => {
-        const items = d[section] || [];
+        const items = stripStockParams(d[section] || []);
         if (items.length) writeSection(section, items);
         return { [section]: items } as CatalogData;
       })
