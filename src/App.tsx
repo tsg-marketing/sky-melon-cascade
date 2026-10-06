@@ -21,6 +21,7 @@ import Contacts from "./pages/Contacts";
 import NotFoundPage from "./pages/NotFoundPage";
 import TzPelmeni from "./pages/TzPelmeni";
 import SanitaryEquipment from "./pages/SanitaryEquipment";
+import SanitaryEmailsCold from "./pages/SanitaryEmailsCold";
 import RouteMeta from "./components/site/RouteMeta";
 import ScrollToHash from "./components/site/ScrollToHash";
 
@@ -57,6 +58,7 @@ const App = () => (
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/tz-pelmeni-2026" element={<TzPelmeni />} />
           <Route path="/santarnoe_oborudovanie" element={<SanitaryEquipment />} />
+          <Route path="/santarnoe_oborudovanie/emailscold" element={<SanitaryEmailsCold />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           {/* Динамические категории — держим НИЖЕ всех статических маршрутов */}
           <Route path="/:slug" element={<CategoryPage />} />
