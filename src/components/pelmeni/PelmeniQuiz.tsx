@@ -11,10 +11,11 @@ export const PELMENI_QUIZ_QUESTIONS = [
 
 interface Props {
   sending: boolean;
+  questions?: { q: string; options: string[] }[];
   onSent: (name: string, phone: string, email: string, quizAnswers: Record<string, string>) => void;
 }
 
-export default function PelmeniQuiz({ sending, onSent }: Props) {
+export default function PelmeniQuiz({ sending, onSent, questions = PELMENI_QUIZ_QUESTIONS }: Props) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [name, setName] = useState("");
@@ -24,7 +25,7 @@ export default function PelmeniQuiz({ sending, onSent }: Props) {
   const [consent, setConsent] = useState(false);
   const [done, setDone] = useState(false);
 
-  const total = PELMENI_QUIZ_QUESTIONS.length;
+  const total = questions.length;
   const isLast = step === total;
   const phoneValid = isValidPhone(phone);
   const emailValid = !email.trim() || isValidEmail(email);
@@ -36,7 +37,7 @@ export default function PelmeniQuiz({ sending, onSent }: Props) {
   const handleSubmit = () => {
     if (!canSend) return;
     const quizAnswers: Record<string, string> = {};
-    PELMENI_QUIZ_QUESTIONS.forEach((q, i) => { quizAnswers[q.q] = answers[i] || ""; });
+    questions.forEach((q, i) => { quizAnswers[q.q] = answers[i] || ""; });
     onSent(name, phone, email, quizAnswers);
     setDone(true);
   };
@@ -57,14 +58,14 @@ export default function PelmeniQuiz({ sending, onSent }: Props) {
       {!isLast ? (
         <div>
           <div className="flex items-center gap-3 mb-8">
-            {PELMENI_QUIZ_QUESTIONS.map((_, i) => (
+            {questions.map((_, i) => (
               <div key={i} className={`h-2 flex-1 rounded-full transition-all ${i < step ? "bg-primary" : i === step ? "bg-primary/50" : "bg-border"}`} />
             ))}
           </div>
           <p className="text-sm text-muted-foreground mb-2">Вопрос {step + 1} из {total}</p>
-          <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-8">{PELMENI_QUIZ_QUESTIONS[step].q}</h3>
+          <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-8">{questions[step].q}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {PELMENI_QUIZ_QUESTIONS[step].options.map((opt, i) => (
+            {questions[step].options.map((opt, i) => (
               <button
                 key={i}
                 onClick={() => choose(opt)}

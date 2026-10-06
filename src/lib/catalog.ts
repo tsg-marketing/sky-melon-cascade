@@ -24,6 +24,7 @@ export interface CatalogData {
   blockcutters?: CatalogItem[];
   patty?: CatalogItem[];
   dumplings?: CatalogItem[];
+  sanitary?: CatalogItem[];
 }
 
 export const CATALOG_URL =

@@ -9,13 +9,15 @@ interface Props {
   onZoom: (photos: string[], index: number) => void;
   onLead: () => void;
   onDetails: () => void;
+  /** Подпись к фото в alt, например «пельменный аппарат». */
+  altLabel?: string;
 }
 
-export default function PelmeniProductCard({ item, slide, onSlide, onZoom, onLead, onDetails }: Props) {
+export default function PelmeniProductCard({ item, slide, onSlide, onZoom, onLead, onDetails, altLabel = "пельменный аппарат" }: Props) {
   const pics = (item.pictures || []).slice(0, 8);
   const current = pics.length ? pics[Math.min(slide, pics.length - 1)] : "";
   const params = cardParams(item, 5);
-  const alt = `${item.name} — пельменный аппарат`;
+  const alt = `${item.name} — ${altLabel}`;
 
   const move = (dir: number) => {
     if (pics.length < 2) return;

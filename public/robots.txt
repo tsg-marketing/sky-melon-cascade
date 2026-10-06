@@ -1,20 +1,26 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /santarnoe_oborudovanie
 
 User-agent: Yandexbot
 Allow: /
+Disallow: /santarnoe_oborudovanie
 
 User-agent: Bingbot
 Allow: /
+Disallow: /santarnoe_oborudovanie
 
 User-agent: Twitterbot
 Allow: /
+Disallow: /santarnoe_oborudovanie
 
 User-agent: facebookexternalhit
 Allow: /
+Disallow: /santarnoe_oborudovanie
 
 User-agent: *
 Allow: /
+Disallow: /santarnoe_oborudovanie
 Disallow: /cart
 
 Sitemap: https://meatmassagers.ru/sitemap.xml

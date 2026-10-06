@@ -14,7 +14,9 @@ const PERKS = [
   { icon: "MessagesSquare", title: "Экспертная консультация", desc: "Помощь в выборе и отладке технологии" },
 ];
 
-export default function PelmeniAbout({ visible }: { visible: boolean }) {
+const DEFAULT_HIGHLIGHT = "Пельменное направление — одно из ключевых: в наличии и под заказ более 30 моделей от настольных аппаратов до промышленных автоматов производительностью 350 кг/ч.";
+
+export default function PelmeniAbout({ visible, highlight = DEFAULT_HIGHLIGHT }: { visible: boolean; highlight?: string }) {
   return (
     <section id="about" className="py-12 px-6 bg-gradient-to-b from-secondary to-white">
       <div className="max-w-7xl mx-auto">
@@ -41,7 +43,7 @@ export default function PelmeniAbout({ visible }: { visible: boolean }) {
             </p>
             <div className="p-6 bg-primary/5 border border-primary/15 rounded-2xl mb-5">
               <p className="text-lg text-foreground leading-relaxed">
-                Пельменное направление — одно из ключевых: в наличии и под заказ более 30 моделей от настольных аппаратов до промышленных автоматов производительностью 350 кг/ч.
+                {highlight}
               </p>
             </div>
             <p className="text-lg text-muted-foreground leading-relaxed mb-5">

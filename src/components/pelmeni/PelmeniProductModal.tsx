@@ -7,9 +7,11 @@ interface Props {
   item: CatalogItem | null;
   onClose: () => void;
   onLead: (item: CatalogItem) => void;
+  /** Подпись к фото в alt, например «пельменный аппарат». */
+  altLabel?: string;
 }
 
-export default function PelmeniProductModal({ item, onClose, onLead }: Props) {
+export default function PelmeniProductModal({ item, onClose, onLead, altLabel = "пельменный аппарат" }: Props) {
   const [slide, setSlide] = useState(0);
   const boxRef = useRef<HTMLDivElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
@@ -66,7 +68,7 @@ export default function PelmeniProductModal({ item, onClose, onLead }: Props) {
           <div>
             <div className="relative bg-gray-100 rounded-2xl overflow-hidden aspect-square">
               {pics[slide] && (
-                <img src={pics[slide]} alt={`${item.name} — пельменный аппарат`} referrerPolicy="no-referrer" className="w-full h-full object-contain" />
+                <img src={pics[slide]} alt={`${item.name} — ${altLabel}`} referrerPolicy="no-referrer" className="w-full h-full object-contain" />
               )}
               {pics.length > 1 && (
                 <>

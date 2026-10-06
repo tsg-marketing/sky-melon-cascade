@@ -15,6 +15,14 @@
       "expectedStatus": 200,
       "expectedBody": {},
       "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get sanitary section",
+      "method": "GET",
+      "path": "/?section=sanitary",
+      "expectedStatus": 200,
+      "expectedBody": {},
+      "bodyMatcher": "partial"
     }
   ]
 }
