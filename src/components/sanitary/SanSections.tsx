@@ -11,7 +11,7 @@ export function SanPains({ visible, onLead }: { visible: boolean; onLead: () => 
     <section id="pain" className="py-12 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className={`text-center mb-12 ${sectionAnim(visible)}`}>
-          <h2 className={H2}>Знакомые проблемы?</h2>
+          <h2 className={H2}>Когда требуется наше санитарно-гигиеническое оборудование</h2>
           <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">Санитарный режим — первое, что смотрят проверяющие и аудиторы торговых сетей</p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

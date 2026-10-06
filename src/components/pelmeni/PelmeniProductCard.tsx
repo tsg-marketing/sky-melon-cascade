@@ -11,9 +11,11 @@ interface Props {
   onDetails: () => void;
   /** Подпись к фото в alt, например «пельменный аппарат». */
   altLabel?: string;
+  /** Крупные характеристики с буллетами и тире. */
+  bigParams?: boolean;
 }
 
-export default function PelmeniProductCard({ item, slide, onSlide, onZoom, onLead, onDetails, altLabel = "пельменный аппарат" }: Props) {
+export default function PelmeniProductCard({ item, slide, onSlide, onZoom, onLead, onDetails, altLabel = "пельменный аппарат", bigParams = false }: Props) {
   const pics = (item.pictures || []).slice(0, 8);
   const current = pics.length ? pics[Math.min(slide, pics.length - 1)] : "";
   const params = cardParams(item, 5);
@@ -75,7 +77,20 @@ export default function PelmeniProductCard({ item, slide, onSlide, onZoom, onLea
           {formatPrice(item)}
         </p>
 
-        {params.length > 0 && (
+        {params.length > 0 && bigParams && (
+          <ul className="text-sm sm:text-base text-muted-foreground space-y-1.5 mb-5">
+            {params.map((p, i) => (
+              <li key={i} className="flex items-start gap-2 leading-snug">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0 mt-2" />
+                <span>
+                  {p.name} — <span className="text-foreground font-semibold">{p.value}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {params.length > 0 && !bigParams && (
           <div className="text-xs text-muted-foreground space-y-1 mb-5">
             {params.map((p, i) => (
               <div key={i} className="flex gap-1.5">

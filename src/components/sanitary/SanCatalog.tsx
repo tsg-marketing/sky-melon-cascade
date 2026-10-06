@@ -86,16 +86,16 @@ export default function SanCatalog({ visible, items, loading, sending, category,
         ) : (
           <>
             <div className="mb-6 space-y-4">
-              <div className="flex flex-wrap gap-2 sm:gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {SAN_CATEGORIES.filter((c) => c.id === "all" || counts[c.id]).map((c) => (
                   <button
                     key={c.id}
                     onClick={() => onCategory(c.id)}
-                    className={`inline-flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all border ${category === c.id ? "bg-primary text-white border-primary" : "bg-white text-foreground border-border hover:border-primary/40"}`}
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-4 sm:py-5 rounded-2xl text-base sm:text-lg font-bold transition-all border ${category === c.id ? "bg-primary text-white border-primary" : "bg-white text-foreground border-border hover:border-primary/40"}`}
                   >
-                    <Icon name={c.icon} fallback="Circle" size={16} />
+                    <Icon name={c.icon} fallback="Circle" size={22} className="flex-shrink-0" />
                     {c.label}
-                    <span className={`text-xs ${category === c.id ? "text-white/75" : "text-muted-foreground"}`}>{counts[c.id] || 0}</span>
+                    <span className={`text-sm font-semibold ${category === c.id ? "text-white/75" : "text-muted-foreground"}`}>{counts[c.id] || 0}</span>
                   </button>
                 ))}
               </div>
@@ -114,6 +114,7 @@ export default function SanCatalog({ visible, items, loading, sending, category,
                   key={item.id}
                   item={item}
                   altLabel={SAN_ALT[item.category_id] || "санитарное оборудование"}
+                  bigParams
                   slide={slides[item.id] || 0}
                   onSlide={(index) => setSlides((prev) => ({ ...prev, [item.id]: index }))}
                   onZoom={onZoom}

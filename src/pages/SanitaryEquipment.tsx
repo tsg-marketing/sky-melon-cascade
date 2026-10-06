@@ -20,14 +20,14 @@ import { SAN_ALT, SAN_QUIZ } from "@/components/sanitary/data";
 const PATH = "/santarnoe_oborudovanie";
 const TOPIC = "санитарное оборудование";
 const LEAD_KEY = "lead_sent_211";
-const SECTION_IDS = ["top", "pain", "directions", "catalog", "zones", "process", "quiz", "about", "faq", "contact-us"];
+const SECTION_IDS = ["top", "directions", "catalog", "zones", "pain", "process", "quiz", "about", "faq", "contact-us"];
 
 export default function SanitaryEquipment() {
   const { sendLead, sending, thankYouOpen, setThankYouOpen } = useLeadForm();
   const [visible, setVisible] = useState<Record<string, boolean>>({ top: true });
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState("214");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [details, setDetails] = useState<CatalogItem | null>(null);
@@ -94,7 +94,6 @@ export default function SanitaryEquipment() {
         onAudit={() => openModal("Бесплатный аудит санпропускника")}
       />
 
-      <SanPains visible={vis("pain")} onLead={() => openModal("Расчёт комплекта санитарного оборудования")} />
       <SanDirections visible={vis("directions")} onSelect={showCategory} />
 
       <SanCatalog
@@ -112,6 +111,7 @@ export default function SanitaryEquipment() {
       />
 
       <SanZones visible={vis("zones")} onPick={(zone) => openModal(`Подбор оборудования: ${zone}`)} />
+      <SanPains visible={vis("pain")} onLead={() => openModal("Расчёт комплекта санитарного оборудования")} />
       <SanProcess visible={vis("process")} />
 
       <section id="quiz" className="py-12 px-6 bg-gradient-to-br from-orange-50 via-orange-100/50 to-background scroll-mt-32">

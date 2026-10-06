@@ -1,10 +1,10 @@
 export const SAN_CATEGORIES = [
-  { id: "all", label: "Все", icon: "LayoutGrid" },
   { id: "214", label: "Станции гигиены", icon: "ShieldCheck" },
   { id: "213", label: "Мойка обуви", icon: "Footprints" },
   { id: "212", label: "Мойка ящиков и тары", icon: "Container" },
   { id: "215", label: "Стерилизаторы", icon: "Sparkles" },
   { id: "216", label: "Сушилки для обуви", icon: "Wind" },
+  { id: "all", label: "Все", icon: "LayoutGrid" },
 ] as const;
 
 export const SAN_ALT: Record<string, string> = {
