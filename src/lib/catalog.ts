@@ -25,6 +25,7 @@ export interface CatalogData {
   patty?: CatalogItem[];
   dumplings?: CatalogItem[];
   sanitary?: CatalogItem[];
+  fish?: CatalogItem[];
 }
 
 export const CATALOG_URL =

@@ -23,6 +23,14 @@
       "expectedStatus": 200,
       "expectedBody": {},
       "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get fish section",
+      "method": "GET",
+      "path": "/?section=fish",
+      "expectedStatus": 200,
+      "expectedBody": {},
+      "bodyMatcher": "partial"
     }
   ]
 }

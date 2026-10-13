@@ -16,7 +16,10 @@ const PERKS = [
 
 const DEFAULT_HIGHLIGHT = "Пельменное направление — одно из ключевых: в наличии и под заказ более 30 моделей от настольных аппаратов до промышленных автоматов производительностью 350 кг/ч.";
 
-export default function PelmeniAbout({ visible, highlight = DEFAULT_HIGHLIGHT }: { visible: boolean; highlight?: string }) {
+const DEFAULT_INTRO = "поставляет оборудование для мясопереработки и производства полуфабрикатов. Работаем с 2001 года и помогаем предприятиям оснащать и модернизировать цеха.";
+const DEFAULT_OUTRO = "Технологи компании помогают не только выбрать автомат, но и отладить рецептуру теста под конкретную модель — от этого напрямую зависит процент брака на формовке.";
+
+export default function PelmeniAbout({ visible, highlight = DEFAULT_HIGHLIGHT, intro = DEFAULT_INTRO, outro = DEFAULT_OUTRO }: { visible: boolean; highlight?: string; intro?: string; outro?: string }) {
   return (
     <section id="about" className="py-12 px-6 bg-gradient-to-b from-secondary to-white">
       <div className="max-w-7xl mx-auto">
@@ -39,7 +42,7 @@ export default function PelmeniAbout({ visible, highlight = DEFAULT_HIGHLIGHT }:
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           <div>
             <p className="text-lg text-muted-foreground leading-relaxed mb-5">
-              Компания <strong className="text-foreground">«Техно-Сиб»</strong> поставляет оборудование для мясопереработки и производства полуфабрикатов. Работаем с 2001 года и помогаем предприятиям оснащать и модернизировать цеха.
+              Компания <strong className="text-foreground">«Техно-Сиб»</strong> {intro}
             </p>
             <div className="p-6 bg-primary/5 border border-primary/15 rounded-2xl mb-5">
               <p className="text-lg text-foreground leading-relaxed">
@@ -50,7 +53,7 @@ export default function PelmeniAbout({ visible, highlight = DEFAULT_HIGHLIGHT }:
               Собственные офисы продаж, склады и сервисная служба в Москве, Новосибирске и Челябинске. Отгружаем со склада и доставляем по России и СНГ.
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Технологи компании помогают не только выбрать автомат, но и отладить рецептуру теста под конкретную модель — от этого напрямую зависит процент брака на формовке.
+              {outro}
             </p>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
