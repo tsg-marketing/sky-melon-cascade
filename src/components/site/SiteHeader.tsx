@@ -14,7 +14,7 @@ const MAIN_LINKS = [
   { href: "/blokorezki", label: "Блокорезки" },
   { href: "/kotletnyy-avtomat", label: "Котлетные автоматы" },
   { href: "/pelmennye-avtomaty", label: "Пельменные автоматы" },
-  { href: "/oborudovanie-dlya-rybopererabotki", label: "Рыбопереработка" },
+  { href: "/oborudovanie-dlya-rybopererabotki", label: "Оборудование для рыбопереработки" },
 ];
 
 interface CatLink { slug: string; title: string; }
