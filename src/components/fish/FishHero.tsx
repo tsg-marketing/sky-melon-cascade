@@ -36,8 +36,8 @@ export default function FishHero({ visible, onPick, onCatalog }: { visible: bool
             </div>
 
             <div className={`hidden lg:block relative ${sectionAnim(visible)}`}>
-              <div className="rounded-3xl overflow-hidden shadow-2xl border border-border bg-white aspect-[4/3] flex items-center justify-center">
-                <img src={FISH_IMAGES.hero} alt="Головоотсекающая машина для рыбы SF-84" className="w-full h-full object-contain p-6" />
+              <div className="rounded-3xl overflow-hidden shadow-2xl border border-border bg-white aspect-square">
+                <img src="https://cdn.poehali.dev/projects/63874bed-e293-4b07-975b-a3b344891b91/bucket/f94cbc7c-9432-44cc-b231-66f8d44ba133.png" alt="Цех рыбопереработки с оборудованием" className="w-full h-full object-cover" />
               </div>
               <div className="absolute -bottom-6 -left-6 w-48 rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-white">
                 <img src={FISH_IMAGES.fishRaw} alt="Свежая рыба для переработки" className="w-full h-32 object-cover" />
