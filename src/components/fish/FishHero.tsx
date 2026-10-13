@@ -11,10 +11,6 @@ export default function FishHero({ visible, onPick, onCatalog }: { visible: bool
         <div className="relative z-10 max-w-7xl mx-auto w-full">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div className={sectionAnim(visible)}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-5">
-                <Icon name="Fish" size={16} />
-                AGK Kronawitter · Suntok · Daribo · Nock
-              </div>
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-black leading-[1.05] tracking-tight mb-4 text-foreground">
                 Оборудование <span className="text-primary">для рыбопереработки</span>
               </h1>

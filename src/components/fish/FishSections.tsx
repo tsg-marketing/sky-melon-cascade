@@ -18,8 +18,8 @@ export function FishDirections({ visible, onSelect }: { visible: boolean; onSele
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {FISH_DIRECTIONS.map((d, i) => (
             <div key={d.cat} className={`bg-white border border-border rounded-2xl shadow-sm hover:shadow-lg hover:border-primary/40 transition-all flex flex-col overflow-hidden ${cardAnim(visible)}`} style={delay(i)}>
-              <div className="aspect-[4/3] bg-white flex items-center justify-center border-b border-border">
-                <img src={d.img} alt={d.title} loading="lazy" className="w-full h-full object-contain p-3" />
+              <div className="h-56 bg-white flex items-center justify-center border-b border-border p-4 overflow-hidden">
+                <img src={d.img} alt={d.title} loading="lazy" className="max-w-full max-h-full object-contain" />
               </div>
               <div className="p-6 flex flex-col flex-1">
                 <h3 className="font-bold text-xl text-foreground mb-2">{d.title}</h3>
