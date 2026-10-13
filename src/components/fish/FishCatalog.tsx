@@ -27,7 +27,7 @@ const chip = (active: boolean) =>
   `px-4 py-2 rounded-full text-sm font-semibold border transition-all ${active ? "bg-primary text-white border-primary" : "bg-white text-foreground border-border hover:border-primary/40"}`;
 
 export default function FishCatalog({ visible, items, loading, sending, category, onCategory, onQuickLead, onCardLead, onDetails, onEmptyLead, onZoom }: Props) {
-  const [sort, setSort] = useState<SortMode>("price-desc");
+  const [sort, setSort] = useState<SortMode>("price-asc");
   const [brand, setBrand] = useState("all");
   const [query, setQuery] = useState("");
   const [slides, setSlides] = useState<Record<string, number>>({});
@@ -151,8 +151,8 @@ export default function FishCatalog({ visible, items, loading, sending, category
                   )}
                 </div>
                 <select aria-label="Сортировка" value={sort} onChange={(e) => setSort(e.target.value as SortMode)} className={selectCls}>
-                  <option value="price-desc">Сначала дороже</option>
                   <option value="price-asc">Сначала дешевле</option>
+                  <option value="price-desc">Сначала дороже</option>
                   <option value="name">По названию</option>
                 </select>
                 <p className="text-sm text-muted-foreground ml-auto">Показано {filtered.length} из {items.length} моделей</p>

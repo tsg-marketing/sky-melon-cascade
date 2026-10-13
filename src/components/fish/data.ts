@@ -11,22 +11,22 @@ export const FISH_IMAGES = {
   injector: IMG("f51/pmjj9dlsw9r4uyxma2kghiuvhb9028yr.png"),
   bone: IMG("09f/g1e1egirzoeplxrdxhbd11dx2nbxu6zc.png"),
   salt: IMG("d88/olsnxh9ucrvc2kjkh2zdal3xlelc19p8.jpg"),
-  cutter: IMG("46d/0pnf9p5b6igc6ctcyktyqawj7jm8on7n.jpg"),
+  cutter: IMG("3aa/bmut3fg701tydb7ri6lbcbjlp7ytkpz6.jpg"),
   fishRaw: "https://cdn.poehali.dev/projects/63874bed-e293-4b07-975b-a3b344891b91/files/cdb1606f-cc01-486f-b0a9-5f6305730f44.jpg",
 };
 
 export const FISH_CATEGORIES = [
   { id: "all", label: "Все", icon: "LayoutGrid" },
-  { id: "281", label: "Филетировочные", icon: "Fish" },
-  { id: "282", label: "Чешуесъёмные", icon: "Sparkles" },
-  { id: "283", label: "Шкуросъёмные", icon: "Layers" },
-  { id: "271", label: "Головоотсекающие", icon: "Scissors" },
+  { id: "281", label: "Филетировочные машины", icon: "Fish" },
+  { id: "282", label: "Чешуесъёмные машины", icon: "Sparkles" },
+  { id: "283", label: "Шкуросъёмные машины", icon: "Layers" },
+  { id: "271", label: "Головоотсекающие машины", icon: "Scissors" },
   { id: "272", label: "Инъекторы для рыбы", icon: "Syringe" },
-  { id: "273", label: "Удаление мелкой кости", icon: "Bone" },
-  { id: "276", label: "Посол рыбы", icon: "Droplets" },
-  { id: "677", label: "Рыбный цех", icon: "Factory" },
-  { id: "278", label: "Рыбный фарш", icon: "Cog" },
-  { id: "270", label: "Нарезка рыбы", icon: "Slice" },
+  { id: "273", label: "Машины для удаления мелкой кости", icon: "Bone" },
+  { id: "276", label: "Оборудование для посола рыбы", icon: "Droplets" },
+  { id: "677", label: "Оборудование для рыбного цеха", icon: "Factory" },
+  { id: "278", label: "Производство рыбного фарша", icon: "Cog" },
+  { id: "270", label: "Слайсеры для нарезки рыбы", icon: "Slice" },
 ] as const;
 
 export const FISH_ALT: Record<string, string> = {
