@@ -18,14 +18,13 @@ interface QuizSideTriggerProps {
   autoOpenScroll?: number;
 }
 
+const SESSION_DELAY_MS = 30000;
+
 export default function QuizSideTrigger({
   children,
-  storageKey = "quiz_auto_opened",
   label = "Подобрать оборудование",
-  autoOpenMs = 30000,
   topic,
   skipIfLeadKey,
-  autoOpenScroll,
 }: QuizSideTriggerProps) {
   const [open, setOpen] = useState(false);
   const [renderKey, setRenderKey] = useState(0);
@@ -36,15 +35,18 @@ export default function QuizSideTrigger({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    let already = false;
+    const SHOWN_KEY = "quiz_popup_shown";
+    const START_KEY = "quiz_session_start";
+    let startedAt = Date.now();
     try {
-      already = sessionStorage.getItem(storageKey) === "1";
+      if (sessionStorage.getItem(SHOWN_KEY) === "1") return;
+      const saved = Number(sessionStorage.getItem(START_KEY));
+      if (saved) startedAt = saved;
+      else sessionStorage.setItem(START_KEY, String(startedAt));
     } catch {
-      already = false;
+      /* noop */
     }
-    if (already) return;
 
-    // Посетитель уже оставил заявку — второй раз квиз не навязываем.
     if (skipIfLeadKey) {
       try {
         if (localStorage.getItem(skipIfLeadKey) === "1") return;
@@ -55,34 +57,17 @@ export default function QuizSideTrigger({
 
     const show = () => {
       try {
-        sessionStorage.setItem(storageKey, "1");
+        if (sessionStorage.getItem(SHOWN_KEY) === "1") return;
+        sessionStorage.setItem(SHOWN_KEY, "1");
       } catch {
         /* noop */
       }
       setOpen(true);
     };
 
-    const t = setTimeout(show, autoOpenMs);
-
-    let onScroll: (() => void) | undefined;
-    if (autoOpenScroll) {
-      onScroll = () => {
-        const height = document.documentElement.scrollHeight - window.innerHeight;
-        if (height <= 0) return;
-        if (window.scrollY / height >= autoOpenScroll) {
-          window.removeEventListener("scroll", onScroll!);
-          clearTimeout(t);
-          show();
-        }
-      };
-      window.addEventListener("scroll", onScroll, { passive: true });
-    }
-
-    return () => {
-      clearTimeout(t);
-      if (onScroll) window.removeEventListener("scroll", onScroll);
-    };
-  }, [storageKey, autoOpenMs, skipIfLeadKey, autoOpenScroll]);
+    const t = setTimeout(show, Math.max(0, SESSION_DELAY_MS - (Date.now() - startedAt)));
+    return () => clearTimeout(t);
+  }, [skipIfLeadKey]);
 
   return (
     <>

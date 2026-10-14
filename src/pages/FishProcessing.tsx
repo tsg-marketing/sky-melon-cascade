@@ -35,7 +35,7 @@ export default function FishProcessing() {
 
   useEffect(() => {
     fetchCatalog("fish")
-      .then((d) => setItems(d.fish || []))
+      .then((d) => setItems((d.fish || []).filter((i) => !/ebro|эбро/i.test(i.name || ""))))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
   }, []);
